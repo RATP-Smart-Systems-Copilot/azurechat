@@ -22,3 +22,6 @@ jobs:
         uses: azure/CLI@v1
         with:
           inlineScript: az config set bicep.use_binary_from_path=false && az bicep build -f infra/main.bicep --stdout
+
+
+
