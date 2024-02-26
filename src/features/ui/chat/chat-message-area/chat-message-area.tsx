@@ -68,13 +68,13 @@ export const ChatMessageArea = (props: {
   }
 
   return (
-    <div className="flex flex-col">
+    <div className="flex flex-col max-w-[690px] border rounded-lg overflow-hidden p-4 gap-8">
       <div className="h-7 flex items-center justify-between">
         <div className="flex gap-3">
           {profile}
           <div
             className={cn(
-              "text-primary capitalize items-center flex",
+              "text-corporateblue font-bold capitalize items-center flex",
               props.role === "function" || props.role === "tool"
                 ? "text-muted-foreground text-sm"
                 : ""
@@ -101,10 +101,13 @@ export const ChatMessageArea = (props: {
           </div>
         </div>
       </div>
-      <div className="flex flex-col gap-2 flex-1 px-10">
-        <div className="prose prose-slate dark:prose-invert whitespace-break-spaces prose-p:leading-relaxed prose-pre:p-0 max-w-none">
-          {props.children}
-        </div>
+      <div className={cn(
+            "-m-4 p-4 prose-slate dark:prose-invert break-words prose-p:leading-relaxed prose-pre:p-0 max-w-non",
+            props.role === "user"
+              ? "bg-ring text-white"
+              : "bg-greybackground"
+          )}>
+        {props.children}
       </div>
     </div>
   );

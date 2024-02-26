@@ -26,10 +26,10 @@ export const LogIn: FC<LoginProps> = (props) => {
           <Avatar className="h-8 w-8">
             <AvatarImage src={"ai-icon.png"} />
           </Avatar>
-          <span className="text-primary">{AI_NAME}</span>
+          <span className="text-corporateblue">{AI_NAME}</span>
         </CardTitle>
         <CardDescription>
-          Login in with your GitHub or Microsoft 365 account
+          Authentifiez vous avec votre compte Microsoft 365
         </CardDescription>
       </CardHeader>
       <CardContent className="grid gap-4">
