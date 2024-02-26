@@ -38,7 +38,7 @@ export const CodeBlock: FC<Props> = memo(({ language, children }) => {
   }, [isIconChecked]);
 
   return (
-    <div className="flex flex-col -mx-9">
+    <div className="flex flex-col">
       <div className="flex items-center justify-end">
         <Button
           variant={"ghost"}

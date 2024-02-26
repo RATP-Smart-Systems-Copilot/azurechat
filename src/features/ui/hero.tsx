@@ -11,10 +11,10 @@ export const Hero: FC<HeroProps> = (props) => {
     <div className="border-b w-full py-16">
       <div className="container max-w-4xl h-full flex flex-col gap-16">
         <div className="flex gap-6 flex-col items-start">
-          <h1 className="text-4xl font-bold flex gap-2 items-center">
+          <h1 className="text-corporateblue text-4xl font-bold flex gap-2 items-center">
             {props.title}
           </h1>
-          <p className="text-muted-foreground max-w-xl">{props.description}</p>
+          <p className="text-muted-foreground max-w-4xl">{props.description}</p>
         </div>
         <div className="grid grid-cols-3 gap-2">{props.children}</div>
       </div>
@@ -36,7 +36,7 @@ export const HeroButton: FC<HeroButtonProps> = (props) => {
       className="flex flex-col gap-4 h-auto p-4 items-start text-start justify-start"
       onClick={props.onClick}
     >
-      <span className="flex gap-2 items-center text-primary">
+      <span className="flex gap-2 items-center text-corporateblue">
         <span>{props.icon}</span>
         <span className="">{props.title}</span>
       </span>

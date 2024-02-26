@@ -22,9 +22,9 @@ export const ChatHome: FC<ChatPersonaProps> = (props) => {
           title={
             <>
               <Image
-                src={"/ai-icon.png"}
-                width={60}
-                height={60}
+                src={"/ratp-hd.png"}
+                width={300}
+                height={100}
                 quality={100}
                 alt="ai-icon"
               />{" "}
@@ -35,7 +35,7 @@ export const ChatHome: FC<ChatPersonaProps> = (props) => {
         ></Hero>
         <div className="container max-w-4xl flex gap-20 flex-col">
           <div>
-            <h2 className="text-2xl font-bold mb-3">Extensions</h2>
+            <h2 className="text-corporateblue text-2xl font-bold mb-3">Extensions</h2>
 
             {props.extensions && props.extensions.length > 0 ? (
               <div className="grid grid-cols-3 gap-3">
@@ -55,7 +55,7 @@ export const ChatHome: FC<ChatPersonaProps> = (props) => {
 
           </div>
           <div>
-            <h2 className="text-2xl font-bold mb-3">Personas</h2>
+            <h2 className="text-corporateblue text-2xl font-bold mb-3">Personas</h2>
 
             {props.personas && props.personas.length > 0 ? (
               <div className="grid grid-cols-3 gap-3">
