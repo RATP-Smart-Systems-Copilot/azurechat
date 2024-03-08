@@ -24,7 +24,7 @@ export const LogIn: FC<LoginProps> = (props) => {
           <Avatar className="h-8 w-8">
             <AvatarImage src={"ai-icon.png"} />
           </Avatar>
-          <span className="text-primary">{AI_NAME}</span>
+          <span className="text-corporateblue">{AI_NAME}</span>
         </CardTitle>
         <CardDescription>
           Authentifiez vous avec votre compte Microsoft 365

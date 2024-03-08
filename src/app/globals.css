@@ -2,6 +2,42 @@
 @tailwind components;
 @tailwind utilities;
 
+@font-face {
+  font-family: "Parisine";
+  src: url("../public/fonts/parisineTTRegular.ttf");
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "Parisinebold";
+  src: url("../public/fonts/parisineTTBold.ttf");
+  font-weight: bold;
+}
+
+@font-face {
+  font-family: "Parisineitalic";
+  src: url("../public/fonts/parisineTTItalic.ttf");
+  font-style: italic;
+}
+
+@font-face {
+  font-family: "Montserrat";
+  src: url("../public/fonts/Montserrat-Regular.ttf");
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "Montserratbold";
+  src: url("../public/fonts/Montserrat-Bold.ttf");
+  font-weight: bold;
+}
+
+@font-face {
+  font-family: "Montserratitalic";
+  src: url("../public/fonts/Montserrat-Italic.ttf");
+  font-style: italic;
+}
+
 @layer base {
   :root {
     --background: 0 0% 93%;
@@ -29,13 +65,13 @@
   }
 
   .dark {
-    --background: 240 10% 3.9%;
+    --background: 0 0% 12%;
     --foreground: 0 0% 98%;
     --card: 240 10% 3.9%;
     --card-foreground: 0 0% 98%;
     --popover: 240 10% 3.9%;
     --popover-foreground: 0 0% 98%;
-    --primary: 240 10% 3.9%;
+    --primary: 176 47% 20%;
     --primary-foreground: 240 5.9% 10%;
     --corporateblue: 0 0% 99%;
     --secondary: 23 90% 56%;
@@ -56,8 +92,12 @@
 @layer base {
   * {
     @apply border-border;
+    font-family: "Parisine";
   }
   body {
     @apply bg-background text-foreground;
+  }
+  h1, h2, h3, h4, h5, h6{
+    font-family: "Montserrat";
   }
 }
