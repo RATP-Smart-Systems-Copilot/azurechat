@@ -12,6 +12,10 @@ module.exports = {
       center: true,
       screens: {},
     },
+    fontFamily: {
+      parisine: ["Parisine", "sans-serif"],
+      montserrat: ["Montserrat", "sans-serif"],
+    },
     extend: {
       colors: {
         border: "hsl(var(--border))",
