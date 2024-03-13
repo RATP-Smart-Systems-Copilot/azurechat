@@ -18,6 +18,7 @@ import { HistoryContainer } from "../../common/services/cosmos";
 import { DeleteDocuments } from "./azure-ai-search/azure-ai-search";
 import { FindAllChatDocuments } from "./chat-document-service";
 import { FindAllChatMessagesForCurrentUser } from "./chat-message-service";
+import { PERSONA_TEMPERATURE } from "@/features/persona-page/persona-services/models";
 import {
   CHAT_THREAD_ATTRIBUTE,
   ChatDocumentModel,
@@ -288,6 +289,7 @@ export const CreateChatThread = async (): Promise<
       type: CHAT_THREAD_ATTRIBUTE,
       personaMessage: "",
       personaMessageTitle: CHAT_DEFAULT_PERSONA,
+      personaTemperature: PERSONA_TEMPERATURE,
       extension: [],
     };
 
