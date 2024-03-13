@@ -66,6 +66,7 @@ ${userMessage}
   const stream: ChatCompletionStreamParams = {
     model: "",
     stream: true,
+    temperature: chatThread.personaTemperature,
     messages: [
       {
         role: "system",

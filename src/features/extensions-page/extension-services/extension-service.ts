@@ -11,6 +11,7 @@ import {
   CHAT_THREAD_ATTRIBUTE,
   ChatThreadModel,
 } from "@/features/chat-page/chat-services/models";
+import { PERSONA_TEMPERATURE } from "@/features/persona-page/persona-services/models";
 import {
   ServerActionResponse,
   zodErrorsToServerActionErrors,
@@ -398,6 +399,7 @@ export const CreateChatWithExtension = async (
       type: CHAT_THREAD_ATTRIBUTE,
       personaMessage: "",
       personaMessageTitle: CHAT_DEFAULT_PERSONA,
+      personaTemperature: PERSONA_TEMPERATURE,
       extension: [extension.id],
     });
 

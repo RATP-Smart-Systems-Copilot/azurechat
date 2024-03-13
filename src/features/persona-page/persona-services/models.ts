@@ -2,6 +2,7 @@ import { refineFromEmpty } from "@/features/common/schema-validation";
 import { z } from "zod";
 
 export const PERSONA_ATTRIBUTE = "PERSONA";
+export const PERSONA_TEMPERATURE = 0.1;
 export type PersonaModel = z.infer<typeof PersonaModelSchema>;
 
 export const PersonaModelSchema = z.object({
@@ -25,6 +26,8 @@ export const PersonaModelSchema = z.object({
     })
     .min(1)
     .refine(refineFromEmpty, "System message cannot be empty"),
+  temperature: z.number({invalid_type_error: "Temperature must be a number",})
+    .refine((value) => value >= 0 && value <= 2, "Temperature must be between 0 and 2"),
   isPublished: z.boolean(),
   type: z.literal(PERSONA_ATTRIBUTE),
   createdAt: z.date(),
