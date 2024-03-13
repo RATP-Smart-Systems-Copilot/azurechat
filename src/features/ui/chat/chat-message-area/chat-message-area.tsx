@@ -103,9 +103,9 @@ export const ChatMessageArea = (props: {
       </div>
       <div className={cn(
             "-m-4 p-4 prose-slate dark:prose-invert break-words prose-p:leading-relaxed prose-pre:p-0 max-w-non",
-            props.role === "assistant"
-              ? "bg-greybackground"
-              : "bg-ring text-white"
+            props.role === "user"
+              ? "bg-ring text-white"
+              : "bg-greybackground"
           )}>
         {props.children}
       </div>
