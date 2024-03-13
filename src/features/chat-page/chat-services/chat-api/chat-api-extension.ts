@@ -34,6 +34,7 @@ export const ChatApiExtensions = async (props: {
         },
       ],
       tools: extensions,
+      temperature: chatThread.personaTemperature,
     },
     { signal: signal }
   );

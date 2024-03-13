@@ -2,6 +2,7 @@
 import { Hero, HeroButton } from "@/features/ui/hero";
 import { Atom, Languages, VenetianMask } from "lucide-react";
 import { personaStore } from "../persona-store";
+import { PERSONA_TEMPERATURE } from "../persona-services/models"
 
 export const PersonaHero = () => {
   return (
@@ -30,6 +31,7 @@ Expertise:
 Example:
 [Describe an example of the personality e.g. a Marketing copywriter who can write catchy headlines.]`,
             description: "",
+            temperature: PERSONA_TEMPERATURE,
           })
         }
       />
@@ -43,6 +45,7 @@ Example:
             personaMessage:
               "You are an expert in translating English to French. You will be provided with a sentence in English, and your task is to translate it into French.",
             description: "English to French translator.",
+            temperature: 0.3,
           })
         }
       />
@@ -79,6 +82,7 @@ export { Input };
 
               `,
             description: "Customer service persona.",
+            temperature: 1,
           })
         }
       />
