@@ -5,3 +5,20 @@ export const CHAT_DEFAULT_PERSONA = AI_NAME + " default";
 export const CHAT_DEFAULT_SYSTEM_PROMPT = `You are a helpful AI Assistant. You will provide clear and concise queries. You will answer questions truthfully and accurately. You must always return in markdown format with the best format: table, list, paragraph...`;
 
 export const NEW_CHAT_NAME = "New chat";
+
+export type ModelOptions = 'gpt-3.5-turbo-16k';
+
+export const modelOptions: ModelOptions[] = [
+    'gpt-3.5-turbo-16k',
+  ];
+
+  export const modelMaxToken = {
+    'gpt-3.5-turbo-16k': 16384,
+  };
+
+  export const modelCost = {
+    'gpt-3.5-turbo-16k': {
+      prompt: { price: 0.0005, unit: 1000 },
+      completion: { price: 0.0014, unit: 1000 },
+    },
+  };
