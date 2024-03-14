@@ -1,6 +1,6 @@
 import { proxy, useSnapshot } from "valtio";
 import { RevalidateCache } from "../common/navigation-helpers";
-import { PERSONA_ATTRIBUTE, PersonaModel } from "./persona-services/models";
+import { PERSONA_ATTRIBUTE, PERSONA_TEMPERATURE, PersonaModel } from "./persona-services/models";
 import {
   CreatePersona,
   UpsertPersona,
@@ -12,6 +12,7 @@ class PersonaState {
     name: "",
     description: "",
     personaMessage: "",
+    temperature: PERSONA_TEMPERATURE,
     createdAt: new Date(),
     isPublished: false,
     type: "PERSONA",
@@ -44,12 +45,14 @@ class PersonaState {
     name: string;
     description: string;
     personaMessage: string;
+    temperature: number;
   }) {
     this.persona = {
       ...this.defaultModel,
       name: persona.name,
       description: persona.description,
       personaMessage: persona.personaMessage,
+      temperature: persona.temperature,
     };
     this.isOpened = true;
   }
@@ -91,6 +94,7 @@ export const FormDataToPersonaModel = (formData: FormData): PersonaModel => {
     name: formData.get("name") as string,
     description: formData.get("description") as string,
     personaMessage: formData.get("personaMessage") as string,
+    temperature: parseFloat(formData.get("temperature") as string),
     isPublished: formData.get("isPublished") === "on" ? true : false,
     userId: "", // the user id is set on the server once the user is authenticated
     createdAt: new Date(),

@@ -99,6 +99,19 @@ export const AddNewPersona: FC<Props> = (props) => {
                   placeholder="Short description"
                 />
               </div>
+              <div className="grid gap-2">
+                <Label htmlFor="temperature">Niveau de créativité</Label>
+                <Input
+                  type="number"
+                  required
+                  defaultValue={persona.temperature}
+                  name="temperature"
+                  min={0}
+                  max={2.0}
+                  step={0.1}
+                  placeholder="Température compris entre 0 et 2.0"
+                />
+              </div>
               <div className="grid gap-2 flex-1 ">
                 <Label htmlFor="personaMessage">Personality</Label>
                 <Textarea
