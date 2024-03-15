@@ -8,7 +8,7 @@ import { ChatMessageModel } from "./models";
 export const mapOpenAIChatMessages = (
   messages: ChatMessageModel[]
 ): ChatCompletionMessageParam[] => {
-  return messages.filter(({ role }) => role !== "function").map((message) => {
+  return messages.map((message) => {
     switch (message.role) {
       case "function":
         return {

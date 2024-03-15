@@ -14,7 +14,7 @@ export const getChatGPTEncoding = (
   const roleSep = '<|im_sep|>';
 
   const serialized = [
-    messages.filter(({ role }) => role !== "function")
+    messages
       .map(({ role, content }) => {
         return `<|im_start|>${role}${roleSep}${content}<|im_end|>`;
       })

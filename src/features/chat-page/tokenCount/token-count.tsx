@@ -11,16 +11,16 @@ interface TokenCountProps {
 const TokenCount: React.FC<TokenCountProps> = ({ messages, model }) => {
     const [tokenCount, setTokenCount] = useState<number>(0);
 
-    useEffect(() => {
-        setTokenCount(countTokens(messages, model));
-    }, [messages, model]);
-
     const cost = useMemo(() => {
       const price =
         modelCost[model].prompt.price *
         (tokenCount / modelCost[model].prompt.unit);
       return price.toPrecision(3);
     }, [model, tokenCount]);
+
+    useEffect(() => {
+        setTokenCount(countTokens(messages, model));
+    }, [messages, model]);
 
     return (
       <div>
