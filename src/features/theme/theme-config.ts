@@ -8,3 +8,20 @@ You have access to the following functions:
 1. create_img: You must only use the function create_img if the user asks you to create an image.`;
 
 export const NEW_CHAT_NAME = "New chat";
+
+export type ModelOptions = 'gpt-3.5-turbo-16k';
+
+export const modelOptions: ModelOptions[] = [
+    'gpt-3.5-turbo-16k',
+  ];
+
+  export const modelMaxToken = {
+    'gpt-3.5-turbo-16k': 16384,
+  };
+
+  export const modelCost = {
+    'gpt-3.5-turbo-16k': {
+      prompt: { price: 0.0005, unit: 1000 },
+      completion: { price: 0.0014, unit: 1000 },
+    },
+  };
