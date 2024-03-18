@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { ChatMessageModel } from "../chat-services/models";
-import { modelCost, ModelOptions } from '../../theme/theme-config';
-import countTokens from './utils';
+import { ModelOptions } from '../../theme/theme-config';
+import { getTotalTokenUsed, getTokenCostToCost } from './utils';
 
 interface TokenCountProps {
     messages: ChatMessageModel[];
@@ -9,25 +9,23 @@ interface TokenCountProps {
 }
 
 const TokenCount: React.FC<TokenCountProps> = ({ messages, model }) => {
-    const [tokenCount, setTokenCount] = useState<number>(0);
-
-    const cost = useMemo(() => {
-      const price =
-        modelCost[model].prompt.price *
-        (tokenCount / modelCost[model].prompt.unit);
-      return price.toPrecision(3);
-    }, [model, tokenCount]);
-
+    // Utilise le hook useEffect pour mettre à jour l'état tokenCount une seule fois
     useEffect(() => {
-        setTokenCount(countTokens(messages, model));
-    }, [messages, model]);
+        const tokens = getTotalTokenUsed(model, messages);
+        const cost = getTokenCostToCost(tokens.prompt, tokens.completion, model);
+        setTokenCount(tokens.prompt + tokens.completion);
+        setCost(cost);
+    }, [messages, model]); // Déclenche la mise à jour lorsque les messages ou le modèle changent
+
+    const [tokenCount, setTokenCount] = useState<number>(0);
+    const [cost, setCost] = useState<number>(0);
 
     return (
-      <div>
-        <div className='text-xs italic text-corporateblue'>
-          Estimation des Tokens : {tokenCount} ({cost} €)
+        <div>
+            <div className='text-xs italic text-corporateblue'>
+                Estimation des Tokens : {tokenCount} ({cost} €)
+            </div>
         </div>
-      </div>
     );
 };
 

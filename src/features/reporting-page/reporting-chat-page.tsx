@@ -15,6 +15,10 @@ interface ReportingChatPageProps {
 }
 
 export default function ReportingChatPage(props: ReportingChatPageProps) {
+  const handleDeleteMessage = () => {
+    window.alert("Impossible de supprimer un message en admin");
+  };
+
   return (
     <main className="flex flex-1 relative flex-col">
       <ChatMessageContainer>
@@ -31,6 +35,7 @@ export default function ReportingChatPage(props: ReportingChatPageProps) {
                 profilePicture={
                   message.role === "assistant" ? "/ai-icon.png" : undefined
                 }
+                onDelete={() => handleDeleteMessage()}
               >
                 <MessageContent message={message} />
               </ChatMessageArea>
