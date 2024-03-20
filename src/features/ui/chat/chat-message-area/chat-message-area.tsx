@@ -5,6 +5,7 @@ import {
   ClipboardIcon,
   PocketKnife,
   UserCircle,
+  Trash2,
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Avatar, AvatarImage } from "../../avatar";
@@ -16,8 +17,16 @@ export const ChatMessageArea = (props: {
   profileName?: string;
   role: "function" | "user" | "assistant" | "system" | "tool";
   onCopy: () => void;
+  onDelete: () => void;
 }) => {
   const [isIconChecked, setIsIconChecked] = useState(false);
+  const [isIconDeleteChecked, setIsIconDeleteChecked] = useState(false);
+
+
+  const handleButtonDeleteClick = () => {
+    props.onDelete();
+    setIsIconDeleteChecked(true);
+  };
 
   const handleButtonClick = () => {
     props.onCopy();
@@ -27,6 +36,7 @@ export const ChatMessageArea = (props: {
   useEffect(() => {
     const timeout = setTimeout(() => {
       setIsIconChecked(false);
+      setIsIconDeleteChecked(false);
     }, 2000);
 
     return () => clearTimeout(timeout);
@@ -96,6 +106,21 @@ export const ChatMessageArea = (props: {
                 <CheckIcon size={16} />
               ) : (
                 <ClipboardIcon size={16} />
+              )}
+            </Button>
+          </div>
+          <div>
+            <Button
+              variant={"ghost"}
+              size={"sm"}
+              title="Delete message"
+              className="justify-right flex"
+              onClick={handleButtonDeleteClick}
+            >
+              {isIconDeleteChecked ? (
+                <CheckIcon size={16} />
+              ) : (
+                <Trash2 size={16} />
               )}
             </Button>
           </div>
