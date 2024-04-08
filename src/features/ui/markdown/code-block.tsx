@@ -3,6 +3,7 @@ import { FC, memo, useEffect, useState } from "react";
 import { Prism } from "react-syntax-highlighter";
 import { atomDark } from "react-syntax-highlighter/dist/esm/styles/prism";
 import { Button } from "../button";
+import { RenderCodeMermaid } from "./mermaid";
 
 export const fence = {
   render: "CodeBlock",
@@ -55,10 +56,13 @@ export const CodeBlock: FC<Props> = memo(({ language, children }) => {
           )}
         </Button>
       </div>
-
-      <Prism language={language} style={atomDark} PreTag="pre" showLineNumbers>
-        {children}
-      </Prism>
+      {language === 'mermaid' ?
+      (<RenderCodeMermaid mermaidCode={children} />)
+      :
+      (<Prism language={language} style={atomDark} PreTag="pre" showLineNumbers>
+      {children}
+    </Prism>)
+      }
     </div>
   );
 });
