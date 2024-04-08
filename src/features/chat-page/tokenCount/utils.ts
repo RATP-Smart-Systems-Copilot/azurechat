@@ -1,9 +1,7 @@
 import { ModelOptions } from '../../theme/theme-config';
 import { ChatMessageModel } from "../chat-services/models";
-import { Tiktoken } from 'js-tiktoken/lite';
 import { modelCost } from '../../theme/theme-config';
 import { getEncoding } from 'js-tiktoken';
-import { useState } from "react";
 const encoder = getEncoding('cl100k_base');
 
 // https://github.com/dqbd/tiktoken/issues/23#issuecomment-1483317174

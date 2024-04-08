@@ -2,7 +2,6 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { ChatMessageModel } from "../chat-services/models";
 import { ModelOptions } from '../../theme/theme-config';
 import { getTotalTokenUsed, getTokenCostToCost } from './utils';
-import { speechToTextStore } from '../chat-input/speech/use-speech-to-text';
 
 interface TokenCountProps {
     messages: ChatMessageModel[];
