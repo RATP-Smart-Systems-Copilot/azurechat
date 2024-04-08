@@ -1,7 +1,9 @@
 import { ModelOptions } from '../../theme/theme-config';
 import { ChatMessageModel } from "../chat-services/models";
 import { Tiktoken } from 'js-tiktoken/lite';
+import { modelCost } from '../../theme/theme-config';
 import { getEncoding } from 'js-tiktoken';
+import { useState } from "react";
 const encoder = getEncoding('cl100k_base');
 
 // https://github.com/dqbd/tiktoken/issues/23#issuecomment-1483317174
@@ -30,48 +32,29 @@ const countTokens = (messages: ChatMessageModel[], model: ModelOptions) => {
   return getChatGPTEncoding(messages, model).length;
 };
 
-export const limitMessageTokens = (
+export const getTotalTokenUsed = (
+  model: ModelOptions,
   messages: ChatMessageModel[],
-  limit: number = 4096,
+) => {
+  const newPromptTokens = countTokens(messages.slice(0, -1), model);
+  const completionMessages = messages.filter(
+    (chatMessage) => chatMessage.role === "assistant" || chatMessage.role === "system" || chatMessage.role === "tool"
+  );
+  const newCompletionTokens = countTokens(completionMessages, model);
+
+  return {completion : newCompletionTokens, prompt: newPromptTokens};
+};
+
+export const getTokenCostToCost = (
+  promptTokens: number,
+  completionTokens: number,
   model: ModelOptions
-): ChatMessageModel[] => {
-  const limitedMessages: ChatMessageModel[] = [];
-  let tokenCount = 0;
-
-  const isSystemFirstMessage = messages[0]?.role === 'system';
-  let retainSystemMessage = false;
-
-  // Check if the first message is a system message and if it fits within the token limit
-  if (isSystemFirstMessage) {
-    const systemTokenCount = countTokens([messages[0]], model);
-    if (systemTokenCount < limit) {
-      tokenCount += systemTokenCount;
-      retainSystemMessage = true;
-    }
-  }
-
-  // Iterate through messages in reverse order, adding them to the limitedMessages array
-  // until the token limit is reached (excludes first message)
-  for (let i = messages.length - 1; i >= 1; i--) {
-    const count = countTokens([messages[i]], model);
-    if (count + tokenCount > limit) break;
-    tokenCount += count;
-    limitedMessages.unshift({ ...messages[i] });
-  }
-
-  // Process first message
-  if (retainSystemMessage) {
-    // Insert the system message in the third position from the end
-    limitedMessages.splice(-3, 0, { ...messages[0] });
-  } else if (!isSystemFirstMessage) {
-    // Check if the first message (non-system) can fit within the limit
-    const firstMessageTokenCount = countTokens([messages[0]], model);
-    if (firstMessageTokenCount + tokenCount < limit) {
-      limitedMessages.unshift({ ...messages[0] });
-    }
-  }
-
-  return limitedMessages;
+) => {
+  const { prompt, completion } = modelCost[model as keyof typeof modelCost];
+  const completionCost =
+    (completion.price / completion.unit) * completionTokens;
+  const promptCost = (prompt.price / prompt.unit) * promptTokens;
+  return completionCost + promptCost;
 };
 
 export default countTokens;
