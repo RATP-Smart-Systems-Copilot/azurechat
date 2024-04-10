@@ -73,25 +73,26 @@ function initializeMermaid(mermaidAPI: MermaidAPI): MermaidAPI {
     securityLevel: 'loose',
     theme: 'base',
     themeVariables: {
-        'primaryColor': "#5ac4bd",
+        'primaryColor': '#0b0080',
         'primaryTextColor': '#fff',
         'primaryBorderColor': '#5ac4bd',
-        'lineColor': '#d75b19',
-        'secondaryColor': '#0b0080',
-        'tertiaryColor': '#a3d8d4'
+        'lineColor': "#fff",
+        'textColor': "#fff",
+        'secondaryColor': "#5ac4bd",
+        'tertiaryColor': '#a3d8d4',
     },
 
     // per-chart configuration
-    mindmap: { useMaxWidth: true },
-    flowchart: { useMaxWidth: true },
-    sequence: { useMaxWidth: true },
-    timeline: { useMaxWidth: true },
-    class: { useMaxWidth: true },
-    state: { useMaxWidth: true },
-    pie: { useMaxWidth: true },
-    er: { useMaxWidth: true },
-    gantt: { useMaxWidth: true },
-    gitGraph: { useMaxWidth: true },
+    mindmap: { useMaxWidth: false },
+    flowchart: { useMaxWidth: false },
+    sequence: { useMaxWidth: false },
+    timeline: { useMaxWidth: false },
+    class: { useMaxWidth: false },
+    state: { useMaxWidth: false },
+    pie: { useMaxWidth: false },
+    er: { useMaxWidth: false },
+    gantt: { useMaxWidth: false },
+    gitGraph: { useMaxWidth: false },
   });
   return mermaidAPI;
 }
@@ -147,14 +148,13 @@ export function RenderCodeMermaid(props: { mermaidCode: string }) {
     };
   }, [mermaidAPI, props.mermaidCode]);
 
-
   // render errors when loading Mermaid. for syntax errors, the Error SVG will be rendered in-place
   if (mermaidError)
     return <div>Error: {mermaidError}</div>;
 
   return (
     <pre>
-        <div
+        <div className="overflow-auto bg-blue-900"
         ref={mermaidContainerRef}
         dangerouslySetInnerHTML={{ __html: svgCode || 'Loading Diagram...' }}
         />
