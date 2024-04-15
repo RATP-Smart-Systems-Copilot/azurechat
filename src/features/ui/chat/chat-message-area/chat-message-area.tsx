@@ -78,7 +78,7 @@ export const ChatMessageArea = (props: {
   }
 
   return (
-    <div className="flex flex-col max-w-[690px] border rounded-lg overflow-hidden p-4 gap-8">
+    <div className="flex flex-col max-w-[900px] border rounded-lg overflow-hidden p-4 gap-8">
       <div className="h-7 flex items-center justify-between">
         <div className="flex gap-3">
           {profile}
