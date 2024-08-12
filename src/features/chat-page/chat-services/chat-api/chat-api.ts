@@ -18,7 +18,8 @@ import { GetDynamicExtensions } from "./chat-api-dynamic-extensions";
 import { ChatApiExtensions } from "./chat-api-extension";
 import { ChatApiMultimodal } from "./chat-api-multimodal";
 import { OpenAIStream } from "./open-ai-stream";
-type ChatTypes = "extensions" | "chat-with-file" | "multimodal";
+import { ChatApiAssistant } from "@/features/assistant-page/assistant-services/chat-api-assistant";
+type ChatTypes = "extensions" | "chat-with-file" | "multimodal" | "assistant";
 
 export const ChatAPIEntry = async (props: UserPrompt, signal: AbortSignal) => {
   const currentChatThreadResponse = await EnsureChatThreadOperation(props.id);
@@ -46,7 +47,10 @@ export const ChatAPIEntry = async (props: UserPrompt, signal: AbortSignal) => {
 
   let chatType: ChatTypes = "extensions";
 
-  if (props.multimodalImage && props.multimodalImage.length > 0) {
+  if(currentChatThread.threadAssistantID !== null){
+    chatType = "assistant";
+  }
+  else if (props.multimodalImage && props.multimodalImage.length > 0) {
     chatType = "multimodal";
   } else if (docs.length > 0) {
     chatType = "chat-with-file";
@@ -84,6 +88,14 @@ export const ChatAPIEntry = async (props: UserPrompt, signal: AbortSignal) => {
       break;
     case "extensions":
       runner = await ChatApiExtensions({
+        chatThread: currentChatThread,
+        userMessage: props.message,
+        history: history,
+        extensions: extension,
+        signal: signal,
+      });
+    case "assistant":
+      messages = await ChatApiAssistant({
         chatThread: currentChatThread,
         userMessage: props.message,
         history: history,

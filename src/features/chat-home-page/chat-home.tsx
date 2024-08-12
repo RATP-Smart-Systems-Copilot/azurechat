@@ -17,11 +17,14 @@ import { MessageCircle } from "lucide-react";
 import { useState } from "react";
 import { Button } from "../ui/button";
 import { CreatNewChatGPT } from "../chat-page/chat-services/chat-thread-service";
+import { AssistantModel } from "../assistant-page/assistant-services/models";
+import { AssistantCard } from "../assistant-page/assistant-card/assistant-card";
 
 interface ChatPersonaProps {
   personas: PersonaModel[];
   extensions: ExtensionModel[];
   gpts: GPTS;
+  assistants: AssistantModel[];
 }
 
 interface Props {
@@ -79,6 +82,46 @@ export const ChatHome: FC<ChatPersonaProps> = (props) => {
               <ChatCard model={props.gpts['gpt4o'].model} name={props.gpts['gpt4o'].name} index={0} description={props.gpts['gpt4o'].description} />
             </div>
           </div>
+        <div>
+            <h2 className="text-corporateblue text-2xl font-bold mb-3">Assistants</h2>
+
+            {props.assistants && props.assistants.length > 0 ? (
+              <div className="grid grid-cols-3 gap-3">
+                {props.assistants.map((assistant) => {
+                  return (
+                    <AssistantCard
+                      assistant={assistant}
+                      key={assistant.id}
+                      showContextMenu={false}
+                    />
+                  );
+                })}
+              </div>
+            ) :
+              <p className="text-muted-foreground max-w-xl">No extentions created</p>
+            }
+
+          </div>
+          {/* <div>
+            <h2 className="text-corporateblue text-2xl font-bold mb-3">Extensions</h2>
+
+            {props.extensions && props.extensions.length > 0 ? (
+              <div className="grid grid-cols-3 gap-3">
+                {props.extensions.map((extension) => {
+                  return (
+                    <ExtensionCard
+                      extension={extension}
+                      key={extension.id}
+                      showContextMenu={false}
+                    />
+                  );
+                })}
+              </div>
+            ) :
+              <p className="text-muted-foreground max-w-xl">No extentions created</p>
+            }
+
+          </div> */}
           <div>
             <h2 className="text-corporateblue text-2xl font-bold mb-3">Personas</h2>
 
