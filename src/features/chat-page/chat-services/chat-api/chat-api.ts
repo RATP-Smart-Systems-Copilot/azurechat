@@ -17,7 +17,7 @@ import { GetDefaultExtensions } from "./chat-api-default-extensions";
 import { GetDynamicExtensions } from "./chat-api-dynamic-extensions";
 import { ChatApiExtensions } from "./chat-api-extension";
 import { ChatApiMultimodal } from "./chat-api-multimodal";
-import { OpenAIStream } from "./open-ai-stream";
+import { OpenAIStream, OpenAIStreamAssistant } from "./open-ai-stream";
 import { ChatApiAssistant } from "@/features/assistant-page/assistant-services/chat-api-assistant";
 type ChatTypes = "extensions" | "chat-with-file" | "multimodal" | "assistant";
 
@@ -95,13 +95,26 @@ export const ChatAPIEntry = async (props: UserPrompt, signal: AbortSignal) => {
         signal: signal,
       });
     case "assistant":
-      messages = await ChatApiAssistant({
+      const stream = await ChatApiAssistant({
         chatThread: currentChatThread,
         userMessage: props.message,
         history: history,
         extensions: extension,
         signal: signal,
       });
+
+      const readableStream = OpenAIStreamAssistant({
+        runner: stream,
+        chatThread: currentChatThread,
+      });
+
+      return new Response(readableStream, {
+        headers: {
+          "Cache-Control": "no-cache",
+          Connection: "keep-alive",
+        },
+      });
+
       break;
   }
 

@@ -53,6 +53,25 @@ export const AddNewPersona: FC<Props> = (props) => {
     }
   };
 
+  const UpdateToAssistant = () => {
+    if (data === undefined || data === null) return null;
+
+    if (data?.user?.isAdmin) {
+      return (
+        <div className="grid gap-2">
+          <Label>ID Assistant</Label>
+          <Input
+            type="text"
+            required
+            name="assistantID"
+            defaultValue={persona.assistantID}
+            placeholder="ID Assistant OPEN AI Azure"
+          />
+        </div>
+      );
+    }
+  };
+
   return (
     <Sheet
       open={isOpened}
@@ -141,6 +160,7 @@ export const AddNewPersona: FC<Props> = (props) => {
                 </SelectContent>
               </Select>
               </div>
+              <UpdateToAssistant />
             </div>
           </ScrollArea>
           <SheetFooter className="py-2 flex sm:justify-between flex-row">

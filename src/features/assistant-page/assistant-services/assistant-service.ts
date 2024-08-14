@@ -90,6 +90,7 @@ export const CreateAssistantChat = async (
       personaMessageTitle: "",
       personaTemperature: 1,
       extension: [],
+      assistantID: assistantId,
       threadAssistantID: emptyThread.id,
     });
 

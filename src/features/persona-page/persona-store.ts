@@ -20,6 +20,7 @@ class PersonaState {
     type: "PERSONA",
     userId: "",
     gptModel: defaultGPTModel,
+    assistantID: "",
   };
 
   public isOpened: boolean = false;
@@ -103,5 +104,6 @@ export const FormDataToPersonaModel = (formData: FormData): PersonaModel => {
     createdAt: new Date(),
     type: PERSONA_ATTRIBUTE,
     gptModel: formData.get("gptModel") as string,
+    assistantID: formData.get("assistantID") as string,
   };
 };

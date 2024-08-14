@@ -24,6 +24,7 @@ interface PersonaInput {
   personaMessage: string;
   temperature: number;
   isPublished: boolean;
+  assistantID: string;
 }
 
 export const FindPersonaByID = async (
@@ -81,6 +82,10 @@ export const CreatePersona = async (
   try {
     const user = await getCurrentUser();
 
+    if(props.assistantID){
+
+    }
+
     const modelToSave: PersonaModel = {
       id: uniqueId(),
       name: props.name,
@@ -92,6 +97,7 @@ export const CreatePersona = async (
       userId: await userHashedId(),
       createdAt: new Date(),
       type: "PERSONA",
+      assistantID: props.assistantID,
     };
 
     const valid = ValidateSchema(modelToSave);
@@ -205,6 +211,7 @@ export const UpsertPersona = async (
           ? personaInput.isPublished
           : persona.isPublished,
         createdAt: new Date(),
+        assistantID: personaInput.assistantID,
       };
 
       const validationResponse = ValidateSchema(modelToUpdate);
@@ -316,7 +323,7 @@ export const CreatePersonaChat = async (
       extension: [],
       gptModel: gptModel,
       threadAssistantID: "",
-      assistantID: "",
+      assistantID: persona.assistantID,
     });
 
     return response;
