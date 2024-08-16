@@ -220,21 +220,26 @@ class ChatState {
 
               break;
             case "contentAssistant":
-              const mappedContentAssistant: ChatMessageModel = {
-                id: responseType.response.id,
-                content: responseType.response.content[0].text.value || "",
-                name: AI_NAME,
-                role: "assistant",
-                createdAt: new Date(),
-                isDeleted: false,
-                threadId: this.chatThreadId,
-                type: "CHAT_MESSAGE",
-                userId: "",
-                multiModalImage: "",
-              };
+              const content = responseType.response.content?.[0];
+              switch (content?.type) {
+                case 'text':
+                  const mappedContentAssistant: ChatMessageModel = {
+                    id: responseType.response.id,
+                    content: content.text?.value || "",
+                    name: AI_NAME,
+                    role: "assistant",
+                    createdAt: new Date(),
+                    isDeleted: false,
+                    threadId: this.chatThreadId,
+                    type: "CHAT_MESSAGE",
+                    userId: "",
+                    multiModalImage: "",
+                  };
 
-              this.addToMessages(mappedContentAssistant);
-              this.lastMessage = mappedContentAssistant.content;
+                  this.addToMessages(mappedContentAssistant);
+                  this.lastMessage = mappedContentAssistant.content;
+                  break;
+              }
 
               break;
             case "abort":

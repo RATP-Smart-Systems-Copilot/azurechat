@@ -132,31 +132,39 @@ export const OpenAIStreamAssistant = (props: {
       let run_id
 
       while(!is_completed) {
-          let stream = runner;
+          let stream = runner as AssistantStream;
           let str = ''
 
           for await (const event of stream) {
               if(event.event === 'thread.message.delta') {
                   // the value of str is not used in particular,
                   // just to determine if there is already text generated
-                  str += event.data.delta.content[0].text.value
-
-                  controller.enqueue(event.data.delta.content[0].text.value)
+                  const content = event.data.delta.content?.[0];
+                  switch (content?.type) {
+                    case 'text':
+                      str += content.text?.value
+                      controller.enqueue(content.text?.value)
+                      break;
+                  }
 
               } else if(event.event === 'thread.message.completed'){
                 const content = event.data;
-                const message = event.data.content[0].text.value;
-                await CreateChatMessage({
-                  name: AI_NAME,
-                  content: message,
-                  role: "assistant",
-                  chatThreadId: props.chatThread.id,
-                });
-                const response: AzureChatCompletion = {
-                  type: "contentAssistant",
-                  response: content,
-                };
-                streamResponse(response.type, JSON.stringify(response));
+                const message = event.data.content[0];
+                switch (message?.type) {
+                  case 'text':
+                    await CreateChatMessage({
+                      name: AI_NAME,
+                      content: message.text?.value,
+                      role: "assistant",
+                      chatThreadId: props.chatThread.id,
+                    });
+                    const response: AzureChatCompletion = {
+                      type: "contentAssistant",
+                      response: content,
+                    };
+                    streamResponse(response.type, JSON.stringify(response));
+                    break;
+                }
               }else if(event.event === 'thread.run.completed'){
                   is_completed = true
               }
