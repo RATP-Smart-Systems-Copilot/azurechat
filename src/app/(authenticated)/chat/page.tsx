@@ -1,4 +1,5 @@
 import { ChatHome } from "@/features/chat-home-page/chat-home";
+import { getModelOptions } from "@/features/common/services/openai";
 import { FindAllExtensionForCurrentUser } from "@/features/extensions-page/extension-services/extension-service";
 import { FindAllPersonaForCurrentUser } from "@/features/persona-page/persona-services/persona-service";
 import { DisplayError } from "@/features/ui/error/display-error";
@@ -20,6 +21,7 @@ export default async function Home() {
     <ChatHome
       personas={personaResponse.response}
       extensions={extensionResponse.response}
+      gpts={getModelOptions()}
     />
   );
 }
