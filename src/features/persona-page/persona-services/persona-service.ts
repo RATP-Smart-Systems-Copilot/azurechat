@@ -15,9 +15,11 @@ import { HistoryContainer } from "@/features/common/services/cosmos";
 import { uniqueId } from "@/features/common/util";
 import { SqlQuerySpec } from "@azure/cosmos";
 import { PERSONA_ATTRIBUTE, PersonaModel, PersonaModelSchema } from "./models";
+import { defaultGPTModel, modelOptions } from "@/features/common/services/openai";
 
 interface PersonaInput {
   name: string;
+  gptModel: string;
   description: string;
   personaMessage: string;
   temperature: number;
@@ -82,6 +84,7 @@ export const CreatePersona = async (
     const modelToSave: PersonaModel = {
       id: uniqueId(),
       name: props.name,
+      gptModel: props.gptModel,
       description: props.description,
       personaMessage: props.personaMessage,
       temperature: props.temperature,
@@ -194,6 +197,7 @@ export const UpsertPersona = async (
       const modelToUpdate: PersonaModel = {
         ...persona,
         name: personaInput.name,
+        gptModel: personaInput.gptModel,
         description: personaInput.description,
         personaMessage: personaInput.personaMessage,
         temperature: personaInput.temperature,
@@ -293,6 +297,8 @@ export const CreatePersonaChat = async (
 
   if (personaResponse.status === "OK") {
     const persona = personaResponse.response;
+    const personaGptModel = personaResponse.response.gptModel;
+    const gptModel = personaGptModel ? modelOptions[personaGptModel].model : modelOptions[defaultGPTModel].model
 
     const response = await UpsertChatThread({
       name: persona.name,
@@ -308,6 +314,7 @@ export const CreatePersonaChat = async (
       personaMessageTitle: persona.name,
       personaTemperature: persona.temperature,
       extension: [],
+      gptModel: gptModel,
     });
 
     return response;

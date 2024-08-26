@@ -7,6 +7,8 @@ param openAiLocation string
 param openAiSkuName string = 'S0'
 param chatGptDeploymentCapacity int = 30
 param chatGptDeploymentName string = 'chat-gpt-35-turbo'
+param chatGptDeploymentName4oMini string = 'gpt-4o-mini'
+param chatGptDeploymentName4o string = 'gpt-4o'
 param chatGptModelName string = 'chat-gpt-35-turbo'
 param chatGptModelVersion string = '1106'
 param embeddingDeploymentName string = 'text-embedding-ada-002'
@@ -160,6 +162,14 @@ resource webApp 'Microsoft.Web/sites@2020-06-01' = {
         {
           name: 'AZURE_OPENAI_API_DEPLOYMENT_NAME'
           value: chatGptDeploymentName
+        }
+        {
+          name: 'AZURE_OPENAI_API_DEPLOYMENT_NAME_4omini'
+          value: chatGptDeploymentName4oMini
+        }
+        {
+          name: 'AZURE_OPENAI_API_DEPLOYMENT_NAME_4o'
+          value: chatGptDeploymentName4o
         }
         {
           name: 'AZURE_OPENAI_API_EMBEDDINGS_DEPLOYMENT_NAME'

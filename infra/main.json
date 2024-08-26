@@ -722,6 +722,14 @@
                       "value": "[parameters('chatGptDeploymentName')]"
                     },
                     {
+                      "name": "AZURE_OPENAI_API_DEPLOYMENT_NAME_4omini",
+                      "value": "[parameters('chatGptDeploymentName4oMini')]"
+                    },
+                    {
+                      "name": "AZURE_OPENAI_API_DEPLOYMENT_NAME_4o",
+                      "value": "[parameters('chatGptDeploymentName4o')]"
+                    },
+                    {
                       "name": "AZURE_OPENAI_API_EMBEDDINGS_DEPLOYMENT_NAME",
                       "value": "[parameters('embeddingDeploymentName')]"
                     },

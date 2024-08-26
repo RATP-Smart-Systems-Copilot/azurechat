@@ -1,6 +1,5 @@
 "use client";
 
-import { RedirectToChatThread } from "@/features/common/navigation-helpers";
 import { showError } from "@/features/globals/global-message-store";
 import { LoadingIndicator } from "@/features/ui/loading";
 import { MessageCircle } from "lucide-react";
@@ -8,6 +7,7 @@ import { FC, useState } from "react";
 import { Button } from "../../ui/button";
 import { PersonaModel } from "../persona-services/models";
 import { CreatePersonaChat } from "../persona-services/persona-service";
+import { RedirectToChatThread } from "@/features/chat-page/chat-services/chat-thread-service";
 
 interface Props {
   persona: PersonaModel;
