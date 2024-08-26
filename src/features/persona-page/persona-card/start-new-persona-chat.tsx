@@ -1,6 +1,5 @@
 "use client";
 
-import { RedirectToChatThread } from "@/features/common/navigation-helpers";
 import { showError } from "@/features/globals/global-message-store";
 import { LoadingIndicator } from "@/features/ui/loading";
 import { MessageCircle } from "lucide-react";
@@ -24,7 +23,7 @@ export const StartNewPersonaChat: FC<Props> = (props) => {
         setIsLoading(true);
         const response = await CreatePersonaChat(persona.id);
         if (response.status === "OK") {
-          RedirectToChatThread(response.response.id);
+          redirect(`/chat/${response.response.id}`);
         } else {
           showError(response.errors.map((e) => e.message).join(", "));
         }

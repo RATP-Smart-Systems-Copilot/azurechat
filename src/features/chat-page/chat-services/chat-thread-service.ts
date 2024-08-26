@@ -24,6 +24,7 @@ import {
   ChatDocumentModel,
   ChatThreadModel,
 } from "./models";
+import { redirect } from "next/navigation";
 
 export const FindAllChatThreadForCurrentUser = async (): Promise<
   ServerActionResponse<Array<ChatThreadModel>>
@@ -340,13 +341,13 @@ export const UpdateChatTitle = async (
 export const CreateChatAndRedirect = async () => {
   const response = await CreateChatThread();
   if (response.status === "OK") {
-    RedirectToChatThread(response.response.id);
+    redirect(`/chat/${response.response.id}`);
   }
 };
 
 export const CreatNewChatGPT= async ( gptModel : string = process.env.AZURE_OPENAI_API_DEPLOYMENT_NAME) => {
   const response = await CreateChatThread(gptModel);
   if (response.status === "OK") {
-    RedirectToChatThread(response.response.id);
+    redirect(`/chat/${response.response.id}`);
   }
 };

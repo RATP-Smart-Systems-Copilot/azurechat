@@ -1,5 +1,4 @@
 "use client";
-import { RedirectToPage } from "@/features/common/navigation-helpers";
 import { showError } from "@/features/globals/global-message-store";
 import {
   DropdownMenu,
@@ -11,6 +10,7 @@ import { MoreVertical, Trash } from "lucide-react";
 import { useState } from "react";
 import { DropdownMenuItemWithIcon } from "./chat-menu-item";
 import { DeleteAllChatThreads } from "./chat-menu-service";
+import { redirect } from "next/navigation";
 
 export const ChatContextMenu = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -24,7 +24,7 @@ export const ChatContextMenu = () => {
 
       if (response.status === "OK") {
         setIsLoading(false);
-        RedirectToPage("chat");
+        redirect("/chat");
       } else {
         showError(response.errors.map((e) => e.message).join(", "));
       }
