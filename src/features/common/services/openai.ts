@@ -28,6 +28,7 @@ export const getModelOptions = () : GPTS => {
 
 export const modelOptions = getModelOptions();
 
+export const defaultGPTModel = 'gpt3.5';
 
 export const OpenAIInstance = (gptModel: string = process.env.AZURE_OPENAI_API_DEPLOYMENT_NAME) => {
 

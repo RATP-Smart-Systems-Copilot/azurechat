@@ -5,6 +5,8 @@ import {
   CreatePersona,
   UpsertPersona,
 } from "./persona-services/persona-service";
+import { defaultGPTModel, modelOptions } from "../common/services/openai";
+import { idea } from "react-syntax-highlighter/dist/esm/styles/hljs";
 
 class PersonaState {
   private defaultModel: PersonaModel = {
@@ -17,6 +19,7 @@ class PersonaState {
     isPublished: false,
     type: "PERSONA",
     userId: "",
+    gptModel: defaultGPTModel,
   };
 
   public isOpened: boolean = false;
@@ -99,5 +102,6 @@ export const FormDataToPersonaModel = (formData: FormData): PersonaModel => {
     userId: "", // the user id is set on the server once the user is authenticated
     createdAt: new Date(),
     type: PERSONA_ATTRIBUTE,
+    gptModel: formData.get("gptModel") as string,
   };
 };
