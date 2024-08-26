@@ -6,7 +6,6 @@ import {
   userHashedId,
   userSession,
 } from "@/features/auth-page/helpers";
-import { RedirectToChatThread } from "@/features/common/navigation-helpers";
 import { ServerActionResponse } from "@/features/common/server-action-response";
 import { uniqueId } from "@/features/common/util";
 import {
@@ -24,6 +23,7 @@ import {
   ChatDocumentModel,
   ChatThreadModel,
 } from "./models";
+import { redirect } from "next/navigation";
 
 export const FindAllChatThreadForCurrentUser = async (): Promise<
   ServerActionResponse<Array<ChatThreadModel>>
@@ -273,7 +273,7 @@ export const UpsertChatThread = async (
   }
 };
 
-export const CreateChatThread = async (): Promise<
+export const CreateChatThread = async (gptModel: string = process.env.AZURE_OPENAI_API_DEPLOYMENT_NAME): Promise<
   ServerActionResponse<ChatThreadModel>
 > => {
   try {
@@ -291,6 +291,7 @@ export const CreateChatThread = async (): Promise<
       personaMessageTitle: CHAT_DEFAULT_PERSONA,
       personaTemperature: PERSONA_TEMPERATURE,
       extension: [],
+      gptModel: gptModel,
     };
 
     const { resource } = await HistoryContainer().items.create<ChatThreadModel>(
@@ -339,6 +340,17 @@ export const UpdateChatTitle = async (
 export const CreateChatAndRedirect = async () => {
   const response = await CreateChatThread();
   if (response.status === "OK") {
-    RedirectToChatThread(response.response.id);
+    redirect(`/chat/${response.response.id}`);
   }
+};
+
+export const CreatNewChatGPT= async ( gptModel : string = process.env.AZURE_OPENAI_API_DEPLOYMENT_NAME) => {
+  const response = await CreateChatThread(gptModel);
+  if (response.status === "OK") {
+    redirect(`/chat/${response.response.id}`);
+  }
+};
+
+export const RedirectToChatThread = (chatThreadId: string) => {
+  redirect(`/chat/${chatThreadId}`);
 };

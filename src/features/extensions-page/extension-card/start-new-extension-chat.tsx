@@ -1,12 +1,12 @@
 "use client";
 
-import { RedirectToChatThread } from "@/features/common/navigation-helpers";
 import { LoadingIndicator } from "@/features/ui/loading";
 import { MessageCircle } from "lucide-react";
 import { FC, useState } from "react";
 import { Button } from "../../ui/button";
 import { CreateChatWithExtension } from "../extension-services/extension-service";
 import { ExtensionModel } from "../extension-services/models";
+import { RedirectToChatThread } from "@/features/chat-page/chat-services/chat-thread-service";
 
 interface Props {
   extension: ExtensionModel;

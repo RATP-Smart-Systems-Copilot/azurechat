@@ -2,28 +2,73 @@ import { OpenAI } from "openai";
 import { DefaultAzureCredential, getBearerTokenProvider } from "@azure/identity";
 import { AzureOpenAI } from "openai";
 
+export interface PromptPricing{
+  price: number;
+  unit: number;
+}
+
+export interface GPT{
+  model: string;
+  name: string;
+  description: string;
+  prompt: PromptPricing;
+  completion: PromptPricing;
+}
+
+export interface GPTS {
+  [key: string]: GPT;
+}
+
+export const getModelOptions = () : GPTS => {
+  return {
+    'gpt3.5': {
+      'model': process.env.AZURE_OPENAI_API_DEPLOYMENT_NAME,
+      'name': 'GPT 3.5',
+      'description': 'Chat GPT 3.5 avec un contexte de 16k tokens maximal et un seuil de connaissance à janvier 2022',
+      'prompt': { 'price': 0.0027, 'unit': 1000 },
+      'completion': { 'price': 0.0036, 'unit': 1000 },
+    },
+    'gpt4o': {
+      'model': process.env.AZURE_OPENAI_API_DEPLOYMENT_NAME_4o,
+      'name': 'GPT 4o',
+      'description': 'Chat GPT 4o avec un contexte de 128k tokens maximal et un seuil de connaissance à octobre 2023',
+      'prompt': { 'price': 0.0045, 'unit': 1000 },
+      'completion': { 'price': 0.0135, 'unit': 1000 },
+    },
+  };
+
+};
+
+export const modelOptions = getModelOptions();
+
+export const defaultGPTModel = 'gpt3.5';
+
 const USE_MANAGED_IDENTITIES = process.env.USE_MANAGED_IDENTITIES === "true";
 
-export const OpenAIInstance =  () => {
+export const OpenAIInstance = (gptModel: string = process.env.AZURE_OPENAI_API_DEPLOYMENT_NAME) => {
   const endpointSuffix = process.env.AZURE_OPENAI_API_ENDPOINT_SUFFIX || "openai.azure.com";
   let token = process.env.AZURE_OPENAI_API_KEY;
+  let selectedModel = Object.values(modelOptions).find(model => model.model === gptModel);
+  if (!selectedModel) {
+    selectedModel = modelOptions['gpt3.5']; // Set default value if gptModel is not found in modelOptions
+  }
   if (USE_MANAGED_IDENTITIES) {
     const credential = new DefaultAzureCredential();
     const scope = "https://cognitiveservices.azure.com/.default";
     const azureADTokenProvider = getBearerTokenProvider(credential, scope);
-    const deployment = process.env.AZURE_OPENAI_API_DEPLOYMENT_NAME;
+    const deployment = selectedModel.model;
     const apiVersion = process.env.AZURE_OPENAI_API_VERSION;
     const client = new AzureOpenAI({
       azureADTokenProvider,
       deployment,
       apiVersion,
-      baseURL: `https://${process.env.AZURE_OPENAI_API_INSTANCE_NAME}.${endpointSuffix}/openai/deployments/${process.env.AZURE_OPENAI_API_DEPLOYMENT_NAME}`
+      baseURL: `https://${process.env.AZURE_OPENAI_API_INSTANCE_NAME}.${endpointSuffix}/openai/deployments/${selectedModel.model}`
     });
     return client;
   } else {
     const openai = new OpenAI({
       apiKey: token,
-      baseURL: `https://${process.env.AZURE_OPENAI_API_INSTANCE_NAME}.${endpointSuffix}/openai/deployments/${process.env.AZURE_OPENAI_API_DEPLOYMENT_NAME}`,
+      baseURL: `https://${process.env.AZURE_OPENAI_API_INSTANCE_NAME}.${endpointSuffix}/openai/deployments/${selectedModel.model}`,
       defaultQuery: { "api-version": process.env.AZURE_OPENAI_API_VERSION },
       defaultHeaders: { "api-key": process.env.AZURE_OPENAI_API_KEY },
     });

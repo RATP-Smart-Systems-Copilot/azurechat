@@ -8,6 +8,8 @@ export type PersonaModel = z.infer<typeof PersonaModelSchema>;
 export const PersonaModelSchema = z.object({
   id: z.string(),
   userId: z.string(),
+  gptModel: z.string().min(1)
+  .refine(refineFromEmpty, "Vous devez choisir un modèle"),
   name: z
     .string({
       invalid_type_error: "Invalid title",

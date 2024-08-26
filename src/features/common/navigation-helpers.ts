@@ -16,11 +16,3 @@ export const RevalidateCache = (props: {
     revalidatePath(`/${page}`, type);
   }
 };
-
-export const RedirectToPage = (path: Page) => {
-  redirect(`/${path}`);
-};
-
-export const RedirectToChatThread = (chatThreadId: string) => {
-  redirect(`/chat/${chatThreadId}`);
-};

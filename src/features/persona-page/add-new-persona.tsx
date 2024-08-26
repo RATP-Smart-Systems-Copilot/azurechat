@@ -23,6 +23,8 @@ import {
   personaStore,
   usePersonaState,
 } from "./persona-store";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
+import { modelOptions } from "../common/services/openai";
 
 interface Props {}
 
@@ -121,6 +123,23 @@ export const AddNewPersona: FC<Props> = (props) => {
                   name="personaMessage"
                   placeholder="Personality of your persona"
                 />
+              </div>
+              <div className="grid gap-2 flex-1 ">
+              <Label htmlFor="gptModel">Modèle GPT</Label>
+              <Select
+                defaultValue={persona.gptModel}
+                name="gptModel"
+                required
+              >
+                <SelectTrigger className="w-[100px]" aria-label="Select GPT Model">
+                  <SelectValue placeholder="Sélectionnez un modèle" defaultValue={persona.gptModel} />
+                </SelectTrigger>
+                <SelectContent>
+                  {Object.entries(modelOptions).map(([key, value]) => (
+                    <SelectItem key={key} value={key}>{value.name}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
               </div>
             </div>
           </ScrollArea>

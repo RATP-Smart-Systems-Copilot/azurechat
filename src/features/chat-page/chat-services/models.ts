@@ -35,6 +35,7 @@ export interface ChatThreadModel {
   personaTemperature: number;
   extension: string[];
   type: typeof CHAT_THREAD_ATTRIBUTE;
+  gptModel?: string;
 }
 
 export interface UserPrompt {
