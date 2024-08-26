@@ -6,7 +6,7 @@ import { FC, useState } from "react";
 import { Button } from "../../ui/button";
 import { CreateChatWithExtension } from "../extension-services/extension-service";
 import { ExtensionModel } from "../extension-services/models";
-import { redirect } from "next/navigation";
+import { RedirectToChatThread } from "@/features/chat-page/chat-services/chat-thread-service";
 
 interface Props {
   extension: ExtensionModel;
@@ -23,7 +23,7 @@ export const StartNewExtensionChat: FC<Props> = (props) => {
         setIsLoading(true);
         const chat = await CreateChatWithExtension(extension.id);
         if (chat.status === "OK") {
-          redirect(`/chat/${chat.response.id}`);
+          RedirectToChatThread(chat.response.id);
         }
       }}
     >

@@ -6,7 +6,6 @@ import {
   userHashedId,
   userSession,
 } from "@/features/auth-page/helpers";
-import { RedirectToChatThread } from "@/features/common/navigation-helpers";
 import { ServerActionResponse } from "@/features/common/server-action-response";
 import { uniqueId } from "@/features/common/util";
 import {
@@ -350,4 +349,8 @@ export const CreatNewChatGPT= async ( gptModel : string = process.env.AZURE_OPEN
   if (response.status === "OK") {
     redirect(`/chat/${response.response.id}`);
   }
+};
+
+export const RedirectToChatThread = (chatThreadId: string) => {
+  redirect(`/chat/${chatThreadId}`);
 };

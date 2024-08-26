@@ -7,6 +7,7 @@ import { FC, useState } from "react";
 import { Button } from "../../ui/button";
 import { PersonaModel } from "../persona-services/models";
 import { CreatePersonaChat } from "../persona-services/persona-service";
+import { RedirectToChatThread } from "@/features/chat-page/chat-services/chat-thread-service";
 
 interface Props {
   persona: PersonaModel;
@@ -23,7 +24,7 @@ export const StartNewPersonaChat: FC<Props> = (props) => {
         setIsLoading(true);
         const response = await CreatePersonaChat(persona.id);
         if (response.status === "OK") {
-          redirect(`/chat/${response.response.id}`);
+          RedirectToChatThread(response.response.id);
         } else {
           showError(response.errors.map((e) => e.message).join(", "));
         }
