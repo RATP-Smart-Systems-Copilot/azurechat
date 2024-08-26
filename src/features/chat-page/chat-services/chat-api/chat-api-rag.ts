@@ -20,7 +20,7 @@ export const ChatApiRAG = async (props: {
 }): Promise<ChatCompletionStreamingRunner> => {
   const { chatThread, userMessage, history, signal } = props;
 
-  const openAI = OpenAIInstance();
+  const openAI = OpenAIInstance(chatThread.gptModel);
 
   const documentResponse = await SimilaritySearch(
     userMessage,

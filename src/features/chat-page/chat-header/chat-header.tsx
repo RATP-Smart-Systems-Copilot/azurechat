@@ -26,7 +26,7 @@ export const ChatHeader: FC<Props> = (props) => {
           <span>{props.chatThread.name}</span>
           <span className="text-sm text-muted-foreground flex gap-1 items-center">
             <VenetianMask size={18} />
-            {persona}
+            {persona} - {props.chatThread.gptModel}
           </span>
         </div>
         <div className="flex gap-2">

@@ -27,7 +27,6 @@ export const OpenAIStream = (props: {
       runner
         .on("content", (content) => {
           const completion = runner.currentChatCompletionSnapshot;
-
           if (completion) {
             const response: AzureChatCompletion = {
               type: "content",
