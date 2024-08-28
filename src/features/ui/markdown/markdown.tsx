@@ -7,6 +7,12 @@ import { MarkdownProvider } from "./markdown-context";
 import { Paragraph } from "./paragraph";
 import { Link } from "./link";
 import { List } from "./list";
+import { Table } from "./table";
+import { Thead } from "./thead";
+import { Tbody } from "./tbody";
+import { Th } from "./th";
+import { Td } from "./td";
+import { Tr } from "./tr";
 
 interface Props {
   content: string;
@@ -26,7 +32,7 @@ export const Markdown: FC<Props> = (props) => {
   const WithContext = () => (
     <MarkdownProvider onCitationClick={props.onCitationClick}>
       {Markdoc.renderers.react(content, React, {
-        components: { Citation, Paragraph, CodeBlock, Link, List },
+        components: { Citation, Paragraph, CodeBlock, Link, List, Table, Thead, Tbody, Th, Td, Tr },
       })}
     </MarkdownProvider>
   );
