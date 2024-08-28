@@ -33,7 +33,7 @@ export const GetDefaultExtensions = async (props: {
         },
       },
       description:
-        "You must only use this tool if the user asks you to create an image. You must only use this tool once per message.",
+        "You must ONLY use the function create_img if and only if the user asks you to create an image with the sentence 'crée une image' or 'create an image'. Don't use this function without this sentence.You only use the create_img function if you explicitly include the phrase 'creates an image'. You must only use this tool once per message.",
       name: "create_img",
     },
   });

@@ -19,6 +19,8 @@ const ChatThreadRow: React.FC<ChatThreadRowProps> = (props) => {
       }}
     >
       <TableCell className="font-medium">{chatThread.name}</TableCell>
+      <TableCell>{chatThread.gptModel}</TableCell>
+      <TableCell>{chatThread.personaMessageTitle}</TableCell>
       <TableCell>{chatThread.useName}</TableCell>
       <TableCell>
         {new Date(chatThread.createdAt).toLocaleDateString()}
