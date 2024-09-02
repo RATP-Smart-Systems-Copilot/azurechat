@@ -12,7 +12,6 @@ import { FC, useEffect, useRef, useState } from "react";
 import { ExtensionModel } from "../extensions-page/extension-services/models";
 import { ChatHeader } from "./chat-header/chat-header";
 import TokenCount from '../chat-page/tokenCount/token-count';
-import { modelOptions } from '../theme/theme-config';
 import {
   ChatDocumentModel,
   ChatMessageModel,
@@ -92,7 +91,7 @@ export const ChatPage: FC<ChatPageProps> = (props) => {
         </ChatMessageContentArea>
       </ChatMessageContainer>
       <ChatInput />
-      <TokenCount messages={props.messages} model={modelOptions[0]} />
+      <TokenCount messages={props.messages} model={props.chatThread.gptModel} />
     </main>
   );
 };
