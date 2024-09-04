@@ -25,7 +25,7 @@ interface ChatPersonaProps {
 }
 
 interface Props {
-  gpt: GPT;
+  gpt: string;
 }
 
 export const StartNewChatGPT: FC<Props> = (props) => {
@@ -37,7 +37,7 @@ export const StartNewChatGPT: FC<Props> = (props) => {
       className="flex-1 gap-3"
       onClick={async () => {
         setIsLoading(true);
-        const response = await CreatNewChatGPT(gpt.model);
+        const response = await CreatNewChatGPT(gpt);
         setIsLoading(false);
       }}
     >

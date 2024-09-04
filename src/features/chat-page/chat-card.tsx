@@ -34,7 +34,7 @@ export const ChatCard: FC<Props> = (props) => {
         {description}
         </CardContent>
         <CardFooter className="gap-1 content-stretch f">
-        <StartNewChatGPT gpt={props} />
+        <StartNewChatGPT gpt={props.model} />
       </CardFooter>
     </Card>
   );

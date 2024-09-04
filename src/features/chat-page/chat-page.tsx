@@ -91,7 +91,7 @@ export const ChatPage: FC<ChatPageProps> = (props) => {
         </ChatMessageContentArea>
       </ChatMessageContainer>
       <ChatInput />
-      <TokenCount messages={props.messages} model={props.chatThread.gptModel} />
+      <TokenCount messages={props.messages} gptModel={props.chatThread.gptModel} />
     </main>
   );
 };
