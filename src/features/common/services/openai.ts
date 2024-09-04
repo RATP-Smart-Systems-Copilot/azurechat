@@ -1,9 +1,17 @@
+import { PromptModel } from "@/features/prompt-page/models";
 import { OpenAI } from "openai";
+
+export interface PromptPricing{
+  price: number;
+  unit: number;
+}
 
 export interface GPT{
   model: string;
   name: string;
   description: string;
+  prompt: PromptPricing;
+  completion: PromptPricing;
 }
 
 export interface GPTS {
@@ -15,12 +23,16 @@ export const getModelOptions = () : GPTS => {
     'gpt3.5': {
       'model': process.env.AZURE_OPENAI_API_DEPLOYMENT_NAME,
       'name': 'GPT 3.5',
-      'description': 'Chat GPT 3.5 avec un contexte de 16k tokens maximal et un seuil de connaissance à janvier 2022'
+      'description': 'Chat GPT 3.5 avec un contexte de 16k tokens maximal et un seuil de connaissance à janvier 2022',
+      'prompt': { 'price': 0.0027, 'unit': 1000 },
+      'completion': { 'price': 0.0036, 'unit': 1000 },
     },
     'gpt4o': {
       'model': process.env.AZURE_OPENAI_API_DEPLOYMENT_NAME_4o,
       'name': 'GPT 4o',
-      'description': 'Chat GPT 4o avec un contexte de 128k tokens maximal et un seuil de connaissance à octobre 2023'
+      'description': 'Chat GPT 4o avec un contexte de 128k tokens maximal et un seuil de connaissance à octobre 2023',
+      'prompt': { 'price': 0.0045, 'unit': 1000 },
+      'completion': { 'price': 0.0135, 'unit': 1000 },
     },
   };
 

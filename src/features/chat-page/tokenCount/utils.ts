@@ -1,13 +1,12 @@
-import { ModelOptions } from '../../theme/theme-config';
 import { ChatMessageModel } from "../chat-services/models";
-import { modelCost } from '../../theme/theme-config';
 import { getEncoding } from 'js-tiktoken';
+import { GPT } from '@/features/common/services/openai';
 const encoder = getEncoding('cl100k_base');
 
 // https://github.com/dqbd/tiktoken/issues/23#issuecomment-1483317174
 export const getChatGPTEncoding = (
   messages: ChatMessageModel[],
-  model: ModelOptions
+  model: GPT
 ) => {
 
   const msgSep = '';
@@ -25,13 +24,13 @@ export const getChatGPTEncoding = (
   return encoder.encode(serialized, 'all');
 };
 
-const countTokens = (messages: ChatMessageModel[], model: ModelOptions) => {
+const countTokens = (messages: ChatMessageModel[], model: GPT) => {
   if (messages.length === 0) return 0;
   return getChatGPTEncoding(messages, model).length;
 };
 
 export const getTotalTokenUsed = (
-  model: ModelOptions,
+  model: GPT,
   messages: ChatMessageModel[],
 ) => {
   const newPromptTokens = countTokens(messages.slice(0, -1), model);
@@ -46,9 +45,10 @@ export const getTotalTokenUsed = (
 export const getTokenCostToCost = (
   promptTokens: number,
   completionTokens: number,
-  model: ModelOptions
+  model: GPT
 ) => {
-  const { prompt, completion } = modelCost[model as keyof typeof modelCost];
+  const prompt = model.prompt;
+  const completion = model.completion;
   const completionCost =
     (completion.price / completion.unit) * completionTokens;
   const promptCost = (prompt.price / prompt.unit) * promptTokens;

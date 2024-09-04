@@ -1,21 +1,27 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { ChatMessageModel } from "../chat-services/models";
-import { ModelOptions } from '../../theme/theme-config';
 import { getTotalTokenUsed, getTokenCostToCost } from './utils';
+import { modelOptions } from '@/features/common/services/openai';
 
 interface TokenCountProps {
     messages: ChatMessageModel[];
-    model: ModelOptions;
+    gptModel: string|undefined;
 }
 
-const TokenCount: React.FC<TokenCountProps> = ({ messages, model }) => {
+const TokenCount: React.FC<TokenCountProps> = ({ messages, gptModel }) => {
+
+    let selectedModel = Object.values(modelOptions).find(model => model.model === gptModel);
+    if (!selectedModel) {
+        selectedModel = modelOptions['gpt3.5']; // Set default value if gptModel is not found in modelOptions
+    }
     // Utilise le hook useEffect pour mettre à jour l'état tokenCount une seule fois
     useEffect(() => {
+        const model = selectedModel;
         const tokens = getTotalTokenUsed(model, messages);
         const cost = getTokenCostToCost(tokens.prompt, tokens.completion, model);
         setTokenCount(tokens.prompt + tokens.completion);
         setCost(cost);
-    }, [messages, model]); // Déclenche la mise à jour lorsque les messages ou le modèle changent
+    }, [messages, selectedModel]); // Déclenche la mise à jour lorsque les messages ou le modèle changent
 
     const [tokenCount, setTokenCount] = useState<number>(0);
     const [cost, setCost] = useState<number>(0);
