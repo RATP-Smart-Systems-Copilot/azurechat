@@ -11,7 +11,7 @@ import {
   TableRow,
 } from "../ui/table";
 import { ReportingHero } from "./reporting-hero";
-import { CountAllChatThreadsForAdmin, CountAllUsersForAdmin } from "./reporting-services/reporting-service";
+import { CountAllChatThreadsForAdmin, CountAllPersonaForAdmin, CountAllUsersForAdmin } from "./reporting-services/reporting-service";
 import { DisplayError } from "../ui/error/display-error";
 
 export const ReportingHomePage = async () => {
@@ -34,17 +34,22 @@ interface ChatReportingProps {
 async function ReportingContent() {
     const countAllChat = await CountAllChatThreadsForAdmin();
     const allUsers = await CountAllUsersForAdmin();
+    const countPersonas = await CountAllPersonaForAdmin();
 
     if (countAllChat.status !== "OK") {
         return <DisplayError errors={countAllChat.errors} />;
     }
-
     if (allUsers.status !== "OK") {
         return <DisplayError errors={allUsers.errors} />;
     }
+    if (countPersonas.status !== "OK") {
+        return <DisplayError errors={countPersonas.errors} />;
+    }
+
 
   const resultCountChat = countAllChat.response;
   const countAllUsers = allUsers.response;
+  const resultCountPersona = countPersonas.response;
 
   return (
     <div className="container max-w-4xl py-3">
@@ -63,6 +68,10 @@ async function ReportingContent() {
             <TableRow>
                 <TableCell className="font-medium">Nombre de collaborateur</TableCell>
                 <TableCell className="font-medium"><Link href={"/reporting/user"}>{countAllUsers} </Link></TableCell>
+            </TableRow>
+            <TableRow>
+                <TableCell className="font-medium">Nombre de persona</TableCell>
+                <TableCell className="font-medium"><Link href={"/reporting/persona"}>{resultCountPersona} </Link></TableCell>
             </TableRow>
         </TableBody>
       </Table>

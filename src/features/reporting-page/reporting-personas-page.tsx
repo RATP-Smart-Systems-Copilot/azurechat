@@ -14,15 +14,16 @@ import {
   TableRow,
 } from "../ui/table";
 import { ReportingHero } from "./reporting-hero";
-import { FindAllUsersForAdmin } from "./reporting-services/reporting-service";
+import { FindAllPersonaForAdmin } from "./reporting-services/reporting-service";
+import PersonaRow from "./table-row-persona";
 
 const SEARCH_PAGE_SIZE = 100;
 
-interface UserReportingProps {
+interface PersonaReportingProps {
   page: number;
 }
 
-export const UserReportingPage: FC<UserReportingProps> = async (props) => {
+export const PersonaReportingPage: FC<PersonaReportingProps> = async (props) => {
   return (
     <ScrollArea className="flex-1">
       <main className="flex flex-1 flex-col">
@@ -35,54 +36,52 @@ export const UserReportingPage: FC<UserReportingProps> = async (props) => {
   );
 };
 
-async function ReportingContent(props: UserReportingProps) {
+async function ReportingContent(props: PersonaReportingProps) {
   let pageNumber = props.page < 0 ? 0 : props.page;
   let nextPage = pageNumber + 1;
   let previousPage = pageNumber - 1;
 
-  const usersResponse = await FindAllUsersForAdmin(
+  const personaResponse = await FindAllPersonaForAdmin(
     SEARCH_PAGE_SIZE,
     props.page * SEARCH_PAGE_SIZE
   );
 
-  if (usersResponse.status !== "OK") {
-    return <DisplayError errors={usersResponse.errors} />;
+  if (personaResponse.status !== "OK") {
+    return <DisplayError errors={personaResponse.errors} />;
   }
 
-  const users = usersResponse.response;
-  const hasMoreResults = users.length === SEARCH_PAGE_SIZE;
+  const personas = personaResponse.response;
+  const hasMoreResults = personas.length === SEARCH_PAGE_SIZE;
   return (
-    <div className="container max-w-4xl py-3">
+    <div className="container max-w-7xl py-3">
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead className="w-[200px]">Utilisateurs</TableHead>
-            <TableHead className="w-[200px]">ID</TableHead>
-            <TableHead className="w-[50px]">Nombre de Chat</TableHead>
+            <TableHead className="w-[10px]">Nom</TableHead>
+            <TableHead className="w-[20px]">Instructions</TableHead>
+            <TableHead className="w-[10px]">Température</TableHead>
+            <TableHead className="w-[10px]">Modèle GPT</TableHead>
+            <TableHead className="w-[10px]">Date de création</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
-          {users &&
-            users.map((user) => (
-                <TableRow  key={user.userId}>
-                    <TableCell className="font-medium">{user.useName}</TableCell>
-                    <TableCell>{user.userId}</TableCell>
-                    <TableCell>{user.chats}</TableCell>
-                </TableRow>
+          {personas &&
+            personas.map((persona) => (
+              <PersonaRow key={persona.id} {...persona} />
             ))}
         </TableBody>
       </Table>
       <div className="flex gap-2 p-2 justify-end">
         {previousPage >= 0 && (
           <Button asChild size={"icon"} variant={"outline"}>
-            <Link href={"/reporting/user?pageNumber=" + previousPage}>
+            <Link href={"/reporting/persona?pageNumber=" + previousPage}>
               <ChevronLeft />
             </Link>
           </Button>
         )}
         {hasMoreResults && (
           <Button asChild size={"icon"} variant={"outline"}>
-            <Link href={"/reporting/user?pageNumber=" + nextPage}>
+            <Link href={"/reporting/persona?pageNumber=" + nextPage}>
               <ChevronRight />
             </Link>
           </Button>
