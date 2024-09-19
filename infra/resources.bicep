@@ -475,7 +475,7 @@ resource llmdeployment 'Microsoft.CognitiveServices/accounts/deployments@2023-05
     model: deployment.model
     /*raiPolicyName: contains(deployment, 'raiPolicyName') ? deployment.raiPolicyName : null*/
   }
-  sku: contains(deployment, 'sku') ? deployment.sku : {
+  sku: deployment.?sku ?? {
     name: 'Standard'
     capacity: deployment.capacity
   }
