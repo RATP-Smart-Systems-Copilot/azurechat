@@ -8,21 +8,21 @@ import { ScrollArea } from "../ui/scroll-area";
 import {
   Table,
   TableBody,
+  TableCell,
   TableHead,
   TableHeader,
   TableRow,
 } from "../ui/table";
 import { ReportingHero } from "./reporting-hero";
-import { FindAllChatThreadsForAdmin } from "./reporting-services/reporting-service";
-import ChatThreadRow from "./table-row";
+import { FindAllUsersForAdmin } from "./reporting-services/reporting-service";
 
 const SEARCH_PAGE_SIZE = 100;
 
-interface ChatReportingProps {
+interface UserReportingProps {
   page: number;
 }
 
-export const ChatReportingPage: FC<ChatReportingProps> = async (props) => {
+export const UserReportingPage: FC<UserReportingProps> = async (props) => {
   return (
     <ScrollArea className="flex-1">
       <main className="flex flex-1 flex-col">
@@ -35,52 +35,54 @@ export const ChatReportingPage: FC<ChatReportingProps> = async (props) => {
   );
 };
 
-async function ReportingContent(props: ChatReportingProps) {
+async function ReportingContent(props: UserReportingProps) {
   let pageNumber = props.page < 0 ? 0 : props.page;
   let nextPage = pageNumber + 1;
   let previousPage = pageNumber - 1;
 
-  const chatHistoryResponse = await FindAllChatThreadsForAdmin(
+  const usersResponse = await FindAllUsersForAdmin(
     SEARCH_PAGE_SIZE,
     props.page * SEARCH_PAGE_SIZE
   );
 
-  if (chatHistoryResponse.status !== "OK") {
-    return <DisplayError errors={chatHistoryResponse.errors} />;
+  if (usersResponse.status !== "OK") {
+    return <DisplayError errors={usersResponse.errors} />;
   }
 
-  const chatThreads = chatHistoryResponse.response;
-  const hasMoreResults = chatThreads.length === SEARCH_PAGE_SIZE;
+  const users = usersResponse.response;
+  const hasMoreResults = users.length === SEARCH_PAGE_SIZE;
   return (
     <div className="container max-w-4xl py-3">
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead>Conversation</TableHead>
-            <TableHead className="w-[200px]">Modèle</TableHead>
-            <TableHead className="w-[200px]">Assistant</TableHead>
-            <TableHead className="w-[200px]">User</TableHead>
-            <TableHead className="w-[100px]">Date</TableHead>
+            <TableHead className="w-[200px]">Utilisateurs</TableHead>
+            <TableHead className="w-[200px]">ID</TableHead>
+            <TableHead className="w-[50px]">Nombre de Chat</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
-          {chatThreads &&
-            chatThreads.map((chatThread) => (
-              <ChatThreadRow key={chatThread.id} {...chatThread} />
+          {users &&
+            users.map((user) => (
+                <TableRow  key={user.userId}>
+                    <TableCell className="font-medium">{user.useName}</TableCell>
+                    <TableCell>{user.userId}</TableCell>
+                    <TableCell>{user.chats}</TableCell>
+                </TableRow>
             ))}
         </TableBody>
       </Table>
       <div className="flex gap-2 p-2 justify-end">
         {previousPage >= 0 && (
           <Button asChild size={"icon"} variant={"outline"}>
-            <Link href={"/reporting/chat?pageNumber=" + previousPage}>
+            <Link href={"/reporting/user?pageNumber=" + previousPage}>
               <ChevronLeft />
             </Link>
           </Button>
         )}
         {hasMoreResults && (
           <Button asChild size={"icon"} variant={"outline"}>
-            <Link href={"/reporting/chat?pageNumber=" + nextPage}>
+            <Link href={"/reporting/user?pageNumber=" + nextPage}>
               <ChevronRight />
             </Link>
           </Button>

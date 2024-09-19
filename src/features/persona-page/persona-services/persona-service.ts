@@ -201,9 +201,8 @@ export const UpsertPersona = async (
         description: personaInput.description,
         personaMessage: personaInput.personaMessage,
         temperature: personaInput.temperature,
-        isPublished: user.isAdmin
-          ? personaInput.isPublished
-          : persona.isPublished,
+       // isPublished: user.isAdmin ? personaInput.isPublished : persona.isPublished,
+        isPublished: personaInput.isPublished,
         createdAt: new Date(),
       };
 
