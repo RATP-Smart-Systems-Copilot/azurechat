@@ -43,11 +43,12 @@ export const AddNewPersona: FC<Props> = (props) => {
   const PublicSwitch = () => {
     if (data === undefined || data === null) return null;
 
-    if (data?.user?.isAdmin) {
+    //if (data?.user?.isAdmin) {
+    if(persona.id){
       return (
         <div className="flex items-center space-x-2">
           <Switch name="isPublished" defaultChecked={persona.isPublished} />
-          <Label htmlFor="description">Publish</Label>
+          <Label htmlFor="description">Publier à tous les collaborateurs</Label>
         </div>
       );
     }

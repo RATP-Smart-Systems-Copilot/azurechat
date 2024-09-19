@@ -369,9 +369,3 @@ export const FindPersonaForAdmin = async (
     };
   }
 };
-
-interface User{
-  useName: string;
-  userId: string;
-  chats: number;
-}
