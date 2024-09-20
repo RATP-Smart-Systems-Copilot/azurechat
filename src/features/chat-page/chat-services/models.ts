@@ -1,4 +1,5 @@
 import { ChatCompletionSnapshot } from "openai/lib/ChatCompletionStream";
+import { Message } from "openai/resources/beta/threads/messages.mjs";
 import { ChatCompletionMessage } from "openai/resources/chat/completions";
 
 export const CHAT_DOCUMENT_ATTRIBUTE = "CHAT_DOCUMENT";
@@ -36,6 +37,8 @@ export interface ChatThreadModel {
   extension: string[];
   type: typeof CHAT_THREAD_ATTRIBUTE;
   gptModel?: string;
+  threadAssistantID: string;
+  assistantID: string;
 }
 
 export interface UserPrompt {
@@ -103,10 +106,16 @@ export type AzureChatCompletionAbort = {
   response: string;
 };
 
+export type AzureAssistantMessageContent = {
+  type: "contentAssistant";
+  response: Message;
+};
+
 export type AzureChatCompletion =
   | AzureChatCompletionError
   | AzureChatCompletionFunctionCall
   | AzureChatCompletionFunctionCallResult
   | AzureChatCompletionContent
   | AzureChatCompletionFinalContent
-  | AzureChatCompletionAbort;
+  | AzureChatCompletionAbort
+  | AzureAssistantMessageContent;
