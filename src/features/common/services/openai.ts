@@ -19,12 +19,12 @@ export interface GPTS {
 
 export const getModelOptions = () : GPTS => {
   return {
-    'gpt3.5': {
+    'gpt-4o-mini': {
       'model': process.env.AZURE_OPENAI_API_DEPLOYMENT_NAME,
-      'name': 'GPT 3.5',
-      'description': 'Chat GPT 3.5 avec un contexte de 16k tokens maximal et un seuil de connaissance à janvier 2022',
-      'prompt': { 'price': 0.0027, 'unit': 1000 },
-      'completion': { 'price': 0.0036, 'unit': 1000 },
+      'name': 'GPT 4o mini',
+      'description': 'Chat GPT 4o mini avec un contexte de 128k tokens maximal et un seuil de connaissance à octobre 2023',
+      'prompt': { 'price': 0.00013434, 'unit': 1000 },
+      'completion': { 'price': 0.0005374, 'unit': 1000 },
     },
     'gpt4o': {
       'model': process.env.AZURE_OPENAI_API_DEPLOYMENT_NAME_4o,
@@ -39,13 +39,13 @@ export const getModelOptions = () : GPTS => {
 
 export const modelOptions = getModelOptions();
 
-export const defaultGPTModel = 'gpt3.5';
+export const defaultGPTModel = 'gpt-4o-mini';
 
 export const OpenAIInstance = (gptModel: string = process.env.AZURE_OPENAI_API_DEPLOYMENT_NAME) => {
   const endpointSuffix = process.env.AZURE_OPENAI_API_ENDPOINT_SUFFIX || "openai.azure.com";
   let selectedModel = Object.values(modelOptions).find(model => model.model === gptModel);
   if (!selectedModel) {
-    selectedModel = modelOptions['gpt3.5']; // Set default value if gptModel is not found in modelOptions
+    selectedModel = modelOptions['gpt-4o-mini']; // Set default value if gptModel is not found in modelOptions
   }
   const openai = new OpenAI({
     apiKey: process.env.AZURE_OPENAI_API_KEY,

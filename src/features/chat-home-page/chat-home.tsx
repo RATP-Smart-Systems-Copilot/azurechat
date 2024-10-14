@@ -75,7 +75,7 @@ export const ChatHome: FC<ChatPersonaProps> = (props) => {
           <div>
             <h2 className="text-corporateblue text-2xl font-bold mb-3">GPTs disponibles</h2>
             <div className="grid grid-cols-3 gap-3">
-              <ChatCard model={props.gpts['gpt3.5'].model} name={props.gpts['gpt3.5'].name} index={0} description={props.gpts['gpt3.5'].description} />
+              <ChatCard model={props.gpts['gpt-4o-mini'].model} name={props.gpts['gpt-4o-mini'].name} index={0} description={props.gpts['gpt-4o-mini'].description} />
               <ChatCard model={props.gpts['gpt4o'].model} name={props.gpts['gpt4o'].name} index={0} description={props.gpts['gpt4o'].description} />
             </div>
           </div>
