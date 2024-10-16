@@ -25,6 +25,8 @@ import {
 } from "./persona-store";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
 import { modelOptions } from "../common/services/openai";
+import { AttachFile } from "../ui/chat/chat-input-area/attach-file";
+import { fileStore, useFileStore } from "./file/file-store";
 
 interface Props {}
 
@@ -32,6 +34,7 @@ export const AddNewPersona: FC<Props> = (props) => {
   const initialState: ServerActionResponse | undefined = undefined;
 
   const { isOpened, persona } = usePersonaState();
+  const { uploadButtonLabel } = useFileStore();
 
   const [formState, formAction] = useFormState(
     addOrUpdatePersona,
@@ -49,6 +52,23 @@ export const AddNewPersona: FC<Props> = (props) => {
         <div className="flex items-center space-x-2">
           <Switch name="isPublished" defaultChecked={persona.isPublished} />
           <Label htmlFor="description">Publier à tous les collaborateurs</Label>
+        </div>
+      );
+    }
+  };
+
+  const AttachFileToPersona = () => {
+    if (data === undefined || data === null) return null;
+
+    if(data?.user?.isAdmin && persona.id){
+      const personaId = persona.id;
+      return (
+        <div className="flex items-center space-x-2">
+          <AttachFile
+            onClick={(formData) =>
+              fileStore.onFileChange({ formData, personaId })
+            }
+          />
         </div>
       );
     }
@@ -142,11 +162,17 @@ export const AddNewPersona: FC<Props> = (props) => {
                 </SelectContent>
               </Select>
               </div>
+                <AttachFileToPersona />
             </div>
           </ScrollArea>
           <SheetFooter className="py-2 flex sm:justify-between flex-row">
             <PublicSwitch /> <Submit />
           </SheetFooter>
+          <div className=" flex justify-center">
+            <div className="border bg-background p-2 px-5  rounded-full flex gap-2 items-center text-sm">
+              {uploadButtonLabel}
+            </div>
+          </div>
         </form>
       </SheetContent>
     </Sheet>

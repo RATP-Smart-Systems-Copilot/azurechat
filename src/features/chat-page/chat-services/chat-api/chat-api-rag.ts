@@ -27,7 +27,7 @@ export const ChatApiRAG = async (props: {
   const userMessageConfluence = "";
   if(chatThread.name == "Confluence RSS"){
     const fixedChatThreadId = "GcOxmZJmTeRS4BbcgQIUO86VlCAdMRbuveKk";
-    filter = `${filter} or chatThreadId eq '${fixedChatThreadId}'`;
+    filter = `${filter} or chatThreadId eq '${fixedChatThreadId}' or personaId eq '${chatThread.personaId}'`;
     const userMessageConfluence = "- If the user asks you where to find information, look for links to provide them in the documents";
   }
 

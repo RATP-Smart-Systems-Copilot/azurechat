@@ -36,6 +36,7 @@ export interface ChatThreadModel {
   extension: string[];
   type: typeof CHAT_THREAD_ATTRIBUTE;
   gptModel?: string;
+  personaId?: string;
 }
 
 export interface UserPrompt {
@@ -47,11 +48,12 @@ export interface UserPrompt {
 export interface ChatDocumentModel {
   id: string;
   name: string;
-  chatThreadId: string;
+  chatThreadId?: string;
   userId: string;
   isDeleted: boolean;
   createdAt: Date;
   type: typeof CHAT_DOCUMENT_ATTRIBUTE;
+  personaId?: string;
 }
 
 export interface ToolsInterface {

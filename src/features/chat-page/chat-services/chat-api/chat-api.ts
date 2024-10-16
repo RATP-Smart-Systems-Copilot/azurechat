@@ -5,7 +5,7 @@ import { getCurrentUser } from "@/features/auth-page/helpers";
 import { CHAT_DEFAULT_SYSTEM_PROMPT } from "@/features/theme/theme-config";
 import { ChatCompletionStreamingRunner } from "openai/resources/beta/chat/completions";
 import { ChatApiRAG } from "../chat-api/chat-api-rag";
-import { FindAllChatDocuments } from "../chat-document-service";
+import { FindAllChatDocuments, FindAllChatDocumentsByPersona } from "../chat-document-service";
 import {
   CreateChatMessage,
   FindTopChatMessagesForCurrentUser,
@@ -31,10 +31,11 @@ export const ChatAPIEntry = async (props: UserPrompt, signal: AbortSignal) => {
   const currentChatThread = currentChatThreadResponse.response;
 
   // promise all to get user, history and docs
-  const [user, history, docs, extension] = await Promise.all([
+  const [user, history, docs, docsPersona, extension] = await Promise.all([
     getCurrentUser(),
     _getHistory(currentChatThread),
     _getDocuments(currentChatThread),
+    _getDocumentsByPersona(currentChatThread),
     _getExtensions({
       chatThread: currentChatThread,
       userMessage: props.message,
@@ -51,7 +52,7 @@ export const ChatAPIEntry = async (props: UserPrompt, signal: AbortSignal) => {
   }
   else if (props.multimodalImage && props.multimodalImage.length > 0) {
     chatType = "multimodal";
-  } else if (docs.length > 0) {
+  } else if (docs.length > 0 || docsPersona.length > 0) {
     chatType = "chat-with-file";
   } else if (extension.length > 0) {
     chatType = "extensions";
@@ -163,6 +164,20 @@ const _getDocuments = async (chatThread: ChatThreadModel) => {
 
   return [];
 
+};
+
+const _getDocumentsByPersona = async (chatThread: ChatThreadModel) => {
+  if(!chatThread.personaId)
+    return [];
+
+  const docsResponse = await FindAllChatDocumentsByPersona(chatThread.personaId);
+
+  if (docsResponse.status === "OK") {
+    return docsResponse.response;
+  }
+
+  console.error("🔴 Error on AI search:", docsResponse.errors);
+  return [];
 };
 
 const _getExtensions = async (props: {

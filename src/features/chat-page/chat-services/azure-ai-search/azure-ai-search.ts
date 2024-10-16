@@ -20,8 +20,9 @@ export interface AzureSearchDocumentIndex {
   pageContent: string;
   embedding?: number[];
   user: string;
-  chatThreadId: string;
+  chatThreadId?: string;
   metadata: string;
+  personaId?: string;
 }
 
 export type DocumentSearchResponse = {
@@ -201,7 +202,8 @@ export const ExtensionSimilaritySearch = async (props: {
 export const IndexDocuments = async (
   fileName: string,
   docs: string[],
-  chatThreadId: string
+  chatThreadId?: string,
+  personaId?: string,
 ): Promise<Array<ServerActionResponse<boolean>>> => {
   try {
     const documentsToIndex: AzureSearchDocumentIndex[] = [];
@@ -214,6 +216,7 @@ export const IndexDocuments = async (
         pageContent: doc,
         metadata: fileName,
         embedding: [],
+        personaId: personaId,
       };
 
       documentsToIndex.push(docToAdd);
@@ -264,14 +267,27 @@ export const IndexDocuments = async (
   }
 };
 
-export const DeleteDocuments = async (
+export const DeleteDocumentsForChatTHreadId = async (
   chatThreadId: string
+): Promise<Array<ServerActionResponse<boolean>>> => {
+    return DeleteDocuments(`chatThreadId eq '${chatThreadId}'`);
+};
+
+export const DeleteDocumentsForPersona = async (
+  personaId: string
+): Promise<Array<ServerActionResponse<boolean>>> => {
+  return DeleteDocuments(`personaId eq '${personaId}'`);
+};
+
+
+export const DeleteDocuments = async (
+  filter: string
 ): Promise<Array<ServerActionResponse<boolean>>> => {
   try {
     // find all documents for chat thread
     const documentsInChatResponse = await SimpleSearch(
       undefined,
-      `chatThreadId eq '${chatThreadId}'`
+      filter
     );
 
     if (documentsInChatResponse.status === "OK") {
@@ -407,6 +423,12 @@ const CreateSearchIndex = async (): Promise<
         },
         {
           name: "chatThreadId",
+          type: "Edm.String",
+          searchable: true,
+          filterable: true,
+        },
+        {
+          name: "personaId",
           type: "Edm.String",
           searchable: true,
           filterable: true,
