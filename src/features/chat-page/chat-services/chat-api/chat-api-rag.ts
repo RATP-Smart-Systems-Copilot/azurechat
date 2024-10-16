@@ -22,10 +22,17 @@ export const ChatApiRAG = async (props: {
 
   const openAI = OpenAIInstance(chatThread.gptModel);
 
+  let filter = `user eq '${await userHashedId()}' and chatThreadId eq '${chatThread.id}'`;
+
+  if(chatThread.name == "Confluence RSS"){
+    const fixedChatThreadId = "GcOxmZJmTeRS4BbcgQIUO86VlCAdMRbuveKk";
+    filter = `${filter} or chatThreadId eq '${fixedChatThreadId}'`;
+  }
+
   const documentResponse = await SimilaritySearch(
     userMessage,
     10,
-    `user eq '${await userHashedId()}' and chatThreadId eq '${chatThread.id}'`
+    filter
   );
 
   const documents: ChatCitationModel[] = [];
@@ -51,8 +58,8 @@ export const ChatApiRAG = async (props: {
   // Augment the user prompt
   const _userMessage = `\n
 - Review the following content from documents uploaded by the user and create a final answer.
-- If you don't know the answer, just say that you don't know. Don't try to make up an answer.
 - You must always include a citation at the end of your answer and don't include full stop after the citations.
+- If you don't know the answer, you can try to make up an answer but make it clear.
 - Use the format for your citation {% citation items=[{name:"filename 1",id:"file id"}, {name:"filename 2",id:"file id"}] /%}
 ----------------
 content: 
