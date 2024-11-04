@@ -46,7 +46,6 @@ export const ChatAPIEntry = async (props: UserPrompt, signal: AbortSignal) => {
   currentChatThread.personaMessage = `${CHAT_DEFAULT_SYSTEM_PROMPT} \n\n ${currentChatThread.personaMessage}`;
 
   let chatType: ChatTypes = "extensions";
-console.log(docs.length);
   if (props.multimodalImage && props.multimodalImage.length > 0) {
     chatType = "multimodal";
   } else if (docs.length > 0) {
@@ -124,7 +123,7 @@ const _getHistory = async (chatThread: ChatThreadModel) => {
 };
 
 const _getDocuments = async (chatThread: ChatThreadModel) => {
-  const fixedChatThreadId = "GcOxmZJmTeRS4BbcgQIUO86VlCAdMRbuveKk"; // Remplacez par l'ID fixe souhaité
+  const fixedChatThreadId = "GcOxmZJmTeRS4BbcgQIUO86VlCAdMRbuveKk";
 
   const [docsResponse1, docsResponse2] = await Promise.all([
     FindAllChatDocuments(chatThread.id),

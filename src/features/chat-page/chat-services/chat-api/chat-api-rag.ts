@@ -24,9 +24,11 @@ export const ChatApiRAG = async (props: {
 
   let filter = `user eq '${await userHashedId()}' and chatThreadId eq '${chatThread.id}'`;
 
+  const userMessageConfluence = "";
   if(chatThread.name == "Confluence RSS"){
     const fixedChatThreadId = "GcOxmZJmTeRS4BbcgQIUO86VlCAdMRbuveKk";
     filter = `${filter} or chatThreadId eq '${fixedChatThreadId}'`;
+    const userMessageConfluence = "- If the user asks you where to find information, look for links to provide them in the documents";
   }
 
   const documentResponse = await SimilaritySearch(
@@ -61,6 +63,7 @@ export const ChatApiRAG = async (props: {
 - You must always include a citation at the end of your answer and don't include full stop after the citations.
 - If you don't know the answer, you can try to make up an answer but make it clear.
 - Use the format for your citation {% citation items=[{name:"filename 1",id:"file id"}, {name:"filename 2",id:"file id"}] /%}
+${userMessageConfluence}
 ----------------
 content: 
 ${content}
