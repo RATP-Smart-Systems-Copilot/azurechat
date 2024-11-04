@@ -92,6 +92,7 @@ export const CreatePersona = async (
       userId: await userHashedId(),
       createdAt: new Date(),
       type: "PERSONA",
+      sharedWith: [],
     };
 
     const valid = ValidateSchema(modelToSave);
