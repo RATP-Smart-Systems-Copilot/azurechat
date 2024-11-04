@@ -23,15 +23,15 @@ export const getModelOptions = () : GPTS => {
       'model': process.env.AZURE_OPENAI_API_DEPLOYMENT_NAME,
       'name': 'GPT 4o mini',
       'description': 'Chat GPT 4o mini avec un contexte de 128k tokens maximal et un seuil de connaissance à octobre 2023',
-      'prompt': { 'price': 0.00013434, 'unit': 1000 },
-      'completion': { 'price': 0.0005374, 'unit': 1000 },
+      'prompt': { 'price': 0.00015280, 'unit': 1000 },
+      'completion': { 'price': 0.0006112, 'unit': 1000 },
     },
     'gpt4o': {
       'model': process.env.AZURE_OPENAI_API_DEPLOYMENT_NAME_4o,
       'name': 'GPT 4o',
       'description': 'Chat GPT 4o avec un contexte de 128k tokens maximal et un seuil de connaissance à octobre 2023',
-      'prompt': { 'price': 0.0045, 'unit': 1000 },
-      'completion': { 'price': 0.0135, 'unit': 1000 },
+      'prompt': { 'price': 0.00254665, 'unit': 1000 },
+      'completion': { 'price': 0.0101866, 'unit': 1000 },
     },
   };
 
