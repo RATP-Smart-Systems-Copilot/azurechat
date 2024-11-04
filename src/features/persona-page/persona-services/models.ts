@@ -2,7 +2,7 @@ import { refineFromEmpty } from "@/features/common/schema-validation";
 import { z } from "zod";
 
 export const PERSONA_ATTRIBUTE = "PERSONA";
-export const PERSONA_TEMPERATURE = 0.1;
+export const PERSONA_TEMPERATURE = 0;
 export type PersonaModel = z.infer<typeof PersonaModelSchema>;
 
 export const PersonaModelSchema = z.object({
