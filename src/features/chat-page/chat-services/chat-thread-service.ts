@@ -292,6 +292,8 @@ export const CreateChatThread = async (gptModel: string = process.env.AZURE_OPEN
       personaTemperature: PERSONA_TEMPERATURE,
       extension: [],
       gptModel: gptModel,
+      threadAssistantID : "",
+      assistantID: "",
     };
 
     const { resource } = await HistoryContainer().items.create<ChatThreadModel>(

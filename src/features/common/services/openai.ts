@@ -103,3 +103,13 @@ export const OpenAIDALLEInstance = () => {
   });
   return openai;
 };
+
+export const OpenAIAssistant = () => {
+  const openai = new OpenAI({
+    apiKey: process.env.AZURE_OPENAI_API_KEY,
+    baseURL: `https://${process.env.AZURE_OPENAI_API_INSTANCE_NAME}.openai.azure.com/openai/`,
+    defaultQuery: { "api-version": process.env.AZURE_OPENAI_API_VERSION },
+    defaultHeaders: { "api-key": process.env.AZURE_OPENAI_API_KEY },
+  });
+  return openai;
+};

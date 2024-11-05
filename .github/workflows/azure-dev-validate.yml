@@ -23,3 +23,5 @@ jobs:
         with:
           inlineScript: export DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=1 && az config set bicep.use_binary_from_path=false && az bicep build -f infra/main.bicep --stdout
 
+
+
