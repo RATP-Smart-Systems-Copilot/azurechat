@@ -182,7 +182,7 @@ export const CountAllUsersForAdmin = async (
   }
 };
 
-interface User{
+export interface User{
   useName: string;
   userId: string;
   chats: number;
