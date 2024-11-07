@@ -25,7 +25,7 @@ export const ChatApiRAG = async (props: {
   const documentResponse = await SimilaritySearch(
     userMessage,
     10,
-    `user eq '${await userHashedId()}' and chatThreadId eq '${chatThread.id}'`
+    `(user eq '${await userHashedId()}' and chatThreadId eq '${chatThread.id}') or personaId eq '${chatThread.personaId}'`
   );
 
   const documents: ChatCitationModel[] = [];
