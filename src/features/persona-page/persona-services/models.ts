@@ -33,5 +33,5 @@ export const PersonaModelSchema = z.object({
   isPublished: z.boolean(),
   type: z.literal(PERSONA_ATTRIBUTE),
   createdAt: z.date(),
-  sharedWith: z.array(z.string()),
+  sharedWith: z.array(z.string()).optional(),
 });

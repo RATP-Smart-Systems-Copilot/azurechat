@@ -22,6 +22,7 @@ interface ChatPersonaProps {
   personas: PersonaModel[];
   extensions: ExtensionModel[];
   gpts: GPTS;
+  sharedPersonas: PersonaModel[];
 }
 
 interface Props {
@@ -53,6 +54,7 @@ export const StartNewChatGPT: FC<Props> = (props) => {
 
 
 export const ChatHome: FC<ChatPersonaProps> = (props) => {
+
   return (
     <ScrollArea className="flex-1">
       <main className="flex flex-1 flex-col gap-6 pb-6">
@@ -80,23 +82,45 @@ export const ChatHome: FC<ChatPersonaProps> = (props) => {
             </div>
           </div>
           <div>
-            <h2 className="text-corporateblue text-2xl font-bold mb-3">Personas</h2>
-
-            {props.personas && props.personas.length > 0 ? (
-              <div className="grid grid-cols-3 gap-3">
-                {props.personas.map((persona) => {
-                  return (
+            <h2 className="text-corporateblue text-2xl font-bold mb-3">Assistant</h2>
+            <br />
+            {/* Afficher les personas de l'utilisateur */}
+            {props.personas.length > 0 ? (
+              <div>
+                <h3 className="text-muted-foreground">Mes Assistants</h3>
+                <br />
+                <div className="grid grid-cols-3 gap-3">
+                  {props.personas.map((persona) => (
                     <PersonaCard
                       persona={persona}
                       key={persona.id}
                       showContextMenu={false}
                     />
-                  );
-                })}
+                  ))}
+                </div>
               </div>
-            ) :
-              <p className="text-muted-foreground max-w-xl">No personas created</p>
-            }
+            ) : (
+              <p className="text-muted-foreground max-w-xl">Aucun assistant créé</p>
+            )}
+            <br />
+            {/* Afficher les personas partagés */}
+            {props.sharedPersonas.length > 0 ? (
+              <div>
+                <h3 className="text-muted-foreground">Assistants Partagés</h3>
+                <br />
+                <div className="grid grid-cols-3 gap-3">
+                  {props.sharedPersonas.map((persona) => (
+                    <PersonaCard
+                      persona={persona}
+                      key={persona.id}
+                      showContextMenu={false}
+                    />
+                  ))}
+                </div>
+              </div>
+            ) : (
+              <p className="text-muted-foreground max-w-xl">Aucun assistant partagé</p>
+            )}
           </div>
           { <div>
             <h2 className="text-corporateblue text-2xl font-bold mb-3">Extensions</h2>

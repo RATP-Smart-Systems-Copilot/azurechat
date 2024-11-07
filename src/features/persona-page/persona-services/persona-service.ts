@@ -205,6 +205,7 @@ export const UpsertPersona = async (
        // isPublished: user.isAdmin ? personaInput.isPublished : persona.isPublished,
         isPublished: personaInput.isPublished,
         createdAt: new Date(),
+        sharedWith: personaInput.sharedWith || [],
       };
 
       const validationResponse = ValidateSchema(modelToUpdate);
@@ -252,7 +253,7 @@ export const FindAllPersonaForCurrentUser = async (): Promise<
   try {
     const querySpec: SqlQuerySpec = {
       query:
-        "SELECT * FROM root r WHERE r.type=@type AND (r.isPublished=@isPublished OR r.userId=@userId) ORDER BY r.createdAt DESC",
+        "SELECT * FROM root r WHERE r.type=@type AND (r.isPublished=@isPublished OR r.userId=@userId OR ARRAY_CONTAINS(r.sharedWith, @userId)) ORDER BY r.createdAt DESC",
       parameters: [
         {
           name: "@type",
