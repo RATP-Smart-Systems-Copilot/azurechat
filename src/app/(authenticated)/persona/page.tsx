@@ -1,3 +1,4 @@
+import { userHashedId } from "@/features/auth-page/helpers";
 import { ChatPersonaPage } from "@/features/persona-page/persona-page";
 import { FindAllPersonaForCurrentUser } from "@/features/persona-page/persona-services/persona-service";
 import { DisplayError } from "@/features/ui/error/display-error";
@@ -7,5 +8,10 @@ export default async function Home() {
   if (personasResponse.status !== "OK") {
     return <DisplayError errors={personasResponse.errors} />;
   }
-  return <ChatPersonaPage personas={personasResponse.response} />;
+
+  const userId = await userHashedId();
+  const userPersonas = personasResponse.response.filter(persona => persona.userId === userId);
+  const sharedPersonas = personasResponse.response.filter(persona => persona.isPublished || (persona.sharedWith && persona.sharedWith.includes(userId)));
+
+  return <ChatPersonaPage personas={userPersonas} sharedPersonas={sharedPersonas} />;
 }

@@ -1,3 +1,4 @@
+import { userHashedId } from "@/features/auth-page/helpers";
 import { ChatHome } from "@/features/chat-home-page/chat-home";
 import { getModelOptions } from "@/features/common/services/openai";
 import { FindAllExtensionForCurrentUser } from "@/features/extensions-page/extension-services/extension-service";
@@ -14,14 +15,19 @@ export default async function Home() {
     return <DisplayError errors={personaResponse.errors} />;
   }
 
+  const userId = await userHashedId();
+  const userPersonas = personaResponse.response.filter(persona => persona.userId === userId);
+  const sharedPersonas = personaResponse.response.filter(persona => persona.isPublished || (persona.sharedWith && persona.sharedWith.includes(userId)));
+
   if (extensionResponse.status !== "OK") {
     return <DisplayError errors={extensionResponse.errors} />;
   }
   return (
     <ChatHome
-      personas={personaResponse.response}
+      personas={userPersonas}
       extensions={extensionResponse.response}
       gpts={getModelOptions()}
+      sharedPersonas={sharedPersonas}
     />
   );
 }

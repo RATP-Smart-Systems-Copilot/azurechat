@@ -7,6 +7,7 @@ import { PersonaModel } from "./persona-services/models";
 
 interface ChatPersonaProps {
   personas: PersonaModel[];
+  sharedPersonas: PersonaModel[];
 }
 
 export const ChatPersonaPage: FC<ChatPersonaProps> = (props) => {
@@ -15,6 +16,8 @@ export const ChatPersonaPage: FC<ChatPersonaProps> = (props) => {
       <main className="flex flex-1 flex-col">
         <PersonaHero />
         <div className="container max-w-4xl py-3">
+          <h2>Mes assistants</h2>
+          <br />
           <div className="grid grid-cols-3 gap-3">
             {props.personas.map((persona) => {
               return (
@@ -22,6 +25,20 @@ export const ChatPersonaPage: FC<ChatPersonaProps> = (props) => {
                   persona={persona}
                   key={persona.id}
                   showContextMenu
+                />
+              );
+            })}
+          </div>
+          <br />
+          <h2>Assistants partagés</h2>
+          <br />
+          <div className="grid grid-cols-3 gap-3">
+            {props.sharedPersonas.map((persona) => {
+              return (
+                <PersonaCard
+                  persona={persona}
+                  key={persona.id}
+                  showContextMenu={false}
                 />
               );
             })}
