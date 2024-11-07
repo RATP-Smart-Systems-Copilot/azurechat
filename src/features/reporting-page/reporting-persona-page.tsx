@@ -27,7 +27,7 @@ export default function ReportingPersonaPage(props: PersonaProps) {
   };
 
   const handleUnshareWithUser = async (userId: string) => {
-    const updatedSharedWith = persona.sharedWith.filter(id => id !== userId);
+    const updatedSharedWith = (persona.sharedWith || []).filter(id => id !== userId);
     const updatedPersona = { ...persona, sharedWith: updatedSharedWith };
     const response = await UpsertPersona(updatedPersona);
 
