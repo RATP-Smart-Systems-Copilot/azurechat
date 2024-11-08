@@ -22,7 +22,6 @@ type ChatTypes = "extensions" | "chat-with-file" | "multimodal";
 
 export const ChatAPIEntry = async (props: UserPrompt, signal: AbortSignal) => {
   const currentChatThreadResponse = await EnsureChatThreadOperation(props.id);
-  const rssChat = "Confluence RSS";
 
   if (currentChatThreadResponse.status !== "OK") {
     return new Response("", { status: 401 });
@@ -46,6 +45,7 @@ export const ChatAPIEntry = async (props: UserPrompt, signal: AbortSignal) => {
   currentChatThread.personaMessage = `${CHAT_DEFAULT_SYSTEM_PROMPT} \n\n ${currentChatThread.personaMessage}`;
 
   let chatType: ChatTypes = "extensions";
+
   if (props.multimodalImage && props.multimodalImage.length > 0) {
     chatType = "multimodal";
   } else if (docs.length > 0) {
@@ -123,18 +123,13 @@ const _getHistory = async (chatThread: ChatThreadModel) => {
 };
 
 const _getDocuments = async (chatThread: ChatThreadModel) => {
-  const fixedChatThreadId = "GcOxmZJmTeRS4BbcgQIUO86VlCAdMRbuveKk";
+  const docsResponse = await FindAllChatDocuments(chatThread.id);
 
-  const [docsResponse1, docsResponse2] = await Promise.all([
-    FindAllChatDocuments(chatThread.id),
-    FindAllChatDocuments(fixedChatThreadId)
-  ]);
-
-  if (docsResponse1.status === "OK" && docsResponse2.status === "OK") {
-    return [...docsResponse1.response, ...docsResponse2.response];
+  if (docsResponse.status === "OK") {
+    return docsResponse.response;
   }
 
-  console.error("🔴 Error on AI search:", docsResponse1.errors, docsResponse2.errors);
+  console.error("🔴 Error on AI search:", docsResponse.errors);
   return [];
 };
 
