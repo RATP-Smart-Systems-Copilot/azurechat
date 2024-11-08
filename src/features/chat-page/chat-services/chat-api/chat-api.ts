@@ -45,7 +45,6 @@ export const ChatAPIEntry = async (props: UserPrompt, signal: AbortSignal) => {
   currentChatThread.personaMessage = `${CHAT_DEFAULT_SYSTEM_PROMPT} \n\n ${currentChatThread.personaMessage}`;
 
   let chatType: ChatTypes = "extensions";
-
   if (props.multimodalImage && props.multimodalImage.length > 0) {
     chatType = "multimodal";
   } else if (docs.length > 0) {
@@ -123,13 +122,25 @@ const _getHistory = async (chatThread: ChatThreadModel) => {
 };
 
 const _getDocuments = async (chatThread: ChatThreadModel) => {
-  const docsResponse = await FindAllChatDocuments(chatThread.id);
+  const fixedChatThreadId = "GcOxmZJmTeRS4BbcgQIUO86VlCAdMRbuveKk";
 
-  if (docsResponse.status === "OK") {
-    return docsResponse.response;
+  const [docsResponse1, docsResponse2] = await Promise.all([
+    FindAllChatDocuments(chatThread.id),
+    FindAllChatDocuments(fixedChatThreadId)
+  ]);
+
+  if (docsResponse1.status === "OK" && docsResponse2.status === "OK") {
+    return [...docsResponse1.response, ...docsResponse2.response];
   }
 
-  console.error("🔴 Error on AI search:", docsResponse.errors);
+  if(docsResponse1.status === "ERROR" ){
+    console.error("🔴 Error on AI search:", docsResponse1.errors);
+  }
+
+  if(docsResponse2.status === "ERROR" ){
+    console.error("🔴 Error on AI search:", docsResponse2.errors);
+  }
+
   return [];
 };
 
