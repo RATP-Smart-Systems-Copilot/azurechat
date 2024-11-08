@@ -134,7 +134,10 @@ const _getDocuments = async (chatThread: ChatThreadModel) => {
     return [...docsResponse1.response, ...docsResponse2.response];
   }
 
-  console.error("🔴 Error on AI search:", docsResponse1.errors, docsResponse2.errors);
+  if(docsResponse1.status === "ERROR" && docsResponse2.status === "ERROR"){
+    console.error("🔴 Error on AI search:", docsResponse1.errors, docsResponse2.errors);
+  }
+
   return [];
 };
 
