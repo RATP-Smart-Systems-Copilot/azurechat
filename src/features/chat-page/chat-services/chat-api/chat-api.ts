@@ -22,7 +22,6 @@ type ChatTypes = "extensions" | "chat-with-file" | "multimodal";
 
 export const ChatAPIEntry = async (props: UserPrompt, signal: AbortSignal) => {
   const currentChatThreadResponse = await EnsureChatThreadOperation(props.id);
-  const rssChat = "Confluence RSS";
 
   if (currentChatThreadResponse.status !== "OK") {
     return new Response("", { status: 401 });
@@ -134,8 +133,12 @@ const _getDocuments = async (chatThread: ChatThreadModel) => {
     return [...docsResponse1.response, ...docsResponse2.response];
   }
 
-  if(docsResponse1.status === "ERROR" && docsResponse2.status === "ERROR"){
-    console.error("🔴 Error on AI search:", docsResponse1.errors, docsResponse2.errors);
+  if(docsResponse1.status === "ERROR" ){
+    console.error("🔴 Error on AI search:", docsResponse1.errors);
+  }
+
+  if(docsResponse2.status === "ERROR" ){
+    console.error("🔴 Error on AI search:", docsResponse2.errors);
   }
 
   return [];
