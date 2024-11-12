@@ -122,26 +122,35 @@ const _getHistory = async (chatThread: ChatThreadModel) => {
 };
 
 const _getDocuments = async (chatThread: ChatThreadModel) => {
-  const fixedChatThreadId = "GcOxmZJmTeRS4BbcgQIUO86VlCAdMRbuveKk";
+  const docsResponse = await FindAllChatDocuments(chatThread.id);
 
-  const [docsResponse1, docsResponse2] = await Promise.all([
-    FindAllChatDocuments(chatThread.id),
-    FindAllChatDocuments(fixedChatThreadId)
-  ]);
+  const fixedChatThreadId = chatThread.name === "Confluence RSS" ? "GcOxmZJmTeRS4BbcgQIUO86VlCAdMRbuveKk" : "";
 
-  if (docsResponse1.status === "OK" && docsResponse2.status === "OK") {
-    return [...docsResponse1.response, ...docsResponse2.response];
+  if (docsResponse.status === "OK" && fixedChatThreadId === "")
+    return docsResponse.response;
+
+  if(docsResponse.status === "ERROR" && fixedChatThreadId === ""){
+    console.error("🔴 Error on AI search:", docsResponse.errors);
+    return [];
   }
 
-  if(docsResponse1.status === "ERROR" ){
-    console.error("🔴 Error on AI search:", docsResponse1.errors);
+  const docsResponseConfluence = await FindAllChatDocuments(fixedChatThreadId);
+
+  if (docsResponse.status === "OK" && docsResponseConfluence.status === "OK") {
+    return [...docsResponse.response, ...docsResponseConfluence.response];
   }
 
-  if(docsResponse2.status === "ERROR" ){
-    console.error("🔴 Error on AI search:", docsResponse2.errors);
+  if (docsResponse.status === "ERROR") {
+    console.error("🔴 Error on AI search:", docsResponse.errors);
+  }
+
+
+  if (docsResponseConfluence.status === "ERROR") {
+    console.error("🔴 Error on AI search:", docsResponseConfluence.errors);
   }
 
   return [];
+
 };
 
 const _getExtensions = async (props: {
