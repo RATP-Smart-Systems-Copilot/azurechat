@@ -20,17 +20,6 @@ export const CreatePrompt = async (
   try {
     const user = await getCurrentUser();
 
-    if (!user.isAdmin) {
-      return {
-        status: "UNAUTHORIZED",
-        errors: [
-          {
-            message: `Unable to create prompt - admin role required.`,
-          },
-        ],
-      };
-    }
-
     const modelToSave: PromptModel = {
       id: uniqueId(),
       name: props.name,
@@ -112,14 +101,58 @@ export const FindAllPrompts = async (): Promise<
   }
 };
 
+export const FindAllPromptForCurrentUser = async (): Promise<
+  ServerActionResponse<Array<PromptModel>>
+> => {
+  try {
+    const querySpec: SqlQuerySpec = {
+      query:
+        "SELECT * FROM root r WHERE r.type=@type AND (r.isPublished=@isPublished OR r.userId=@userId) ORDER BY r.createdAt DESC",
+      parameters: [
+        {
+          name: "@type",
+          value: PROMPT_ATTRIBUTE,
+        },
+        {
+          name: "@isPublished",
+          value: true,
+        },
+        {
+          name: "@userId",
+          value: await userHashedId(),
+        },
+      ],
+    };
+
+    const { resources } = await ConfigContainer()
+      .items.query<PromptModel>(querySpec)
+      .fetchAll();
+
+    return {
+      status: "OK",
+      response: resources,
+    };
+  } catch (error) {
+    return {
+      status: "ERROR",
+      errors: [
+        {
+          message: `Error finding prompts: ${error}`,
+        },
+      ],
+    };
+  }
+};
+
 export const EnsurePromptOperation = async (
   promptId: string
 ): Promise<ServerActionResponse<PromptModel>> => {
   const promptResponse = await FindPromptByID(promptId);
   const currentUser = await getCurrentUser();
+  const hashedId = await userHashedId();
 
   if (promptResponse.status === "OK") {
-    if (currentUser.isAdmin) {
+    if (currentUser.isAdmin || promptResponse.response.userId === hashedId) {
       return promptResponse;
     }
   }
@@ -227,9 +260,7 @@ export const UpsertPrompt = async (
         ...prompt,
         name: promptInput.name,
         description: promptInput.description,
-        isPublished: user.isAdmin
-          ? promptInput.isPublished
-          : prompt.isPublished,
+        isPublished: promptInput.isPublished,
         createdAt: new Date(),
       };
 
