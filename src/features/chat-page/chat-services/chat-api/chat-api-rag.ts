@@ -22,12 +22,12 @@ export const ChatApiRAG = async (props: {
 
   const openAI = OpenAIInstance(chatThread.gptModel);
 
-  let filter = `user eq '${await userHashedId()}' and chatThreadId eq '${chatThread.id}'`;
+  let filter = `user eq '${await userHashedId()}' and chatThreadId eq '${chatThread.id}' or personaId eq '${chatThread.personaId}'`;
 
   const userMessageConfluence = "";
   if(chatThread.name == "Confluence RSS"){
     const fixedChatThreadId = "GcOxmZJmTeRS4BbcgQIUO86VlCAdMRbuveKk";
-    filter = `${filter} or chatThreadId eq '${fixedChatThreadId}' or personaId eq '${chatThread.personaId}'`;
+    filter = `${filter} or chatThreadId eq '${fixedChatThreadId}'`;
     const userMessageConfluence = "- If the user asks you where to find information, look for links to provide them in the documents";
   }
 
