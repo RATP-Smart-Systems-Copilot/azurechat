@@ -289,6 +289,10 @@ class ChatState {
 
     this.chat(formData);
   }
+
+  public isSimpleChat(){
+    return this.chatThread?.gptModel === "o1-mini";
+  }
 }
 
 export const chatStore = proxy(new ChatState());
