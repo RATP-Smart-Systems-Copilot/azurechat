@@ -18,7 +18,8 @@ import { GetDynamicExtensions } from "./chat-api-dynamic-extensions";
 import { ChatApiExtensions } from "./chat-api-extension";
 import { ChatApiMultimodal } from "./chat-api-multimodal";
 import { OpenAIStream } from "./open-ai-stream";
-type ChatTypes = "extensions" | "chat-with-file" | "multimodal";
+import { ChatApiSimple } from "./chat-api-simple";
+type ChatTypes = "extensions" | "chat-with-file" | "multimodal" | "simple";
 
 export const ChatAPIEntry = async (props: UserPrompt, signal: AbortSignal) => {
   const currentChatThreadResponse = await EnsureChatThreadOperation(props.id);
@@ -45,7 +46,10 @@ export const ChatAPIEntry = async (props: UserPrompt, signal: AbortSignal) => {
   currentChatThread.personaMessage = `${CHAT_DEFAULT_SYSTEM_PROMPT} \n\n ${currentChatThread.personaMessage}`;
 
   let chatType: ChatTypes = "extensions";
-  if (props.multimodalImage && props.multimodalImage.length > 0) {
+  if(currentChatThread.gptModel === process.env.AZURE_OPENAI_API_DEPLOYMENT_NAME_o1mini){
+    chatType = "simple";
+  }
+  else if (props.multimodalImage && props.multimodalImage.length > 0) {
     chatType = "multimodal";
   } else if (docs.length > 0) {
     chatType = "chat-with-file";
@@ -87,6 +91,14 @@ export const ChatAPIEntry = async (props: UserPrompt, signal: AbortSignal) => {
         userMessage: props.message,
         history: history,
         extensions: extension,
+        signal: signal,
+      });
+      break;
+    case "simple":
+      runner = await ChatApiSimple({
+        chatThread: currentChatThread,
+        userMessage: props.message,
+        history: history,
         signal: signal,
       });
       break;

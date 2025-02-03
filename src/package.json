@@ -45,7 +45,7 @@
     "next": "14.0.4",
     "next-auth": "^4.24.5",
     "next-themes": "^0.2.1",
-    "openai": "^4.67.1",
+    "openai": "^4.80.0",
     "@azure/openai":"^2.0.0-beta.2",
     "react": "^18",
     "react-dom": "^18",
