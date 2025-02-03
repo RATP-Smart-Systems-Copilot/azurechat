@@ -48,6 +48,8 @@ export const ChatInput = () => {
     }
   };
 
+  const isSimpleChat = chatStore.isSimpleChat();
+
   return (
     <ChatInputForm
       ref={formRef}
@@ -77,15 +79,17 @@ export const ChatInput = () => {
       />
       <ChatInputActionArea>
         <ChatInputSecondaryActionArea>
-          <AttachFile
-            onClick={(formData) =>
-              fileStore.onFileChange({ formData, chatThreadId })
-            }
-          />
+          {!isSimpleChat && (
+            <AttachFile
+              onClick={(formData) =>
+                fileStore.onFileChange({ formData, chatThreadId })
+              }
+            />
+          )}
           <PromptSlider />
         </ChatInputSecondaryActionArea>
         <ChatInputPrimaryActionArea>
-          <ImageInput />
+          {!isSimpleChat && <ImageInput />}
           <Microphone
             startRecognition={() => speechToTextStore.startRecognition()}
             stopRecognition={() => speechToTextStore.stopRecognition()}
