@@ -1,7 +1,7 @@
 "use client";
 
 import { useSession } from "next-auth/react";
-import { FC } from "react";
+import { FC, useEffect, useState } from "react";
 import { useFormState, useFormStatus } from "react-dom";
 import { ServerActionResponse } from "../common/server-action-response";
 import { Button } from "../ui/button";
@@ -20,11 +20,16 @@ import { Switch } from "../ui/switch";
 import { Textarea } from "../ui/textarea";
 import {
   addOrUpdatePersona,
+  getDocumentsPersona,
   personaStore,
   usePersonaState,
 } from "./persona-store";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
 import { modelOptions } from "../common/services/openai";
+import { AttachFile } from "../ui/chat/chat-input-area/attach-file";
+import { fileStore, useFileStore } from "./file/file-store";
+import { ChatDocumentModel } from "../chat-page/chat-services/models";
+import { File } from "lucide-react";
 
 interface Props {}
 
@@ -32,6 +37,20 @@ export const AddNewPersona: FC<Props> = (props) => {
   const initialState: ServerActionResponse | undefined = undefined;
 
   const { isOpened, persona } = usePersonaState();
+  const { uploadButtonLabel } = useFileStore();
+  const [documentsPersona, setDocumentsPersona] = useState<Array<ChatDocumentModel>>([]);
+
+  useEffect(() => {
+    const fetchDocuments = async () => {
+      setDocumentsPersona([]);
+      if (persona.id) {
+        const documents = await getDocumentsPersona(persona.id);
+        setDocumentsPersona(documents);
+      }
+    };
+
+    fetchDocuments();
+  }, [persona.id]);
 
   const [formState, formAction] = useFormState(
     addOrUpdatePersona,
@@ -49,6 +68,23 @@ export const AddNewPersona: FC<Props> = (props) => {
         <div className="flex items-center space-x-2">
           <Switch name="isPublished" defaultChecked={persona.isPublished} />
           <Label htmlFor="description">Publier à tous les collaborateurs</Label>
+        </div>
+      );
+    }
+  };
+
+  const AttachFileToPersona = () => {
+    if (data === undefined || data === null) return null;
+
+    if(persona.id){
+      const personaId = persona.id;
+      return (
+        <div className="flex items-center space-x-2">
+          <AttachFile
+            onClick={(formData) =>
+              fileStore.onFileChange({ formData, personaId })
+            }
+          />
         </div>
       );
     }
@@ -142,11 +178,27 @@ export const AddNewPersona: FC<Props> = (props) => {
                 </SelectContent>
               </Select>
               </div>
+              <p>Fichiers de connaissance : </p>
+              <div className="pb-6 px-6 flex gap-2 flex-col  flex-1">
+                {documentsPersona.map((doc) => {
+                  return (
+                    <div className="flex gap-2 items-center" key={doc.id}>
+                      <File size={16} /> <div>{doc.name}</div>
+                    </div>
+                  );
+                })}
+              </div>
+                <AttachFileToPersona />
             </div>
           </ScrollArea>
           <SheetFooter className="py-2 flex sm:justify-between flex-row">
             <PublicSwitch /> <Submit />
           </SheetFooter>
+          <div className=" flex justify-center">
+            <div className="border bg-background p-2 px-5  rounded-full flex gap-2 items-center text-sm">
+              {uploadButtonLabel}
+            </div>
+          </div>
         </form>
       </SheetContent>
     </Sheet>

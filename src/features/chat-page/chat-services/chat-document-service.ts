@@ -120,6 +120,60 @@ const LoadFile = async (
   }
 };
 
+export const FindAllChatDocumentsByPersona = async (
+  personaId: string
+): Promise<ServerActionResponse<ChatDocumentModel[]>> => {
+  try {
+    const querySpec: SqlQuerySpec = {
+      query:
+        "SELECT * FROM root r WHERE r.type=@type AND r.personaId = @personaId AND r.isDeleted=@isDeleted",
+      parameters: [
+        {
+          name: "@type",
+          value: CHAT_DOCUMENT_ATTRIBUTE,
+        },
+        {
+          name: "@personaId",
+          value: personaId,
+        },
+        {
+          name: "@isDeleted",
+          value: false,
+        },
+      ],
+    };
+
+    const { resources } = await HistoryContainer()
+      .items.query<ChatDocumentModel>(querySpec)
+      .fetchAll();
+
+    if (resources) {
+      return {
+        status: "OK",
+        response: resources,
+      };
+    } else {
+      return {
+        status: "ERROR",
+        errors: [
+          {
+            message: "No documents found",
+          },
+        ],
+      };
+    }
+  } catch (e) {
+    return {
+      status: "ERROR",
+      errors: [
+        {
+          message: `${e}`,
+        },
+      ],
+    };
+  }
+};
+
 export const FindAllChatDocuments = async (
   chatThreadID: string
 ): Promise<ServerActionResponse<ChatDocumentModel[]>> => {
@@ -219,6 +273,55 @@ export const CreateChatDocument = async (
     };
   } catch (e) {
     console.error("CreateChatDocument error:", e);
+    return {
+      status: "ERROR",
+      errors: [
+        {
+          message: `${e}`,
+        },
+      ],
+    };
+  }
+};
+
+export const CreateChatDocumentForPersona = async (
+  fileName: string,
+  personaId: string
+): Promise<ServerActionResponse<ChatDocumentModel>> => {
+  try {
+    const modelToSave: ChatDocumentModel = {
+      personaId: personaId,
+      id: uniqueId(),
+      userId: await userHashedId(),
+      createdAt: new Date(),
+      type: CHAT_DOCUMENT_ATTRIBUTE,
+      isDeleted: false,
+      name: fileName,
+    };
+
+    const { resource } =
+      await HistoryContainer().items.upsert<ChatDocumentModel>(modelToSave);
+    RevalidateCache({
+      page: "persona",
+      params: personaId,
+    });
+
+    if (resource) {
+      return {
+        status: "OK",
+        response: resource,
+      };
+    }
+
+    return {
+      status: "ERROR",
+      errors: [
+        {
+          message: "Unable to save chat document",
+        },
+      ],
+    };
+  } catch (e) {
     return {
       status: "ERROR",
       errors: [

@@ -22,7 +22,7 @@ export const ChatApiRAG = async (props: {
 
   const openAI = OpenAIInstance(chatThread.gptModel);
 
-  let filter = `user eq '${await userHashedId()}' and chatThreadId eq '${chatThread.id}'`;
+  let filter = `user eq '${await userHashedId()}' and chatThreadId eq '${chatThread.id}' or personaId eq '${chatThread.personaId}'`;
 
   const userMessageConfluence = "";
   if(chatThread.name == "Confluence RSS"){

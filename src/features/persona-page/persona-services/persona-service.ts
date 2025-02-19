@@ -16,6 +16,8 @@ import { uniqueId } from "@/features/common/util";
 import { SqlQuerySpec } from "@azure/cosmos";
 import { PERSONA_ATTRIBUTE, PersonaModel, PersonaModelSchema } from "./models";
 import { defaultGPTModel, modelOptions } from "@/features/common/services/openai";
+import { FindAllChatDocumentsByPersona } from "@/features/chat-page/chat-services/chat-document-service";
+import { DeleteDocumentsForPersona } from "@/features/chat-page/chat-services/azure-ai-search/azure-ai-search";
 
 interface PersonaInput {
   name: string;
@@ -162,6 +164,17 @@ export const DeletePersona = async (
     const personaResponse = await EnsurePersonaOperation(personaId);
 
     if (personaResponse.status === "OK") {
+      const chatDocumentsResponse = await FindAllChatDocumentsByPersona(personaId);
+
+      if (chatDocumentsResponse.status !== "OK") {
+        return chatDocumentsResponse;
+      }
+
+      const chatDocuments = chatDocumentsResponse.response;
+
+      if (chatDocuments.length !== 0) {
+        await DeleteDocumentsForPersona(personaId);
+      }
       const { resource: deletedPersona } = await HistoryContainer()
         .item(personaId, personaResponse.response.userId)
         .delete();
@@ -316,6 +329,7 @@ export const CreatePersonaChat = async (
       personaTemperature: persona.temperature,
       extension: [],
       gptModel: gptModel,
+      personaId: personaId,
     });
 
     return response;

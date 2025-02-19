@@ -7,6 +7,8 @@ import {
 } from "./persona-services/persona-service";
 import { defaultGPTModel, modelOptions } from "../common/services/openai";
 import { idea } from "react-syntax-highlighter/dist/esm/styles/hljs";
+import { FindAllChatDocumentsByPersona } from "../chat-page/chat-services/chat-document-service";
+import { ChatDocumentModel } from "../chat-page/chat-services/models";
 
 class PersonaState {
   private defaultModel: PersonaModel = {
@@ -63,6 +65,7 @@ class PersonaState {
   public updateErrors(errors: string[]) {
     this.errors = errors;
   }
+
 }
 
 export const personaStore = proxy(new PersonaState());
@@ -71,7 +74,17 @@ export const usePersonaState = () => {
   return useSnapshot(personaStore);
 };
 
-export const addOrUpdatePersona = async (previous: any, formData: FormData) => {
+export const getDocumentsPersona = async (personaId : string):  Promise<Array<ChatDocumentModel>>  => {
+  const chatDocumentsResponse = await FindAllChatDocumentsByPersona(personaId);
+
+  if (chatDocumentsResponse.status !== "OK") {
+    return [];
+  }
+
+  return chatDocumentsResponse.response;
+}
+
+export const addOrUpdatePersona = async (previous: any, formData: FormData)=> {
   personaStore.updateErrors([]);
 
   const model = FormDataToPersonaModel(formData);
