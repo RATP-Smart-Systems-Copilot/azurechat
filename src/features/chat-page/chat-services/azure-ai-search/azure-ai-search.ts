@@ -282,12 +282,16 @@ export const IndexDocuments = async (
 export const DeleteDocumentsForChatThreadId = async (
   chatThreadId: string
 ): Promise<Array<ServerActionResponse<boolean>>> => {
-    return DeleteDocuments(`chatThreadId eq '${chatThreadId}'`);
+  if (debug)
+    console.log("Deleting documents for chatThreadId:", chatThreadId);
+  return DeleteDocuments(`chatThreadId eq '${chatThreadId}'`);
 };
 
 export const DeleteDocumentsForPersona = async (
   personaId: string
 ): Promise<Array<ServerActionResponse<boolean>>> => {
+  if (debug)
+    console.log("Deleting documents for personaId:", personaId);
   return DeleteDocuments(`personaId eq '${personaId}'`);
 };
 
@@ -296,7 +300,6 @@ export const DeleteDocuments = async (
   filter: string
 ): Promise<Array<ServerActionResponse<boolean>>> => {
   try {
-    if (debug) console.log("Deleting documents for chatThreadId:", chatThreadId);
     const documentsInChatResponse = await SimpleSearch(
       undefined,
       filter
