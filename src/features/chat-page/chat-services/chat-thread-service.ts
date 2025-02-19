@@ -14,7 +14,7 @@ import {
 } from "@/features/theme/theme-config";
 import { SqlQuerySpec } from "@azure/cosmos";
 import { HistoryContainer } from "../../common/services/cosmos";
-import { DeleteDocuments } from "./azure-ai-search/azure-ai-search";
+import { DeleteDocumentsForChatThreadId } from "./azure-ai-search/azure-ai-search";
 import { FindAllChatDocuments } from "./chat-document-service";
 import { FindAllChatMessagesForCurrentUser } from "./chat-message-service";
 import { PERSONA_TEMPERATURE } from "@/features/persona-page/persona-services/models";
@@ -148,7 +148,7 @@ export const SoftDeleteChatThreadForCurrentUser = async (
       const chatDocuments = chatDocumentsResponse.response;
 
       if (chatDocuments.length !== 0) {
-        await DeleteDocuments(chatThreadID);
+        await DeleteDocumentsForChatThreadId(chatThreadID);
       }
 
       chatDocuments.forEach(async (chatDocument: ChatDocumentModel) => {

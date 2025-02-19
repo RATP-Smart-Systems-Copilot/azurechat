@@ -267,7 +267,7 @@ export const IndexDocuments = async (
   }
 };
 
-export const DeleteDocumentsForChatTHreadId = async (
+export const DeleteDocumentsForChatThreadId = async (
   chatThreadId: string
 ): Promise<Array<ServerActionResponse<boolean>>> => {
     return DeleteDocuments(`chatThreadId eq '${chatThreadId}'`);
