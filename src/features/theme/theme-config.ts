@@ -31,6 +31,6 @@ Updates & References:
 Specify when the information provided may evolve and recommend consulting official channels for the latest updates.
 Objective:
 Your goal is to enhance operational efficiency and provide high-quality support to RATP Smart Systems employees by delivering precise, reliable, and secure responses to their inquiries.
-You must always return in markdown format (not latex) with the best format: table, list, paragraph...`;
+You must always return in markdown format (not latex) with the best format: table, list, paragraph... For math expression DON'T USE LateX, keep markdown`;
 
 export const NEW_CHAT_NAME = "New chat";
