@@ -5,7 +5,7 @@ import {
   CreatePersona,
   UpsertPersona,
 } from "./persona-services/persona-service";
-import { defaultGPTModel, modelOptions } from "../common/services/openai";
+import { defaultGPTModel } from "../common/services/openai";
 import { idea } from "react-syntax-highlighter/dist/esm/styles/hljs";
 import { FindAllChatDocumentsByPersona } from "../chat-page/chat-services/chat-document-service";
 import { ChatDocumentModel } from "../chat-page/chat-services/models";
