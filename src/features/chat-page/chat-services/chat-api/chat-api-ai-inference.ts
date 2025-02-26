@@ -8,7 +8,6 @@ import { mapAIInferenceChatMessages } from "../utils";
 import { CHAT_DEFAULT_SYSTEM_PROMPT } from "@/features/theme/theme-config";
 import { FindExtensionByID } from "@/features/extensions-page/extension-services/extension-service";
 import { RunnableToolFunction } from "openai/lib/RunnableFunction.mjs";
-import { GetDynamicExtensionsForLLM } from "./chat-api-dynamic-extensions";
 import { ChatCompletionsToolDefinition } from "@azure-rest/ai-inference";
 
 const _getHistory = async (chatThread: ChatThreadModel) => {
