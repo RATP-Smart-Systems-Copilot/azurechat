@@ -74,7 +74,7 @@ export const ChatHome: FC<ChatPersonaProps> = (props) => {
           }
           description={AI_DESCRIPTION}
         ></Hero>
-        <div className="container max-w-4xl flex gap-20 flex-col">
+        <div className="container max-w-5xl flex gap-20 flex-col">
           <div>
             <h2 className="text-corporateblue text-2xl font-bold mb-3">GPTs disponibles</h2>
             <div className="grid grid-cols-3 gap-3">
