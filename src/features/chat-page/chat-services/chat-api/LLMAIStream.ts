@@ -5,10 +5,10 @@ import {
   AzureChatLLMCompletionContent,
   ChatThreadModel,
 } from "../models";
-import { EventMessageStream } from "@azure/core-sse";
+import { createSseStream, EventMessageStream } from "@azure/core-sse";
 
 export const LLMAIStream = (props: {
-  runner: NodeJS.ReadableStream;
+  runner: any;
   chatThread: ChatThreadModel;
 }) => {
   const encoder = new TextEncoder();
@@ -23,65 +23,42 @@ export const LLMAIStream = (props: {
 
       let lastMessage = "";
 
-      runner.on("data", async (chunk) => {
-        const chunkStr = chunk.toString();
-        // Les données SSE peuvent contenir plusieurs lignes
-        const lines = chunkStr.split("\n");
+      const sses = createSseStream(runner);
 
-        for (const line of lines) {
-          if (line.startsWith("data: ")) {
-            // Retirer le préfixe "data: "
-            const dataStr = line.slice(6).trim();
-            // Si le signal [DONE] est reçu, on ferme le flux
-            if (dataStr === "[DONE]") {
-               await CreateChatMessage({
-                name: AI_NAME,
-                content: lastMessage,
-                role: "assistant",
-                chatThreadId: props.chatThread.id,
-              });
+      for await (const event of sses) {
+        if (event.data === "[DONE]") {
+          await CreateChatMessage({
+            name: AI_NAME,
+            content: lastMessage,
+            role: "assistant",
+            chatThreadId: props.chatThread.id,
+          });
 
-              const response: AzureChatCompletion = {
-                type: "finalContent",
-                response: lastMessage,
-              };
-              streamResponse(response.type, JSON.stringify(response));
-              controller.close();
-              continue;
-            }
-            // On ignore les lignes vides
-            if (!dataStr) continue;
-            try {
-              const parsedChunk = JSON.parse(dataStr);
-              // Accumuler le contenu du delta si présent
-              const content = parsedChunk.choices?.[0]?.delta?.content;
-              if (content !== undefined) {
-                lastMessage += content;
-              }
-              const response: AzureChatLLMCompletionContent = {
-                type: "contentLLM",
-                response: lastMessage,
-                idMessage: parsedChunk.id,
-              };
-
-              streamResponse(response.type, JSON.stringify(response));
-            } catch (parseError) {
-              console.error("Erreur lors du parsing du chunk :", parseError);
-            }
-          }
+          const response: AzureChatCompletion = {
+            type: "finalContent",
+            response: lastMessage,
+          };
+          streamResponse(response.type, JSON.stringify(response));
+          controller.close();
+          continue;
         }
-      });
+        for (const choice of JSON.parse(event.data).choices) {
+          const content = choice.delta?.content;
+          if (content !== undefined) {
+            lastMessage += content;
+          }
+          const response: AzureChatLLMCompletionContent = {
+            type: "contentLLM",
+            response: lastMessage,
+            idMessage: choice.id,
+          };
 
-      runner.on("end", () => {
-        console.log("Flux terminé");
-      });
-
-      runner.on("error", (error) => {
-        console.error("Erreur dans le traitement du flux :", error);
-        controller.error(error);
-      });
-    },
+          streamResponse(response.type, JSON.stringify(response));
+        }
+      }
+    }
   });
+
 
   return readableStream;
 };

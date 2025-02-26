@@ -79,8 +79,8 @@ export const ChatHome: FC<ChatPersonaProps> = (props) => {
             <h2 className="text-corporateblue text-2xl font-bold mb-3">GPTs disponibles</h2>
             <div className="grid grid-cols-3 gap-3">
                {Object.entries(llmModels).map(([key, model], index) => (
-                // eslint-disable-next-line react/jsx-key
                 <ChatCard
+                  key={key}
                   model={key}
                   name={model.name}
                   index={index}

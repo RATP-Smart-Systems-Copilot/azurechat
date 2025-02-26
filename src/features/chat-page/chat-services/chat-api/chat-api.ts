@@ -33,15 +33,10 @@ export const ChatAPIEntry = async (props: UserPrompt, signal: AbortSignal) => {
   const currentChatThread = currentChatThreadResponse.response;
 
    // promise all to get user, history and docs
-   const [user, docs, docsPersona, extension] = await Promise.all([
+   const [user, docs, docsPersona] = await Promise.all([
     getCurrentUser(),
     _getDocuments(currentChatThread),
     _getDocumentsByPersona(currentChatThread),
-    _getExtensions({
-      chatThread: currentChatThread,
-      userMessage: props.message,
-      signal,
-    }),
   ]);
 
    // save the user message
@@ -56,11 +51,19 @@ export const ChatAPIEntry = async (props: UserPrompt, signal: AbortSignal) => {
   let selectedModel = Object.values(modelOptions).find(model => model.model === currentChatThread.gptModel);
 
   if(selectedModel?.provider === 'MistralAI'){
-    return llmInference(currentChatThread, props.message);
+    return llmInference(currentChatThread, props.message, signal);
   }
 
   // promise all to get user, history and docs
-  const history = await _getHistory(currentChatThread);
+  const [history, extension] = await Promise.all([
+    _getHistory(currentChatThread),
+    _getExtensions({
+      chatThread: currentChatThread,
+      userMessage: props.message,
+      signal,
+    }),
+  ]);
+
   // Starting values for system and user prompt
   // Note that the system message will also get prepended with the extension execution steps. Please see ChatApiExtensions method.
   currentChatThread.personaMessage = `${CHAT_DEFAULT_SYSTEM_PROMPT} \n\n ${currentChatThread.personaMessage}`;
@@ -113,20 +116,20 @@ export const ChatAPIEntry = async (props: UserPrompt, signal: AbortSignal) => {
         signal: signal,
       });
       break;
-  }
+    }
 
-  const readableStream = OpenAIStream({
-    runner: runner,
-    chatThread: currentChatThread,
-  });
+    const readableStream = OpenAIStream({
+      runner: runner,
+      chatThread: currentChatThread,
+    });
 
-  return new Response(readableStream, {
-    headers: {
-      "Cache-Control": "no-cache",
-      Connection: "keep-alive",
-      "Content-Type": "text/event-stream"
-    },
-  });
+    return new Response(readableStream, {
+      headers: {
+        "Cache-Control": "no-cache",
+        Connection: "keep-alive",
+        "Content-Type": "text/event-stream"
+      },
+    });
 };
 
 const _getHistory = async (chatThread: ChatThreadModel) => {
@@ -219,14 +222,14 @@ const _getExtensions = async (props: {
   return extension;
 };
 
-async function llmInference( currentChatThread : ChatThreadModel, UserMessage : string) {
-  const response = await ChatApiAIInference({chatThread: currentChatThread, userMessage: UserMessage});
+async function llmInference( currentChatThread : ChatThreadModel, userMessage : string, signal: AbortSignal) {
+    const response = await ChatApiAIInference({chatThread: currentChatThread, userMessage: userMessage, signal: signal});
     const stream = response.body;
     if (!stream) {
       throw new Error("The response stream is undefined");
     }
     if (response.status !== "200") {
-      throw new Error(`Failed to get chat completions`);
+      throw new Error(`Failed to get chat completions: ${await streamToString(stream)}`);
     }
     const readableStream = LLMAIStream({
       runner: stream,
@@ -242,3 +245,13 @@ async function llmInference( currentChatThread : ChatThreadModel, UserMessage : 
     });
 }
 
+async function streamToString(stream: NodeJS.ReadableStream) {
+  // lets have a ReadableStream as a stream variable
+  const chunks = [];
+
+  for await (const chunk of stream) {
+    chunks.push(Buffer.from(chunk));
+  }
+
+  return Buffer.concat(chunks).toString("utf-8");
+}
