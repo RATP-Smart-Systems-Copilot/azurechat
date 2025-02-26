@@ -5,7 +5,7 @@ import {
   AzureChatLLMCompletionContent,
   ChatThreadModel,
 } from "../models";
-import { createSseStream, EventMessageStream } from "@azure/core-sse";
+import { createSseStream } from "@azure/core-sse";
 
 export const LLMAIStream = (props: {
   runner: any;
