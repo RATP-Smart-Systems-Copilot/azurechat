@@ -90,6 +90,12 @@ export type AzureChatCompletionContent = {
   response: ChatCompletionSnapshot;
 };
 
+export type AzureChatLLMCompletionContent = {
+  type: "contentLLM";
+  response: string;
+  idMessage: string;
+};
+
 export type AzureChatCompletionFinalContent = {
   type: "finalContent";
   response: string;
@@ -111,4 +117,5 @@ export type AzureChatCompletion =
   | AzureChatCompletionFunctionCallResult
   | AzureChatCompletionContent
   | AzureChatCompletionFinalContent
-  | AzureChatCompletionAbort;
+  | AzureChatCompletionAbort
+  | AzureChatLLMCompletionContent;

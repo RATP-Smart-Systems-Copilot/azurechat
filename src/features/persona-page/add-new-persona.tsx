@@ -25,11 +25,11 @@ import {
   usePersonaState,
 } from "./persona-store";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
-import { modelOptions } from "../common/services/openai";
 import { AttachFile } from "../ui/chat/chat-input-area/attach-file";
 import { fileStore, useFileStore } from "./file/file-store";
 import { ChatDocumentModel } from "../chat-page/chat-services/models";
 import { File } from "lucide-react";
+import { modelOptions } from "../theme/theme-config";
 
 interface Props {}
 
