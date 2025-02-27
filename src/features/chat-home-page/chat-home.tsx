@@ -5,12 +5,13 @@ import { ExtensionCard } from "@/features/extensions-page/extension-card/extensi
 import { ExtensionModel } from "@/features/extensions-page/extension-services/models";
 import { PersonaCard } from "@/features/persona-page/persona-card/persona-card";
 import { PersonaModel } from "@/features/persona-page/persona-services/models";
-import { AI_DESCRIPTION, AI_NAME, GPTS } from "@/features/theme/theme-config";
+import { AI_DESCRIPTION, AI_NAME } from "@/features/theme/theme-config";
 import { Hero } from "@/features/ui/hero";
 import { ScrollArea } from "@/features/ui/scroll-area";
 import Image from "next/image";
 import { FC } from "react";
 import { ChatCard } from "../chat-page/chat-card";
+import { GPTS, GPT } from "../common/services/openai";
 import { LoadingIndicator } from "@/features/ui/loading";
 import { MessageCircle } from "lucide-react";
 import { useState } from "react";
@@ -54,8 +55,6 @@ export const StartNewChatGPT: FC<Props> = (props) => {
 
 export const ChatHome: FC<ChatPersonaProps> = (props) => {
 
-  const llmModels: GPTS = props.gpts;
-
   return (
     <ScrollArea className="flex-1">
       <main className="flex flex-1 flex-col gap-6 pb-6">
@@ -74,46 +73,14 @@ export const ChatHome: FC<ChatPersonaProps> = (props) => {
           }
           description={AI_DESCRIPTION}
         ></Hero>
-        <div className="container max-w-6xl flex gap-20 flex-col">
+        <div className="container max-w-4xl flex gap-20 flex-col">
           <div>
-          <h2 className="text-corporateblue text-2xl font-bold mb-3">LLM disponibles</h2>
-            <div className="space-y-3 max-w-5xl">
-              <Image
-                src={"/openai.png"}
-                width={80}
-                height={30}
-                quality={100}
-                alt="ai-icon"
-              />
-              <div className="grid grid-cols-3 gap-3">
-                {Object.entries(llmModels).filter(([_, model]) => model.provider === 'OpenAI').map(([key, model], index) => (
-                  <ChatCard
-                    key={key}
-                    model={key}
-                    name={model.name}
-                    index={index}
-                    description={model.description} />
-                ))}
-              </div>
-            </div>
-            <div className="space-y-3 max-w-5xl">
-            <Image
-                src={"/mistralai.png"}
-                width={80}
-                height={50}
-                quality={100}
-                alt="ai-icon"
-              />
-              <div className="grid grid-cols-3 gap-3">
-                {Object.entries(llmModels).filter(([_, model]) => model.provider === 'MistralAI').map(([key, model], index) => (
-                  <ChatCard
-                    key={key}
-                    model={key}
-                    name={model.name}
-                    index={index}
-                    description={model.description} />
-                ))}
-              </div>
+            <h2 className="text-corporateblue text-2xl font-bold mb-3">GPTs disponibles</h2>
+            <div className="grid grid-cols-3 gap-3">
+              <ChatCard model={props.gpts['gpt-4o-mini'].model} name={props.gpts['gpt-4o-mini'].name} index={0} description={props.gpts['gpt-4o-mini'].description} />
+              <ChatCard model={props.gpts['gpt4o'].model} name={props.gpts['gpt4o'].name} index={0} description={props.gpts['gpt4o'].description} />
+              <ChatCard model={props.gpts['o1-mini'].model} name={props.gpts['o1-mini'].name} index={0} description={props.gpts['o1-mini'].description} />
+
             </div>
           </div>
           <div>
