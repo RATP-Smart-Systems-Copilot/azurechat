@@ -235,8 +235,6 @@ class ChatState {
 
               this.addToMessages(mappedContentLLM);
               this.lastMessage = mappedContentLLM.content;
-              console.log("coucou"+this.lastMessage );
-
               break;
             case "abort":
               this.removeMessage(newUserMessage.id);

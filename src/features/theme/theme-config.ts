@@ -57,7 +57,7 @@ export const getModelOptions = () : GPTS => {
   return {
     'gpt-4o-mini': {
       'model': process.env.AZURE_OPENAI_API_DEPLOYMENT_NAME,
-      'name': 'OpenAI - GPT 4o mini',
+      'name': 'GPT 4o mini',
       'description': 'GPT 4o mini pour vos tâches courantes : contexte entré 128k tokens maximal, 16 384 tokens maximal par réponse et un seuil de connaissance à octobre 2023',
       'prompt': { 'price': 0.00015280, 'unit': 1000 },
       'completion': { 'price': 0.0006112, 'unit': 1000 },
@@ -65,7 +65,7 @@ export const getModelOptions = () : GPTS => {
     },
     'gpt4o': {
       'model': process.env.AZURE_OPENAI_API_DEPLOYMENT_NAME_4o,
-      'name': 'OpenAI - GPT 4o',
+      'name': 'GPT 4o',
       'description': 'GPT 4o pour les tâches complexes : contexte 128k tokens maximal en entrée, 16 384 tokens maximal par réponse et un seuil de connaissance à octobre 2023',
       'prompt': { 'price': 0.00254665, 'unit': 1000 },
       'completion': { 'price': 0.0101866, 'unit': 1000 },
@@ -73,7 +73,7 @@ export const getModelOptions = () : GPTS => {
     },
     'o1-mini': {
       'model': process.env.AZURE_OPENAI_API_DEPLOYMENT_NAME_o1mini,
-      'name': 'OpenAI - o1 mini',
+      'name': 'o1 mini',
       'description': 'GPT o1 mini pour les raisonnements complexes : contexte 128k tokens maximal en entrée, 65 536 tokens maximal par réponse et un seuil de connaissance à octobre 2023',
       'prompt': { 'price': 0.0031663, 'unit': 1000 },
       'completion': { 'price': 0.012664908, 'unit': 1000 },
@@ -81,7 +81,7 @@ export const getModelOptions = () : GPTS => {
     },
     'Codestral-2501': {
       'model': process.env.AZURE_AI_API_DEPLOYMENT_NAME_Codestral,
-      'name': 'Mistral - Codestral',
+      'name': 'Codestral',
       'description': 'Codestral formé spécifiquement pour les tâches de code: contexte 256k tokens maximal en entrée, seuil de connaissance à août 2023.',
       'prompt': { 'price': 0.0003, 'unit': 1000 },
       'completion': { 'price': 0.0009, 'unit': 1000 },
@@ -89,7 +89,7 @@ export const getModelOptions = () : GPTS => {
     },
     'Mistral-Nemo': {
       'model': process.env.AZURE_AI_API_DEPLOYMENT_NAME_MistralNemo,
-      'name': 'Mistral - Mistral Nemo',
+      'name': 'Mistral Nemo',
       'description': ' Mistral Nemo pour vos tâches courantes : contexte entré 128k tokens maximal, seuil de connaissance à août 2023.',
       'prompt': { 'price': 0.0003, 'unit': 1000 },
       'completion': { 'price': 0.0009, 'unit': 1000 },

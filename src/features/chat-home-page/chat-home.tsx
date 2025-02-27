@@ -74,18 +74,46 @@ export const ChatHome: FC<ChatPersonaProps> = (props) => {
           }
           description={AI_DESCRIPTION}
         ></Hero>
-        <div className="container max-w-5xl flex gap-20 flex-col">
+        <div className="container max-w-6xl flex gap-20 flex-col">
           <div>
-            <h2 className="text-corporateblue text-2xl font-bold mb-3">GPTs disponibles</h2>
-            <div className="grid grid-cols-3 gap-3">
-               {Object.entries(llmModels).map(([key, model], index) => (
-                <ChatCard
-                  key={key}
-                  model={key}
-                  name={model.name}
-                  index={index}
-                  description={model.description} />
+          <h2 className="text-corporateblue text-2xl font-bold mb-3">LLM disponibles</h2>
+            <div className="space-y-3 max-w-5xl">
+              <Image
+                src={"/openai.png"}
+                width={80}
+                height={30}
+                quality={100}
+                alt="ai-icon"
+              />
+              <div className="grid grid-cols-3 gap-3">
+                {Object.entries(llmModels).filter(([_, model]) => model.provider === 'OpenAI').map(([key, model], index) => (
+                  <ChatCard
+                    key={key}
+                    model={key}
+                    name={model.name}
+                    index={index}
+                    description={model.description} />
                 ))}
+              </div>
+            </div>
+            <div className="space-y-3 max-w-5xl">
+            <Image
+                src={"/mistralai.png"}
+                width={80}
+                height={50}
+                quality={100}
+                alt="ai-icon"
+              />
+              <div className="grid grid-cols-3 gap-3">
+                {Object.entries(llmModels).filter(([_, model]) => model.provider === 'MistralAI').map(([key, model], index) => (
+                  <ChatCard
+                    key={key}
+                    model={key}
+                    name={model.name}
+                    index={index}
+                    description={model.description} />
+                ))}
+              </div>
             </div>
           </div>
           <div>
