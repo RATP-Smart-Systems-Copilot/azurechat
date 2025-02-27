@@ -8,7 +8,7 @@ export const MistralInstance = (gptModel: string = process.env.AZURE_OPENAI_API_
     const endpointSuffix = process.env.AZURE_LLM_API_ENDPOINT_SUFFIX || "services.ai.azure.com";
     const azureLLMInstanceName = process.env.AZURE_LLM_API_INSTANCE_NAME as string;
     const azureURL = `https://${azureLLMInstanceName}.${endpointSuffix}/models`;
-    let token = process.env.AZUREAI_ENDPOINT_KEY as string;
+    let token = process.env.AZURE_AI_API_KEY as string;
 
     const client = ModelClient(
         azureURL,
