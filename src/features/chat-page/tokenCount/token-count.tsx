@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { ChatMessageModel } from "../chat-services/models";
 import { getTotalTokenUsed, getTokenCostToCost } from './utils';
-import { modelOptions } from '@/features/theme/theme-config';
+import { modelOptions } from '@/features/common/services/openai';
 
 interface TokenCountProps {
     messages: ChatMessageModel[];

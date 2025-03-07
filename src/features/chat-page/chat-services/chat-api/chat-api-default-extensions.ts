@@ -107,11 +107,9 @@ async function executeCreateImage(
       Buffer.from(response.data[0].b64_json, "base64")
     );
 
-    const imageUrl = await GetImageUrl(threadId, imageName) as string;
-
     const updated_response = {
       revised_prompt: response.data[0].revised_prompt,
-      url: imageUrl,
+      url: GetImageUrl(threadId, imageName),
     };
 
     return updated_response;

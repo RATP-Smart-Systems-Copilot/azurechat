@@ -5,14 +5,6 @@ import {
 } from "openai/resources/chat/completions";
 import { ChatMessageModel } from "./models";
 
-export type Role = 'user' | 'assistant' | 'system';
-export const roles: Role[] = ['user', 'assistant', 'system'];
-
-export interface MessageInterface {
-  role: Role;
-  content: string;
-}
-
 export const mapOpenAIChatMessages = (
   messages: ChatMessageModel[]
 ): ChatCompletionMessageParam[] => {
@@ -37,28 +29,3 @@ export const mapOpenAIChatMessages = (
     }
   });
 };
-
-export const mapAIInferenceChatMessages = (
-  messages: ChatMessageModel[],
-) : MessageInterface[] => {
-  return messages.map((message) => {
-    switch (message.role) {
-      case "assistant":
-        return {
-          role: message.role,
-          content: message.content,
-        };
-      case "user":
-        return {
-          role: message.role,
-          content: message.content,
-        };
-      default:
-        return {
-          role: "assistant",
-          content: message.content,
-        };
-    }
-  });
-};
-
