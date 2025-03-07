@@ -15,9 +15,10 @@ import { HistoryContainer } from "@/features/common/services/cosmos";
 import { uniqueId } from "@/features/common/util";
 import { SqlQuerySpec } from "@azure/cosmos";
 import { PERSONA_ATTRIBUTE, PersonaModel, PersonaModelSchema } from "./models";
-import { defaultGPTModel, modelOptions } from "@/features/common/services/openai";
+import { defaultGPTModel } from "@/features/common/services/openai";
 import { FindAllChatDocumentsByPersona } from "@/features/chat-page/chat-services/chat-document-service";
 import { DeleteDocumentsForPersona } from "@/features/chat-page/chat-services/azure-ai-search/azure-ai-search";
+import { modelOptions } from "@/features/theme/theme-config";
 
 interface PersonaInput {
   name: string;

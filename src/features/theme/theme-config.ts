@@ -34,3 +34,69 @@ Your goal is to enhance operational efficiency and provide high-quality support 
 You must always return in markdown format (not latex) with the best format: table, list, paragraph... For math expression DON'T USE LateX, keep markdown`;
 
 export const NEW_CHAT_NAME = "New chat";
+
+export interface PromptPricing{
+  price: number;
+  unit: number;
+}
+
+export interface GPT{
+  model: string;
+  name: string;
+  description: string;
+  prompt: PromptPricing;
+  completion: PromptPricing;
+  provider: 'OpenAI'|'MistralAI'
+}
+
+export interface GPTS {
+  [key: string]: GPT;
+}
+
+export const getModelOptions = () : GPTS => {
+  return {
+    'gpt-4o-mini': {
+      'model': process.env.AZURE_OPENAI_API_DEPLOYMENT_NAME,
+      'name': 'GPT 4o mini',
+      'description': 'GPT 4o mini pour vos tâches courantes : contexte entré 128k tokens maximal, 16 384 tokens maximal par réponse et un seuil de connaissance à octobre 2023',
+      'prompt': { 'price': 0.00015280, 'unit': 1000 },
+      'completion': { 'price': 0.0006112, 'unit': 1000 },
+      'provider': 'OpenAI',
+    },
+    'gpt4o': {
+      'model': process.env.AZURE_OPENAI_API_DEPLOYMENT_NAME_4o,
+      'name': 'GPT 4o',
+      'description': 'GPT 4o pour les tâches complexes : contexte 128k tokens maximal en entrée, 16 384 tokens maximal par réponse et un seuil de connaissance à octobre 2023',
+      'prompt': { 'price': 0.00254665, 'unit': 1000 },
+      'completion': { 'price': 0.0101866, 'unit': 1000 },
+      'provider': 'OpenAI',
+    },
+    'o1-mini': {
+      'model': process.env.AZURE_OPENAI_API_DEPLOYMENT_NAME_o1mini,
+      'name': 'o1 mini',
+      'description': 'GPT o1 mini pour les raisonnements complexes : contexte 128k tokens maximal en entrée, 65 536 tokens maximal par réponse et un seuil de connaissance à octobre 2023',
+      'prompt': { 'price': 0.0031663, 'unit': 1000 },
+      'completion': { 'price': 0.012664908, 'unit': 1000 },
+      'provider': 'OpenAI',
+    },
+    'Codestral-2501': {
+      'model': process.env.AZURE_AI_API_DEPLOYMENT_NAME_Codestral,
+      'name': 'Codestral',
+      'description': 'Codestral formé spécifiquement pour les tâches de code: contexte 256k tokens maximal en entrée, seuil de connaissance à août 2023.',
+      'prompt': { 'price': 0.0003, 'unit': 1000 },
+      'completion': { 'price': 0.0009, 'unit': 1000 },
+      'provider': 'MistralAI',
+    },
+    'Mistral-Nemo': {
+      'model': process.env.AZURE_AI_API_DEPLOYMENT_NAME_MistralNemo,
+      'name': 'Mistral Nemo',
+      'description': ' Mistral Nemo pour vos tâches courantes : contexte entré 128k tokens maximal, seuil de connaissance à août 2023.',
+      'prompt': { 'price': 0.0003, 'unit': 1000 },
+      'completion': { 'price': 0.0009, 'unit': 1000 },
+      'provider': 'MistralAI',
+    },
+  };
+
+};
+
+export const modelOptions = getModelOptions();
