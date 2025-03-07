@@ -167,7 +167,6 @@ class ChatState {
       });
 
       const onParse = (event: ParsedEvent | ReconnectInterval) => {
-
         if (event.type === "event") {
           const responseType = JSON.parse(event.data) as AzureChatCompletion;
           switch (responseType.type) {
@@ -218,23 +217,6 @@ class ChatState {
               this.addToMessages(mappedContent);
               this.lastMessage = mappedContent.content;
 
-              break;
-            case "contentLLM":
-              const mappedContentLLM: ChatMessageModel = {
-                id: responseType.idMessage,
-                content: responseType.response || "",
-                name: AI_NAME,
-                role: "assistant",
-                createdAt: new Date(),
-                isDeleted: false,
-                threadId: this.chatThreadId,
-                type: "CHAT_MESSAGE",
-                userId: "",
-                multiModalImage: "",
-              };
-
-              this.addToMessages(mappedContentLLM);
-              this.lastMessage = mappedContentLLM.content;
               break;
             case "abort":
               this.removeMessage(newUserMessage.id);
@@ -309,7 +291,7 @@ class ChatState {
   }
 
   public isSimpleChat(){
-    return this.chatThread?.gptModel !==  "gpt-4o-mini" && this.chatThread?.gptModel !==  "gpt-4o" ;
+    return this.chatThread?.gptModel === "o1-mini";
   }
 }
 

@@ -1,7 +1,52 @@
 import { OpenAI } from "openai";
 import { DefaultAzureCredential, getBearerTokenProvider } from "@azure/identity";
 import { AzureOpenAI } from "openai";
-import { modelOptions } from "@/features/theme/theme-config";
+
+export interface PromptPricing{
+  price: number;
+  unit: number;
+}
+
+export interface GPT{
+  model: string;
+  name: string;
+  description: string;
+  prompt: PromptPricing;
+  completion: PromptPricing;
+}
+
+export interface GPTS {
+  [key: string]: GPT;
+}
+
+export const getModelOptions = () : GPTS => {
+  return {
+    'gpt-4o-mini': {
+      'model': process.env.AZURE_OPENAI_API_DEPLOYMENT_NAME,
+      'name': 'GPT 4o mini',
+      'description': 'Chat GPT 4o mini avec un contexte de 128k tokens maximal, 16 384 tokens maximal par réponse et un seuil de connaissance à octobre 2023 \n test',
+      'prompt': { 'price': 0.00015280, 'unit': 1000 },
+      'completion': { 'price': 0.0006112, 'unit': 1000 },
+    },
+    'gpt4o': {
+      'model': process.env.AZURE_OPENAI_API_DEPLOYMENT_NAME_4o,
+      'name': 'GPT 4o',
+      'description': 'Chat GPT 4o avec un contexte de 128k tokens maximal, 16 384 tokens maximal par réponse et un seuil de connaissance à octobre 2023',
+      'prompt': { 'price': 0.00254665, 'unit': 1000 },
+      'completion': { 'price': 0.0101866, 'unit': 1000 },
+    },
+    'o1-mini': {
+      'model': process.env.AZURE_OPENAI_API_DEPLOYMENT_NAME_o1mini,
+      'name': 'o1 mini',
+      'description': 'Chat GPT o1 mini avec un contexte de 128k tokens maximal, 65 536 tokens maximal par réponse et un seuil de connaissance à octobre 2023',
+      'prompt': { 'price': 0.0031663, 'unit': 1000 },
+      'completion': { 'price': 0.012664908, 'unit': 1000 },
+    },
+  };
+
+};
+
+export const modelOptions = getModelOptions();
 
 export const defaultGPTModel = 'gpt-4o-mini';
 
