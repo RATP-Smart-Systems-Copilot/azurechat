@@ -1,8 +1,8 @@
 import { userHashedId } from "@/features/auth-page/helpers";
 import { ChatHome } from "@/features/chat-home-page/chat-home";
+import { getModelOptions } from "@/features/common/services/openai";
 import { FindAllExtensionForCurrentUser } from "@/features/extensions-page/extension-services/extension-service";
 import { FindAllPersonaForCurrentUser } from "@/features/persona-page/persona-services/persona-service";
-import { getModelOptions } from "@/features/theme/theme-config";
 import { DisplayError } from "@/features/ui/error/display-error";
 
 export default async function Home() {

@@ -459,19 +459,6 @@
             {
               "type": "Microsoft.KeyVault/vaults/secrets",
               "apiVersion": "2021-06-01-preview",
-              "name": "[format('{0}/{1}', variables('keyVaultName'), 'AZURE-AI-API-KEY')]",
-              "properties": {
-                "contentType": "text/plain",
-                "value": "[listKeys(resourceId('Microsoft.CognitiveServices/accounts', 'azurechat-aillm-services'), '2023-05-01').key1]"
-              },
-              "dependsOn": [
-                "[resourceId('Microsoft.CognitiveServices/accounts', 'azurechat-aillm-services')]",
-                "[resourceId('Microsoft.KeyVault/vaults', variables('keyVaultName'))]"
-              ]
-            },
-            {
-              "type": "Microsoft.KeyVault/vaults/secrets",
-              "apiVersion": "2021-06-01-preview",
               "name": "[format('{0}/{1}', variables('keyVaultName'), 'AZURE-OPENAI-DALLE-API-KEY')]",
               "properties": {
                 "contentType": "text/plain",
@@ -647,10 +634,6 @@
                       "value": "[if(parameters('disableLocalAuth'), '', format('@Microsoft.KeyVault(VaultName={0};SecretName={1})', variables('keyVaultName'), 'AZURE-OPENAI-API-KEY'))]"
                     },
                     {
-                      "name": "AZURE_AI_API_KEY",
-                      "value": "[if(parameters('disableLocalAuth'), '', format('@Microsoft.KeyVault(VaultName={0};SecretName={1})', variables('keyVaultName'), 'AZURE-AI-API-KEY'))]"
-                    },
-                    {
                       "name": "AZURE_OPENAI_API_INSTANCE_NAME",
                       "value": "[variables('openai_name')]"
                     },
@@ -754,7 +737,6 @@
                 "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'AZURE-DOCUMENT-INTELLIGENCE-KEY')]",
                 "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'AZURE-OPENAI-API-KEY')]",
                 "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'AZURE-OPENAI-DALLE-API-KEY')]",
-                "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'AZURE-AI-API-KEY')]",
                 "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'AZURE-SEARCH-API-KEY')]",
                 "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'AZURE-SPEECH-KEY')]",
                 "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'AZURE-STORAGE-ACCOUNT-KEY')]",
