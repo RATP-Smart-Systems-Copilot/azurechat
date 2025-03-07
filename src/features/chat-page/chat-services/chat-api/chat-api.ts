@@ -32,31 +32,13 @@ export const ChatAPIEntry = async (props: UserPrompt, signal: AbortSignal) => {
 
   const currentChatThread = currentChatThreadResponse.response;
 
+
    // promise all to get user, history and docs
-   const [user, docs, docsPersona] = await Promise.all([
+   const [user, history, docs, docsPersona, extension] = await Promise.all([
     getCurrentUser(),
+    _getHistory(currentChatThread),
     _getDocuments(currentChatThread),
     _getDocumentsByPersona(currentChatThread),
-  ]);
-
-   // save the user message
-   await CreateChatMessage({
-    name: user.name,
-    content: props.message,
-    role: "user",
-    chatThreadId: currentChatThread.id,
-    multiModalImage: props.multimodalImage,
-  });
-
-  let selectedModel = Object.values(modelOptions).find(model => model.model === currentChatThread.gptModel);
-
-  if(selectedModel?.provider === 'MistralAI'){
-    return llmInference(currentChatThread, props.message, signal);
-  }
-
-  // promise all to get user, history and docs
-  const [history, extension] = await Promise.all([
-    _getHistory(currentChatThread),
     _getExtensions({
       chatThread: currentChatThread,
       userMessage: props.message,
@@ -78,6 +60,21 @@ export const ChatAPIEntry = async (props: UserPrompt, signal: AbortSignal) => {
     chatType = "chat-with-file";
   } else if (extension.length > 0) {
     chatType = "extensions";
+  }
+
+  // save the user message
+  await CreateChatMessage({
+    name: user.name,
+    content: props.message,
+    role: "user",
+    chatThreadId: currentChatThread.id,
+    multiModalImage: props.multimodalImage,
+  });
+
+  let selectedModel = Object.values(modelOptions).find(model => model?.model === currentChatThread.gptModel);
+
+  if(selectedModel?.provider === 'MistralAI'){
+    return llmInference(currentChatThread, props.message, signal);
   }
 
   let runner: ChatCompletionStreamingRunner;
