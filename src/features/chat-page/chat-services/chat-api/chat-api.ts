@@ -2,7 +2,7 @@
 import "server-only";
 
 import { getCurrentUser } from "@/features/auth-page/helpers";
-import { CHAT_DEFAULT_SYSTEM_PROMPT } from "@/features/theme/theme-config";
+import { CHAT_DEFAULT_SYSTEM_PROMPT, modelOptions } from "@/features/theme/theme-config";
 import { ChatCompletionStreamingRunner } from "openai/resources/beta/chat/completions";
 import { ChatApiRAG } from "../chat-api/chat-api-rag";
 import { FindAllChatDocuments, FindAllChatDocumentsByPersona } from "../chat-document-service";
@@ -19,7 +19,7 @@ import { ChatApiExtensions } from "./chat-api-extension";
 import { ChatApiMultimodal } from "./chat-api-multimodal";
 import { OpenAIStream } from "./open-ai-stream";
 import { ChatApiSimple } from "./chat-api-simple";
-type ChatTypes = "extensions" | "chat-with-file" | "multimodal" | "simple";
+type ChatTypes = "extensions" | "chat-with-file" | "multimodal" | "simple" | "ai-inference";
 
 export const ChatAPIEntry = async (props: UserPrompt, signal: AbortSignal) => {
   const currentChatThreadResponse = await EnsureChatThreadOperation(props.id);
@@ -30,8 +30,9 @@ export const ChatAPIEntry = async (props: UserPrompt, signal: AbortSignal) => {
 
   const currentChatThread = currentChatThreadResponse.response;
 
-  // promise all to get user, history and docs
-  const [user, history, docs, docsPersona, extension] = await Promise.all([
+
+   // promise all to get user, history and docs
+   const [user, history, docs, docsPersona, extension] = await Promise.all([
     getCurrentUser(),
     _getHistory(currentChatThread),
     _getDocuments(currentChatThread),
@@ -42,11 +43,12 @@ export const ChatAPIEntry = async (props: UserPrompt, signal: AbortSignal) => {
       signal,
     }),
   ]);
+
   // Starting values for system and user prompt
   // Note that the system message will also get prepended with the extension execution steps. Please see ChatApiExtensions method.
   currentChatThread.personaMessage = `${CHAT_DEFAULT_SYSTEM_PROMPT} \n\n ${currentChatThread.personaMessage}`;
-
   let chatType: ChatTypes = "extensions";
+
   if(currentChatThread.gptModel === process.env.AZURE_OPENAI_API_DEPLOYMENT_NAME_o1mini){
     chatType = "simple";
   }
@@ -103,20 +105,20 @@ export const ChatAPIEntry = async (props: UserPrompt, signal: AbortSignal) => {
         signal: signal,
       });
       break;
-  }
+    }
 
-  const readableStream = OpenAIStream({
-    runner: runner,
-    chatThread: currentChatThread,
-  });
+    const readableStream = OpenAIStream({
+      runner: runner,
+      chatThread: currentChatThread,
+    });
 
-  return new Response(readableStream, {
-    headers: {
-      "Cache-Control": "no-cache",
-      Connection: "keep-alive",
-      "Content-Type": "text/event-stream"
-    },
-  });
+    return new Response(readableStream, {
+      headers: {
+        "Cache-Control": "no-cache",
+        Connection: "keep-alive",
+        "Content-Type": "text/event-stream"
+      },
+    });
 };
 
 const _getHistory = async (chatThread: ChatThreadModel) => {
