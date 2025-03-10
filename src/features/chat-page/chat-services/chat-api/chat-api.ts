@@ -19,8 +19,6 @@ import { ChatApiExtensions } from "./chat-api-extension";
 import { ChatApiMultimodal } from "./chat-api-multimodal";
 import { OpenAIStream } from "./open-ai-stream";
 import { ChatApiSimple } from "./chat-api-simple";
-import { ChatApiAIInference } from "./chat-api-ai-inference";
-import { LLMAIStream } from "./LLMAIStream";
 type ChatTypes = "extensions" | "chat-with-file" | "multimodal" | "simple" | "ai-inference";
 
 export const ChatAPIEntry = async (props: UserPrompt, signal: AbortSignal) => {
@@ -70,12 +68,6 @@ export const ChatAPIEntry = async (props: UserPrompt, signal: AbortSignal) => {
     chatThreadId: currentChatThread.id,
     multiModalImage: props.multimodalImage,
   });
-
-  let selectedModel = Object.values(modelOptions).find(model => model?.model === currentChatThread.gptModel);
-
-  if(selectedModel?.provider === 'MistralAI'){
-    return llmInference(currentChatThread, props.message, signal);
-  }
 
   let runner: ChatCompletionStreamingRunner;
 
@@ -218,37 +210,3 @@ const _getExtensions = async (props: {
 
   return extension;
 };
-
-async function llmInference( currentChatThread : ChatThreadModel, userMessage : string, signal: AbortSignal) {
-    const response = await ChatApiAIInference({chatThread: currentChatThread, userMessage: userMessage, signal: signal});
-    const stream = response.body;
-    if (!stream) {
-      throw new Error("The response stream is undefined");
-    }
-    if (response.status !== "200") {
-      throw new Error(`Failed to get chat completions: ${await streamToString(stream)}`);
-    }
-    const readableStream = LLMAIStream({
-      runner: stream,
-      chatThread: currentChatThread,
-    });
-
-    return new Response(readableStream, {
-      headers: {
-        "Cache-Control": "no-cache",
-        Connection: "keep-alive",
-        "Content-Type": "text/event-stream"
-      },
-    });
-}
-
-async function streamToString(stream: NodeJS.ReadableStream) {
-  // lets have a ReadableStream as a stream variable
-  const chunks = [];
-
-  for await (const chunk of stream) {
-    chunks.push(Buffer.from(chunk));
-  }
-
-  return Buffer.concat(chunks).toString("utf-8");
-}

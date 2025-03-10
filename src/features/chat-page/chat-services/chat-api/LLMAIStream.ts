@@ -6,6 +6,7 @@ import {
   ChatThreadModel,
 } from "../models";
 import { createSseStream } from "@azure/core-sse";
+import { uniqueId } from "@/features/common/util";
 
 export const LLMAIStream = (props: {
   runner: any;
@@ -42,15 +43,18 @@ export const LLMAIStream = (props: {
           controller.close();
           continue;
         }
-        for (const choice of JSON.parse(event.data).choices) {
+        const jsonResponse = JSON.parse(event.data);
+        let idMessage = jsonResponse.id;
+        for (const choice of jsonResponse.choices) {
           const content = choice.delta?.content;
           if (content !== undefined) {
             lastMessage += content;
           }
+
           const response: AzureChatLLMCompletionContent = {
             type: "contentLLM",
             response: lastMessage,
-            idMessage: choice.id,
+            idMessage: idMessage,
           };
 
           streamResponse(response.type, JSON.stringify(response));

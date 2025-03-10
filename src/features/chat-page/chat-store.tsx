@@ -160,7 +160,12 @@ class ChatState {
         return;
       }
 
-      const response = await fetch("/api/chat", {
+      let apiRoute = "/api/chat";
+      if(this.chatThread?.gptModel === 'Codestral-2501' || this.chatThread?.gptModel === 'Mistral-Nemo' ){
+        apiRoute = "/api/chat-inference";
+      }
+
+      const response = await fetch(apiRoute, {
         method: "POST",
         body: formData,
         signal: controller.signal,

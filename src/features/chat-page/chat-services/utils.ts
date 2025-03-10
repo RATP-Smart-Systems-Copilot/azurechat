@@ -40,25 +40,23 @@ export const mapOpenAIChatMessages = (
 
 export const mapAIInferenceChatMessages = (
   messages: ChatMessageModel[],
-) : MessageInterface[] => {
-  return messages.map((message) => {
-    switch (message.role) {
-      case "assistant":
-        return {
-          role: message.role,
-          content: message.content,
-        };
-      case "user":
-        return {
-          role: message.role,
-          content: message.content,
-        };
-      default:
-        return {
-          role: "assistant",
-          content: message.content,
-        };
-    }
-  });
+): MessageInterface[] => {
+  return messages
+    .filter((message) => message.content.trim() !== "") // Filtrer les messages avec un content non vide
+    .map((message) => {
+      switch (message.role) {
+        case "assistant":
+        case "user":
+          return {
+            role: message.role,
+            content: message.content,
+          };
+        default:
+          return {
+            role: "assistant",
+            content: message.content,
+          };
+      }
+    });
 };
 
