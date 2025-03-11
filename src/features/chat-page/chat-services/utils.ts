@@ -16,7 +16,9 @@ export interface MessageInterface {
 export const mapOpenAIChatMessages = (
   messages: ChatMessageModel[]
 ): ChatCompletionMessageParam[] => {
-  return messages.map((message) => {
+  return messages
+  .filter((message) => message.content.trim() !== "") // Filtrer les messages avec un content non vide
+  .map((message) => {
     switch (message.role) {
       case "function":
         return {
