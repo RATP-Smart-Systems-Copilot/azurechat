@@ -79,6 +79,14 @@ export const getModelOptions = () : GPTS => {
       'completion': { 'price': 0.012664908, 'unit': 1000 },
       'provider': 'OpenAI',
     },
+    'o3-mini': {
+      'model': process.env.AZURE_OPENAI_API_DEPLOYMENT_NAME_o3mini,
+      'name': 'o3 mini',
+      'description': 'o3 mini pour les raisonnements complexes, calculs mathématiques, et le codage : contexte 200k tokens maximal en entrée, 100k tokens maximal par réponse et un seuil de connaissance à octobre 2023',
+      'prompt': { 'price': 0.0031663, 'unit': 1000 },
+      'completion': { 'price': 0.012664908, 'unit': 1000 },
+      'provider': 'OpenAI',
+    },
     'Codestral-2501': {
       'model': process.env.AZURE_AI_API_DEPLOYMENT_NAME_Codestral,
       'name': 'Codestral',

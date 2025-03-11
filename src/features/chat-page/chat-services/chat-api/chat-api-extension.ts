@@ -34,7 +34,7 @@ export const ChatApiExtensions = async (props: {
         },
       ],
       tools: extensions,
-      temperature: chatThread.personaTemperature,
+      ...(chatThread.gptModel !== "o3-mini" && { temperature: chatThread.personaTemperature }),
     },
     { signal: signal }
   );
