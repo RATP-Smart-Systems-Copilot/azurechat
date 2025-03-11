@@ -79,7 +79,7 @@ export const ChatApiAIInference = async (props: UserPrompt, signal: AbortSignal)
       throw new Error("The response stream is undefined");
     }
     if (response.status !== "200") {
-      throw new Error(`Failed to get chat completions: ${await streamToString(stream)}`);
+      throw new Error("Failed to get chat completions");
     }
     const readableStream = LLMAIStream({
       runner: stream,
@@ -95,16 +95,5 @@ export const ChatApiAIInference = async (props: UserPrompt, signal: AbortSignal)
     });
 
 };
-
-async function streamToString(stream: NodeJS.ReadableStream) {
-  // lets have a ReadableStream as a stream variable
-  const chunks = [];
-
-  for await (const chunk of stream) {
-    chunks.push(Buffer.from(chunk));
-  }
-
-  return Buffer.concat(chunks).toString("utf-8");
-}
 
 
