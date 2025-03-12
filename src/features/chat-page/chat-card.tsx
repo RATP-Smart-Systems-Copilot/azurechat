@@ -31,7 +31,7 @@ export const ChatCard: FC<Props> = (props) => {
             <CardTitle className="flex-1">{name}</CardTitle>
         </CardHeader>
         <CardContent className="text-muted-foreground flex-1">
-        {description}
+        <pre style={{ whiteSpace: 'pre-wrap', wordWrap: 'break-word' }}>{description}</pre>
         </CardContent>
         <CardFooter className="gap-1 content-stretch f">
         <StartNewChatGPT gpt={props.model} />
