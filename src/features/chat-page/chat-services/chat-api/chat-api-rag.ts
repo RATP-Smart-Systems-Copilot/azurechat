@@ -76,7 +76,7 @@ ${userMessage}
   const stream: ChatCompletionStreamParams = {
     model: "",
     stream: true,
-    temperature: chatThread.personaTemperature,
+    ...(chatThread.gptModel !== "o3-mini" && { temperature: chatThread.personaTemperature }),
     messages: [
       {
         role: "system",
