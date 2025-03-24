@@ -314,7 +314,7 @@ class ChatState {
   }
 
   public isSimpleChat(){
-    return this.chatThread?.gptModel !==  "gpt-4o-mini" && this.chatThread?.gptModel !==  "gpt-4o" ;
+    return this.chatThread?.gptModel !==  "gpt-4o-mini" && this.chatThread?.gptModel !==  "gpt4o" && this.chatThread?.gptModel !==  "o3-mini" ;
   }
 }
 
