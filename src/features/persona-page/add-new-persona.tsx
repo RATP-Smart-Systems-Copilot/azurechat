@@ -84,7 +84,7 @@ export const AddNewPersona: FC<Props> = (props) => {
             onClick={(formData) =>
               fileStore.onFileChange({ formData, personaId })
             }
-          />
+          />  Ajouter un document
         </div>
       );
     }
@@ -152,7 +152,7 @@ export const AddNewPersona: FC<Props> = (props) => {
                 />
               </div>
               <div className="grid gap-2 flex-1 ">
-                <Label htmlFor="personaMessage">Personality</Label>
+                <Label htmlFor="personaMessage">Contexte</Label>
                 <Textarea
                   className="min-h-[300px]"
                   required
@@ -178,17 +178,21 @@ export const AddNewPersona: FC<Props> = (props) => {
                 </SelectContent>
               </Select>
               </div>
-              <p>Fichiers de connaissance : </p>
+              <AttachFileToPersona />
+              <p>Base de connaissance : </p>
               <div className="pb-6 px-6 flex gap-2 flex-col  flex-1">
-                {documentsPersona.map((doc) => {
+              {documentsPersona.length === 0 ? (
+                <div>Aucune donnée</div>
+              ) : (
+                documentsPersona.map((doc) => {
                   return (
                     <div className="flex gap-2 items-center" key={doc.id}>
                       <File size={16} /> <div>{doc.name}</div>
                     </div>
                   );
-                })}
+                })
+              )}
               </div>
-                <AttachFileToPersona />
             </div>
           </ScrollArea>
           <SheetFooter className="py-2 flex sm:justify-between flex-row">

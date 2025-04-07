@@ -69,6 +69,7 @@ export const ChatAPIEntry = async (props: UserPrompt, signal: AbortSignal) => {
     multiModalImage: props.multimodalImage,
   });
 
+
   let runner: ChatCompletionStreamingRunner;
 
   switch (chatType) {
@@ -127,7 +128,10 @@ const _getHistory = async (chatThread: ChatThreadModel) => {
   );
 
   if (historyResponse.status === "OK") {
-    const historyResults = historyResponse.response;
+    let historyResults = historyResponse.response;
+    if(chatThread.gptModel === process.env.AZURE_OPENAI_API_DEPLOYMENT_NAME_o3mini){
+      historyResults = historyResults.filter((message) => message.role !== "function");
+    }
     return mapOpenAIChatMessages(historyResults).reverse();
   }
 
