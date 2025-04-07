@@ -195,6 +195,12 @@ export const AddNewPersona: FC<Props> = (props) => {
               </div>
             </div>
           </ScrollArea>
+          <Input
+                  type="hidden"
+                  value={persona.sharedWith}
+                  name="sharedWith"
+                  placeholder="sharedWith"
+                />
           <SheetFooter className="py-2 flex sm:justify-between flex-row">
             <PublicSwitch /> <Submit />
           </SheetFooter>

@@ -105,6 +105,9 @@ export const addOrUpdatePersona = async (previous: any, formData: FormData)=> {
 };
 
 export const FormDataToPersonaModel = (formData: FormData): PersonaModel => {
+  const sharedWith = formData.get("sharedWith") as string;
+  const sharedWithArray = sharedWith ? sharedWith.split(",") : [];
+
   return {
     id: formData.get("id") as string,
     name: formData.get("name") as string,
@@ -116,5 +119,6 @@ export const FormDataToPersonaModel = (formData: FormData): PersonaModel => {
     createdAt: new Date(),
     type: PERSONA_ATTRIBUTE,
     gptModel: formData.get("gptModel") as string,
+    sharedWith: sharedWithArray, // Ajout du champ shareWith
   };
 };
