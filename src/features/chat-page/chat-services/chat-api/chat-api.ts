@@ -139,30 +139,8 @@ const _getHistory = async (chatThread: ChatThreadModel) => {
 const _getDocuments = async (chatThread: ChatThreadModel) => {
   const docsResponse = await FindAllChatDocuments(chatThread.id);
 
-  const fixedChatThreadId = chatThread.name === "Confluence RSS" ? "GcOxmZJmTeRS4BbcgQIUO86VlCAdMRbuveKk" : "";
-
-  if (docsResponse.status === "OK" && fixedChatThreadId === "")
+  if (docsResponse.status === "OK")
     return docsResponse.response;
-
-  if(docsResponse.status === "ERROR" && fixedChatThreadId === ""){
-    console.error("🔴 Error on AI search:", docsResponse.errors);
-    return [];
-  }
-
-  const docsResponseConfluence = await FindAllChatDocuments(fixedChatThreadId);
-
-  if (docsResponse.status === "OK" && docsResponseConfluence.status === "OK") {
-    return [...docsResponse.response, ...docsResponseConfluence.response];
-  }
-
-  if (docsResponse.status === "ERROR") {
-    console.error("🔴 Error on AI search:", docsResponse.errors);
-  }
-
-
-  if (docsResponseConfluence.status === "ERROR") {
-    console.error("🔴 Error on AI search:", docsResponseConfluence.errors);
-  }
 
   return [];
 
