@@ -78,62 +78,61 @@ export const ChatMessageArea = (props: {
   }
 
   return (
-    <div className="flex flex-col max-w-[900px] border rounded-lg overflow-hidden p-4 gap-8">
-      <div className="h-7 flex items-center justify-between">
-        <div className="flex gap-3">
-          {profile}
+    <div className="container max-w-5xl relative flex flex-col gap-4">
+      {/* Container global pour chaque message */}
+      <div className={cn("w-full", props.role === "user" ? "flex justify-end" : "")}>
+        {/* Bloc du message */}
+        <div
+          className={cn(
+            props.role === "user" ? "max-w-[600px]" : "w-full",
+            "flex flex-col border rounded-lg shadow-lg overflow-hidden p-4 gap-8"
+          )}
+        >
+          <div className="h-7 flex items-center justify-between">
+            <div className="flex gap-3">
+              {profile}
+              <div
+                className={cn(
+                  "text-corporateblue font-bold capitalize items-center flex",
+                  props.role === "function" || props.role === "tool" ? "text-muted-foreground text-sm" : ""
+                )}
+              >
+                {props.profileName}
+              </div>
+            </div>
+            <div className="h-7 flex items-center justify-end gap-2">
+              <Button
+                variant={"ghost"}
+                size={"sm"}
+                title="Copy text"
+                className="flex items-center hover:bg-gray-100 transition-colors duration-150 rounded"
+                onClick={handleButtonClick}
+              >
+                {isIconChecked ? <CheckIcon size={16} /> : <ClipboardIcon size={16} />}
+              </Button>
+              <Button
+                variant={"ghost"}
+                size={"sm"}
+                title="Delete message"
+                className="flex items-center hover:bg-gray-100 transition-colors duration-150 rounded"
+                onClick={handleButtonDeleteClick}
+              >
+                {isIconDeleteChecked ? <CheckIcon size={16} /> : <Trash2 size={16} />}
+              </Button>
+            </div>
+          </div>
           <div
             className={cn(
-              "text-corporateblue font-bold capitalize items-center flex",
-              props.role === "function" || props.role === "tool"
-                ? "text-muted-foreground text-sm"
-                : ""
+              "-m-4 p-4 prose prose-slate dark:prose-invert break-words prose-p:leading-relaxed prose-pre:p-0 transition-colors duration-200",
+              props.role === "user" ? "bg-ring text-white" : "max-w-5xl"
             )}
           >
-            {props.profileName}
+            {props.children}
           </div>
         </div>
-        <div className=" h-7 flex items-center justify-between">
-          <div>
-            <Button
-              variant={"ghost"}
-              size={"sm"}
-              title="Copy text"
-              className="justify-right flex"
-              onClick={handleButtonClick}
-            >
-              {isIconChecked ? (
-                <CheckIcon size={16} />
-              ) : (
-                <ClipboardIcon size={16} />
-              )}
-            </Button>
-          </div>
-          <div>
-            <Button
-              variant={"ghost"}
-              size={"sm"}
-              title="Delete message"
-              className="justify-right flex"
-              onClick={handleButtonDeleteClick}
-            >
-              {isIconDeleteChecked ? (
-                <CheckIcon size={16} />
-              ) : (
-                <Trash2 size={16} />
-              )}
-            </Button>
-          </div>
-        </div>
-      </div>
-      <div className={cn(
-            "-m-4 p-4 prose-slate dark:prose-invert break-words prose-p:leading-relaxed prose-pre:p-0 max-w-non",
-            props.role === "user"
-              ? "bg-ring text-white"
-              : "bg-greybackground"
-          )}>
-        {props.children}
       </div>
     </div>
+
+
   );
 };

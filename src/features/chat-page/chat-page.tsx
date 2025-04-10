@@ -90,7 +90,7 @@ export const ChatPage: FC<ChatPageProps> = (props) => {
           {(loading === "loading" || isLoading) && <ChatLoading />}
         </ChatMessageContentArea>
       </ChatMessageContainer>
-      <ChatInput />
+      <ChatInput extensions={props.extensions} disabled={props.chatDocuments.length !== 0}/>
       <TokenCount messages={props.messages} gptModel={props.chatThread.gptModel} />
     </main>
   );
