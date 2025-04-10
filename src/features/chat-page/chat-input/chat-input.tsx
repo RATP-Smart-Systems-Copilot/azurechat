@@ -19,7 +19,7 @@ import { ImageInput } from "@/features/ui/chat/chat-input-area/image-input";
 import { Microphone } from "@/features/ui/chat/chat-input-area/microphone";
 import { StopChat } from "@/features/ui/chat/chat-input-area/stop-chat";
 import { SubmitChat } from "@/features/ui/chat/chat-input-area/submit-chat";
-import React, { useRef } from "react";
+import React, { FC, useRef } from "react";
 import { chatStore, useChat } from "../chat-store";
 import { fileStore, useFileStore } from "./file/file-store";
 import { PromptSlider } from "./prompt/prompt-slider";
@@ -31,8 +31,15 @@ import {
   textToSpeechStore,
   useTextToSpeech,
 } from "./speech/use-text-to-speech";
+import { WebSearchExtension } from "@/features/ui/chat/chat-input-area/web-search-extension";
+import { ExtensionModel } from "@/features/extensions-page/extension-services/models";
 
-export const ChatInput = () => {
+interface Props {
+  extensions: Array<ExtensionModel>;
+  disabled: boolean;
+}
+
+export const ChatInput : FC<Props> = (props) => {
   const { loading, input, chatThreadId } = useChat();
   const { uploadButtonLabel } = useFileStore();
   const { isPlaying } = useTextToSpeech();
@@ -79,6 +86,9 @@ export const ChatInput = () => {
       />
       <ChatInputActionArea>
         <ChatInputSecondaryActionArea>
+          {!isSimpleChat && !props.disabled && <WebSearchExtension extensions={props.extensions}/>}
+        </ChatInputSecondaryActionArea>
+        <ChatInputPrimaryActionArea>
           {!isSimpleChat && (
             <AttachFile
               onClick={(formData) =>
@@ -87,8 +97,6 @@ export const ChatInput = () => {
             />
           )}
           <PromptSlider />
-        </ChatInputSecondaryActionArea>
-        <ChatInputPrimaryActionArea>
           {!isSimpleChat && <ImageInput />}
           <Microphone
             startRecognition={() => speechToTextStore.startRecognition()}

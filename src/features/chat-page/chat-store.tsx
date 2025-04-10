@@ -35,6 +35,7 @@ class ChatState {
   public autoScroll: boolean = false;
   public userName: string = "";
   public chatThreadId: string = "";
+  public webSearchState: boolean = false;
 
   private chatThread: ChatThreadModel | undefined;
 
@@ -109,6 +110,14 @@ class ChatState {
     }
 
     this.loading = "idle";
+  }
+
+  public isSearchExtensionState(): boolean{
+    return this.webSearchState;
+  }
+
+  public updateSearchExtensionState(active : boolean): boolean {
+    return this.webSearchState = active;
   }
 
   public updateInput(value: string) {

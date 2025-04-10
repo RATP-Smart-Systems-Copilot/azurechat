@@ -32,14 +32,12 @@ export const ChatMenuItem: FC<ChatMenuItemProps> = (props) => {
   });
 
   return (
-    <div className="flex group hover:bg-muted pr-3 text-muted-foreground rounded-sm hover:text-muted-foreground">
+    <div className="flex group items-center rounded-md hover:bg-muted px-2">
       <Link
         href={props.href}
         className={cn(
-          "flex-1 flex items-center gap-2 p-3 overflow-hidden",
-          path.startsWith(props.href) && props.href !== "/"
-            ? "text-corporateblue"
-            : ""
+          "flex-1 flex items-center gap-3 p-3 overflow-hidden transition-colors duration-150 rounded-md",
+          path.startsWith(props.href) && props.href !== "/" ? "text-corporateblue font-medium" : "text-muted-foreground"
         )}
       >
         {props.children}
@@ -49,7 +47,7 @@ export const ChatMenuItem: FC<ChatMenuItemProps> = (props) => {
           {isLoading ? (
             <LoadingIndicator isLoading={isLoading} />
           ) : (
-            <MoreVertical size={18} aria-label="Chat Menu Item Dropdown Menu" />
+            <MoreVertical size={18} aria-label="Chat Menu Item Dropdown Menu" className="text-muted-foreground hover:text-corporateblue transition-colors" />
           )}
         </DropdownMenuTrigger>
         <DropdownMenuContent side="right" align="start">
