@@ -9,8 +9,8 @@ const USE_MANAGED_IDENTITIES = process.env.USE_MANAGED_IDENTITIES === "true";
 
 export const OpenAIInstance = (gptModel: string = process.env.AZURE_OPENAI_API_DEPLOYMENT_NAME) => {
 
-  if(gptModel === 'o1-mini')
-    return OpenAIo1Instance();
+  if(gptModel === 'gpt-4.1-mini')
+    return OpenAISwedenInstance();
 
   const endpointSuffix = process.env.AZURE_OPENAI_API_ENDPOINT_SUFFIX || "openai.azure.com";
   let token = process.env.AZURE_OPENAI_API_KEY;
@@ -98,21 +98,21 @@ export const OpenAIDALLEInstance =  () => {
 };
 
 // a new instance definition for DALL-E image generation
-export const OpenAIo1Instance = () => {
+export const OpenAISwedenInstance = () => {
   if (
     !process.env.AZURE_OPENAI_DALLE_API_KEY ||
     !process.env.AZURE_OPENAI_DALLE_API_DEPLOYMENT_NAME ||
     !process.env.AZURE_OPENAI_DALLE_API_INSTANCE_NAME
   ) {
     throw new Error(
-      "Azure OpenAI o1 endpoint config is not set, check environment variables."
+      "Azure OpenAI endpoint config is not set, check environment variables."
     );
   }
   const endpointSuffix = process.env.AZURE_OPENAI_API_ENDPOINT_SUFFIX || "openai.azure.com";
 
   const openai = new OpenAI({
     apiKey: process.env.AZURE_OPENAI_DALLE_API_KEY,
-    baseURL: `https://${process.env.AZURE_OPENAI_DALLE_API_INSTANCE_NAME}.${endpointSuffix}/openai/deployments/${process.env.AZURE_OPENAI_API_DEPLOYMENT_NAME_o1mini}`,
+    baseURL: `https://${process.env.AZURE_OPENAI_DALLE_API_INSTANCE_NAME}.${endpointSuffix}/openai/deployments/gpt-4.1-mini`,
     defaultQuery: {
       "api-version":
         process.env.AZURE_OPENAI_API_VERSION || "2023-12-01-preview",
