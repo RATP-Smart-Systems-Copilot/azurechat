@@ -55,6 +55,14 @@ export interface GPTS {
 
 export const getModelOptions = () : GPTS => {
   return {
+    'gpt-4.1-mini': {
+      'model': 'gpt-4.1-mini',
+      'name': 'GPT 4.1 mini',
+      'description': 'Pour les tâches complexes\n\nInput: 1M tokens\nOutput: 32 768 tokens\nCut-off: 06/2024',
+      'prompt': { 'price': 0.00040, 'unit': 1000 },
+      'completion': { 'price': 0.00160, 'unit': 1000 },
+      'provider': 'OpenAI',
+    },
     'gpt-4o-mini': {
       'model': process.env.AZURE_OPENAI_API_DEPLOYMENT_NAME,
       'name': 'GPT 4o mini',
@@ -69,14 +77,6 @@ export const getModelOptions = () : GPTS => {
       'description': 'Pour les tâches complexes\n\nInput: 128k tokens\nOutput: 16k tokens\nCut-off: 10/2023',
       'prompt': { 'price': 0.00254665, 'unit': 1000 },
       'completion': { 'price': 0.0101866, 'unit': 1000 },
-      'provider': 'OpenAI',
-    },
-    'o1-mini': {
-      'model': process.env.AZURE_OPENAI_API_DEPLOYMENT_NAME_o1mini,
-      'name': 'o1 mini',
-      'description': 'Pour les raisonnements complexes\n\nInput: 128k tokens\nOutput: 65k tokens\nCut-off: 10/2023',
-      'prompt': { 'price': 0.0031663, 'unit': 1000 },
-      'completion': { 'price': 0.012664908, 'unit': 1000 },
       'provider': 'OpenAI',
     },
     'o3-mini': {
