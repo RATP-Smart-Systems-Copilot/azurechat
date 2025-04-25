@@ -18,6 +18,7 @@ import { GetDynamicExtensions } from "./chat-api-dynamic-extensions";
 import { ChatApiExtensions } from "./chat-api-extension";
 import { ChatApiMultimodal } from "./chat-api-multimodal";
 import { OpenAIStream } from "./open-ai-stream";
+import { ResponseStream } from "openai/lib/responses/ResponseStream.mjs";
 type ChatTypes = "extensions" | "chat-with-file" | "multimodal" | "simple" | "ai-inference";
 
 export const ChatAPIEntry = async (props: UserPrompt, signal: AbortSignal) => {
@@ -66,7 +67,7 @@ export const ChatAPIEntry = async (props: UserPrompt, signal: AbortSignal) => {
   });
 
 
-  let runner: ChatCompletionStreamingRunner;
+  let runner: ResponseStream | ChatCompletionStreamingRunner;
 
   switch (chatType) {
     case "chat-with-file":

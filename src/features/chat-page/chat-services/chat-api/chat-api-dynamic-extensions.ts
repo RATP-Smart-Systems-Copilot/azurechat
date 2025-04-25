@@ -14,6 +14,7 @@ import {
 } from "@/features/extensions-page/extension-services/models";
 import { RunnableToolFunction } from "openai/lib/RunnableFunction";
 import { ToolsInterface } from "../models";
+import { Tool } from "openai/resources/responses/responses.mjs";
 export const GetDynamicExtensions = async (props: {
   extensionIds: string[];
 }): Promise<ServerActionResponse<Array<any>>> => {
@@ -24,25 +25,17 @@ export const GetDynamicExtensions = async (props: {
       props.extensionIds.includes(e.id)
     );
 
-    const dynamicExtensions: Array<RunnableToolFunction<any>> = [];
+    const dynamicExtensions: Array<Tool> = [];
 
     extensionToReturn.forEach((e) => {
       e.functions.forEach((f) => {
         const extension = JSON.parse(f.code) as ToolsInterface;
         dynamicExtensions.push({
           type: "function",
-          function: {
-            function: (args: any) =>
-              executeFunction({
-                functionModel: f,
-                extensionModel: e,
-                args,
-              }),
-            parse: JSON.parse,
-            parameters: extension.parameters,
-            description: extension.description,
-            name: extension.name,
-          },
+          parameters: extension.parameters,
+          description: extension.description,
+          name: extension.name,
+          strict: true,
         });
       });
     });

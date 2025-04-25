@@ -112,7 +112,7 @@ export const OpenAISwedenInstance = () => {
 
   const openai = new OpenAI({
     apiKey: process.env.AZURE_OPENAI_DALLE_API_KEY,
-    baseURL: `https://${process.env.AZURE_OPENAI_DALLE_API_INSTANCE_NAME}.${endpointSuffix}/openai/deployments/gpt-4.1-mini`,
+    baseURL: `https://${process.env.AZURE_OPENAI_DALLE_API_INSTANCE_NAME}.${endpointSuffix}/openai`,
     defaultQuery: {
       "api-version":
         process.env.AZURE_OPENAI_API_VERSION || "2023-12-01-preview",

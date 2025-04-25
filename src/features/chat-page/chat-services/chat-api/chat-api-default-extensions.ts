@@ -26,16 +26,16 @@ export const GetDefaultExtensions = async (props: {
           props.signal
         ),
       parse: (input: string) => JSON.parse(input),
-      parameters: {
-        type: "object",
-        properties: {
-          prompt: { type: "string" },
-        },
-      },
-      description:
-        "You must ONLY use the function create_img if and only if the user asks you to create an image with the sentence 'crée une image' or 'create an image'. Don't use this function without this instruction.You only use the create_img function if you explicitly include the phrase 'creates an image'.",
-      name: "create_img",
     },
+    parameters: {
+      type: "object",
+      properties: {
+        prompt: { type: "string" },
+      },
+    },
+    description:
+      "You must ONLY use the function create_img if and only if the user asks you to create an image with the sentence 'crée une image' or 'create an image'. Don't use this function without this instruction.You only use the create_img function if you explicitly include the phrase 'creates an image'.",
+    name: "create_img",
   });
 
   // Add any other default Extension here

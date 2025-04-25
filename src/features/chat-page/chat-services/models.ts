@@ -1,5 +1,6 @@
 import { ChatCompletionSnapshot } from "openai/lib/ChatCompletionStream";
 import { ChatCompletionMessage } from "openai/resources/chat/completions";
+import { ResponseTextDeltaEvent, ResponseTextDoneEvent } from "openai/resources/responses/responses.mjs";
 
 export const CHAT_DOCUMENT_ATTRIBUTE = "CHAT_DOCUMENT";
 export const CHAT_THREAD_ATTRIBUTE = "CHAT_THREAD";
@@ -87,7 +88,7 @@ export type AzureChatCompletionFunctionCallResult = {
 
 export type AzureChatCompletionContent = {
   type: "content";
-  response: ChatCompletionSnapshot;
+  response: ChatCompletionSnapshot|ResponseTextDeltaEvent;
 };
 
 export type AzureChatLLMCompletionContent = {
@@ -98,7 +99,7 @@ export type AzureChatLLMCompletionContent = {
 
 export type AzureChatCompletionFinalContent = {
   type: "finalContent";
-  response: string;
+  response: string|ResponseTextDoneEvent;
 };
 
 export type AzureChatCompletionError = {

@@ -7,34 +7,40 @@ import { RunnableToolFunction } from "openai/lib/RunnableFunction";
 import { ChatCompletionStreamingRunner } from "openai/resources/beta/chat/completions";
 import { ChatCompletionMessageParam } from "openai/resources/chat/completions";
 import { ChatThreadModel } from "../models";
+import { ResponseStream } from "openai/lib/responses/ResponseStream.mjs";
+import { Tool } from "openai/resources/responses/responses.mjs";
+
 export const ChatApiExtensions = async (props: {
   chatThread: ChatThreadModel;
   userMessage: string;
-  history: ChatCompletionMessageParam[];
-  extensions: RunnableToolFunction<any>[];
+  history: any;
+  extensions: Array<Tool>;
   signal: AbortSignal;
-}): Promise<ChatCompletionStreamingRunner> => {
+}) : Promise<ResponseStream> => {
   const { userMessage, history, signal, chatThread, extensions } = props;
 
   const openAI = OpenAIInstance(chatThread.gptModel);
   const systemMessage = await extensionsSystemMessage(chatThread);
-  return openAI.beta.chat.completions.runTools(
+  return openAI.responses.stream(
     {
-      model: "",
+      model: chatThread.gptModel ?? "gpt-4.1-mini",
       stream: true,
-      messages: [
-        {
-          role: "system",
-          content: chatThread.personaMessage + "\n" + systemMessage,
-        },
+      instructions: chatThread.personaMessage + "\n" + systemMessage,
+      input: [
         ...history,
         {
           role: "user",
           content: userMessage,
         },
       ],
+      tool_choice: "auto",
       tools: extensions,
       ...(chatThread.gptModel !== "o3-mini" && { temperature: chatThread.personaTemperature }),
+      max_output_tokens: 25000,
+      ...(chatThread.gptModel == "o3-mini" && { reasoning: {
+        effort: "medium", // unchanged
+        summary: "auto" // auto gives you the best available summary (detailed > auto > None)
+      } }),
     },
     { signal: signal }
   );
