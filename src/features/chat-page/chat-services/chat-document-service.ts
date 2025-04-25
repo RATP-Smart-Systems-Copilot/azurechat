@@ -9,7 +9,7 @@ import { ServerActionResponse } from "@/features/common/server-action-response";
 import { DocumentIntelligenceInstance } from "@/features/common/services/document-intelligence";
 import { uniqueId } from "@/features/common/util";
 import { SqlQuerySpec } from "@azure/cosmos";
-import { EnsureIndexIsCreated } from "./azure-ai-search/azure-ai-search";
+import { DeleteDocumentPersonaByID, EnsureIndexIsCreated } from "./azure-ai-search/azure-ai-search";
 import { CHAT_DOCUMENT_ATTRIBUTE, ChatDocumentModel } from "./models";
 
 const MAX_UPLOAD_DOCUMENT_SIZE: number = 20000000;
@@ -329,6 +329,82 @@ export const CreateChatDocumentForPersona = async (
           message: `${e}`,
         },
       ],
+    };
+  }
+};
+
+export const FindChatDocumentsById = async (
+  id: string
+): Promise<ServerActionResponse<ChatDocumentModel>> => {
+  try {
+    const querySpec: SqlQuerySpec = {
+      query:
+        "SELECT * FROM root r WHERE r.type=@type AND r.id = @id AND r.isDeleted=@isDeleted",
+      parameters: [
+        {
+          name: "@type",
+          value: CHAT_DOCUMENT_ATTRIBUTE,
+        },
+        {
+          name: "@id",
+          value: id,
+        },
+        {
+          name: "@isDeleted",
+          value: false,
+        },
+      ],
+    };
+
+    const { resources } = await HistoryContainer()
+      .items.query<ChatDocumentModel>(querySpec)
+      .fetchAll();
+
+    if (resources.length === 0) {
+      return {
+        status: "NOT_FOUND",
+        errors: [{ message: `Document not found` }],
+      };
+    }
+
+    return {
+      status: "OK",
+      response: resources[0],
+    };
+  } catch (error) {
+    return {
+      status: "ERROR",
+      errors: [{ message: `${error}` }],
+    };
+  }
+};
+
+export const DeleteChatDocumentForPersona = async (
+  file: ChatDocumentModel,
+  personaId: string,
+): Promise<ServerActionResponse<ChatDocumentModel>> => {
+  try {
+    const modelToDelete = await FindChatDocumentsById(file.id);
+    if(modelToDelete.status === "OK"){
+      const result = await DeleteDocumentPersonaByID(file.name, personaId);
+
+      if(result.length > 0 && result[0].status === "ERROR"){
+        throw new Error("Erreur à la suppression du document");
+      }
+
+      const itemToUpdate = {
+        ...modelToDelete.response,
+      };
+      itemToUpdate.isDeleted = true;
+      await HistoryContainer().items.upsert(itemToUpdate);
+
+      modelToDelete.response.isDeleted = true;
+    }
+    return modelToDelete;
+  }catch (error) {
+    return {
+      status: "ERROR",
+      errors: [{ message: `${error}` }],
     };
   }
 };

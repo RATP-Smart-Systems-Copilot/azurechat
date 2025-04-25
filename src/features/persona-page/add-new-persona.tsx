@@ -28,7 +28,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from ".
 import { AttachFile } from "../ui/chat/chat-input-area/attach-file";
 import { fileStore, useFileStore } from "./file/file-store";
 import { ChatDocumentModel } from "../chat-page/chat-services/models";
-import { File } from "lucide-react";
+import { CheckIcon, File, Trash2 } from "lucide-react";
 import { modelOptions } from "../theme/theme-config";
 
 interface Props {}
@@ -39,6 +39,10 @@ export const AddNewPersona: FC<Props> = (props) => {
   const { isOpened, persona } = usePersonaState();
   const { uploadButtonLabel } = useFileStore();
   const [documentsPersona, setDocumentsPersona] = useState<Array<ChatDocumentModel>>([]);
+  const [deletedDocIds, setDeletedDocIds] = useState<Set<string>>(new Set());
+  const [refreshKey, setRefreshKey] = useState(0);
+
+
 
   useEffect(() => {
     const fetchDocuments = async () => {
@@ -50,7 +54,7 @@ export const AddNewPersona: FC<Props> = (props) => {
     };
 
     fetchDocuments();
-  }, [persona.id]);
+  }, [persona.id, , refreshKey]);
 
   const [formState, formAction] = useFormState(
     addOrUpdatePersona,
@@ -89,6 +93,13 @@ export const AddNewPersona: FC<Props> = (props) => {
       );
     }
   };
+
+  const handleButtonDeleteClick = (doc: ChatDocumentModel) => {
+    fileStore.onDelete(doc, persona.id);
+    setDeletedDocIds(prev => new Set(prev).add(doc.id));
+    setRefreshKey(prev => prev + 1); // Force le rechargement des documents
+  };
+
 
   return (
     <Sheet
@@ -188,6 +199,16 @@ export const AddNewPersona: FC<Props> = (props) => {
                   return (
                     <div className="flex gap-2 items-center" key={doc.id}>
                       <File size={16} /> <div>{doc.name}</div>
+                      <Button
+                        type="button"
+                        variant={"ghost"}
+                        size={"sm"}
+                        title="Supprimer le document"
+                        className="flex items-center hover:bg-gray-100 transition-colors duration-150 rounded"
+                        onClick={() => handleButtonDeleteClick(doc)}
+                      >
+                      {deletedDocIds.has(doc.id) ? <CheckIcon size={16} /> : <Trash2 size={16} />}
+                      </Button>
                     </div>
                   );
                 })

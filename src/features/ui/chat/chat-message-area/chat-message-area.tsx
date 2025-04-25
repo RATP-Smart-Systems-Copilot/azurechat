@@ -84,7 +84,7 @@ export const ChatMessageArea = (props: {
         {/* Bloc du message */}
         <div
           className={cn(
-            props.role === "user" ? "max-w-[600px]" : "w-full",
+            props.role === "user" ? "max-w-[800px]" : "w-full",
             "flex flex-col border rounded-lg shadow-lg overflow-hidden p-4 gap-8"
           )}
         >
@@ -124,8 +124,15 @@ export const ChatMessageArea = (props: {
           <div
             className={cn(
               "-m-4 p-4 prose prose-slate dark:prose-invert break-words prose-p:leading-relaxed prose-pre:p-0 transition-colors duration-200",
-              props.role === "user" ? "bg-ring text-white" : "max-w-5xl"
+              props.role === "user"
+                ? "max-w-3xl bg-ring text-white overflow-y-auto resize-y"
+                : "max-w-5xl"
             )}
+            style={
+              props.role === "user"
+                ? { height: "7rem", minHeight: "6rem" }
+                : undefined
+            }
           >
             {props.children}
           </div>

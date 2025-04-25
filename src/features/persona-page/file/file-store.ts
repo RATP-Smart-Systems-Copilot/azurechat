@@ -10,10 +10,26 @@ import { IndexDocuments } from "../../chat-page/chat-services/azure-ai-search/az
 import {
   CrackDocument,
   CreateChatDocumentForPersona,
+  DeleteChatDocumentForPersona,
 } from "../../chat-page/chat-services/chat-document-service";
+import { ChatDocumentModel } from "@/features/chat-page/chat-services/models";
 
 class FileStore {
+
   public uploadButtonLabel: string = "";
+
+  public async onDelete(doc: ChatDocumentModel, personaId: string) {
+    try {
+
+      await DeleteChatDocumentForPersona(doc, personaId);
+      showSuccess({
+        title: "Fichier supprimé",
+        description: `${doc.name} uploaded successfully.`,
+      });
+    } catch (error) {
+      showError("" + error);
+    }
+  }
 
   public async onFileChange(props: {
     formData: FormData;
