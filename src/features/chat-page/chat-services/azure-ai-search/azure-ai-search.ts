@@ -34,15 +34,17 @@ export type DocumentSearchResponse = {
 
 export const SimpleSearch = async (
   searchText?: string,
-  filter?: string
+  filter?: string,
+  fileName?: string
 ): Promise<ServerActionResponse<Array<DocumentSearchResponse>>> => {
   try {
     if (debug) console.log("Executing SimpleSearch with searchText:", searchText, "filter:", filter);
     const instance = AzureAISearchInstance<AzureSearchDocumentIndex>();
     const searchResults = await instance.search(searchText, { filter: filter });
-
     const results: Array<DocumentSearchResponse> = [];
     for await (const result of searchResults.results) {
+      if(fileName && result.document.metadata !== fileName)
+        continue;
       results.push({
         score: result.score,
         document: result.document,
@@ -295,14 +297,25 @@ export const DeleteDocumentsForPersona = async (
   return DeleteDocuments(`personaId eq '${personaId}'`);
 };
 
+export const DeleteDocumentPersonaByID = async (
+  fileName: string, 
+  personaId: string,
+): Promise<Array<ServerActionResponse<boolean>>> => {
+  if (debug)
+    console.log("Deleting document for id:", fileName);
+  return DeleteDocuments(`personaId eq '${personaId}'`, fileName);
+};
+
 
 export const DeleteDocuments = async (
-  filter: string
+  filter: string,
+  fileName?: string,
 ): Promise<Array<ServerActionResponse<boolean>>> => {
   try {
     const documentsInChatResponse = await SimpleSearch(
       undefined,
-      filter
+      filter, 
+      fileName,
     );
 
     if (documentsInChatResponse.status === "OK") {
