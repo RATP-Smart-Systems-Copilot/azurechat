@@ -15,6 +15,7 @@ export const OpenAIStream = (props: {
   const encoder = new TextEncoder();
   const { runner, chatThread } = props;
   let lastMessage = "";
+  let lastMessageExtension = "";
 
   const readableStream = new ReadableStream({
     async start(controller) {
@@ -26,11 +27,12 @@ export const OpenAIStream = (props: {
       // Si le runner est un ResponseStream, on écoute les mises à jour par delta.
       if (runner instanceof ResponseStream) {
         runner.on("response.output_text.delta", (content) => {
+          lastMessage += content.delta;
           const response: AzureChatCompletion = {
             type: "content",
             response: content,
+            value: lastMessage,
           };
-          lastMessage += content.delta;
           streamResponse(response.type, JSON.stringify(response));
         })
         .on("response.output_text.done", async (content) => {
@@ -45,6 +47,47 @@ export const OpenAIStream = (props: {
             response: content,
           };
           streamResponse(response.type, JSON.stringify(response));
+        })
+        .on("response.completed", async (content) => {
+          console.log(content.response.output[0])
+          controller.close();
+        })
+        .on("response.function_call_arguments.done", async (functionCallResult) => {
+          const response: AzureChatCompletion = {
+            type: "functionCallResult",
+            response: functionCallResult.arguments,
+          };
+          await CreateChatMessage({
+            name: "tool",
+            content: functionCallResult.arguments,
+            role: "function",
+            chatThreadId: chatThread.id,
+          });
+          streamResponse(response.type, JSON.stringify(response));
+        })
+        .on("abort", (error) => {
+          const response: AzureChatCompletionAbort = {
+            type: "abort",
+            response: "Chat aborted",
+          };
+          streamResponse(response.type, JSON.stringify(response));
+          controller.close();
+        }).on("response.failed", async (error) => {
+          console.log("🔴 error", error);
+          const response: AzureChatCompletion = {
+            type: "error",
+            response: error.response && error.response.error ? error.response.error.message : "Une erreur est survenue",
+          };
+
+          // Même en cas d'erreur, sauvegarder le dernier message (même incomplet)
+          await CreateChatMessage({
+            name: AI_NAME,
+            content: lastMessage,
+            role: "assistant",
+            chatThreadId: chatThread.id,
+          });
+
+          streamResponse(response.type, JSON.stringify(response));
           controller.close();
         });
       }
@@ -56,11 +99,12 @@ export const OpenAIStream = (props: {
           if (!(runner instanceof ResponseStream)) {
             const completion = runner.currentChatCompletionSnapshot;
             if (completion) {
+              lastMessage = completion.choices[0]?.message?.content ?? "";
               const response: AzureChatCompletion = {
                 type: "content",
                 response: completion,
+                value: lastMessage,
               };
-              lastMessage = completion.choices[0]?.message?.content ?? "";
               streamResponse(response.type, JSON.stringify(response));
             }
           }
@@ -91,6 +135,21 @@ export const OpenAIStream = (props: {
             chatThreadId: chatThread.id,
           });
           streamResponse(response.type, JSON.stringify(response));
+        })
+        .on("finalContent", async (content: string) => {
+          await CreateChatMessage({
+            name: AI_NAME,
+            content: content,
+            role: "assistant",
+            chatThreadId: chatThread.id,
+          });
+
+          const response: AzureChatCompletion = {
+            type: "finalContent",
+            response: content,
+          };
+          streamResponse(response.type, JSON.stringify(response));
+          controller.close();
         })
         .on("abort", (error) => {
           const response: AzureChatCompletionAbort = {

@@ -189,8 +189,8 @@ class ChatState {
             case "functionCall":
               const mappedFunction: ChatMessageModel = {
                 id: uniqueId(),
-                content: responseType.response.arguments,
-                name: responseType.response.name,
+                content: "arguments" in responseType.response ? responseType.response.arguments : (responseType.value || ""),
+                name: "name" in responseType.response ? responseType.response.name : responseType.response.item_id,
                 role: "function",
                 createdAt: new Date(),
                 isDeleted: false,
@@ -220,7 +220,7 @@ class ChatState {
               const response =  responseType.response;
               const mappedContent: ChatMessageModel = {
                 id:  "item_id" in response ? response.item_id : response.id,
-                content:  ("delta" in response ? response.delta : response.choices[0].message.content) || "",
+                content:  ("delta" in response ? responseType.value : response.choices[0].message.content) || "",
                 name: AI_NAME,
                 role: "assistant",
                 createdAt: new Date(),
