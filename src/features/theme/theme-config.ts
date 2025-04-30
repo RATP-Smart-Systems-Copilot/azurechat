@@ -47,6 +47,7 @@ export interface GPT{
   prompt: PromptPricing;
   completion: PromptPricing;
   provider: 'OpenAI'|'MistralAI'
+  enable: boolean;
 }
 
 export interface GPTS {
@@ -62,54 +63,61 @@ export const getModelOptions = () : GPTS => {
       'prompt': { 'price': 0.00040, 'unit': 1000 },
       'completion': { 'price': 0.00160, 'unit': 1000 },
       'provider': 'OpenAI',
+      'enable': true,
     },
     'gpt-4o-mini': {
-      'model': process.env.AZURE_OPENAI_API_DEPLOYMENT_NAME,
+      'model': 'gpt-4o-mini',
       'name': 'GPT 4o mini',
       'description': 'Pour vos tâches courantes\n\nInput: 128k tokens\nOutput: 16k tokens\nCut-off: 10/2023',
       'prompt': { 'price': 0.00015280, 'unit': 1000 },
       'completion': { 'price': 0.0006112, 'unit': 1000 },
       'provider': 'OpenAI',
+      'enable': true,
     },
     'gpt4o': {
-      'model': process.env.AZURE_OPENAI_API_DEPLOYMENT_NAME_4o,
+      'model': 'gpt-4o',
       'name': 'GPT 4o',
       'description': 'Pour les tâches complexes\n\nInput: 128k tokens\nOutput: 16k tokens\nCut-off: 10/2023',
       'prompt': { 'price': 0.00254665, 'unit': 1000 },
       'completion': { 'price': 0.0101866, 'unit': 1000 },
       'provider': 'OpenAI',
+      'enable': true,
     },
     'o3-mini': {
-      'model': process.env.AZURE_OPENAI_API_DEPLOYMENT_NAME_o3mini,
+      'model': 'o3-mini',
       'name': 'o3 mini',
       'description': 'Pour les raisonnements complexes, calculs, algo\n\nInput: 200k tokens\nOutput: 100k tokens\nCut-off: 10/2023',
       'prompt': { 'price': 0.0031663, 'unit': 1000 },
       'completion': { 'price': 0.012664908, 'unit': 1000 },
       'provider': 'OpenAI',
+      'enable': true,
     },
     'Codestral-2501': {
-      'model': process.env.AZURE_AI_API_DEPLOYMENT_NAME_Codestral,
+      'model': 'Codestral-2501',
       'name': 'Codestral',
       'description': 'Pour vos tâches de codes\n\nInput: 128k tokens\nCut-off: 10/2023',
       'prompt': { 'price': 0.0003, 'unit': 1000 },
       'completion': { 'price': 0.0009, 'unit': 1000 },
       'provider': 'MistralAI',
+      'enable': true,
     },
     'Mistral-Nemo': {
-      'model': process.env.AZURE_AI_API_DEPLOYMENT_NAME_MistralNemo,
+      'model': 'Mistral-Nemo',
       'name': 'Mistral Nemo',
       'description': 'Pour vos tâches basiques\n\nInput: 128k tokens\nCut-off: 10/2023',
       'prompt': { 'price': 0.00015, 'unit': 1000 },
       'completion': { 'price': 0.00015, 'unit': 1000 },
       'provider': 'MistralAI',
+      'enable': false,
     },
     'Mistral-Large': {
-      'model': process.env.AZURE_AI_API_DEPLOYMENT_NAME_MistralLarge,
+      'model': 'mistral-large-2411',
       'name': 'Mistral Large',
       'description': 'Pour vos tâches courantes\n\nInput: 128k tokens\nCut-off: 10/2023',
       'prompt': { 'price': 0.006, 'unit': 1000 },
       'completion': { 'price': 0.002, 'unit': 1000 },
       'provider': 'MistralAI',
+      'enable': false,
     },
   };
 

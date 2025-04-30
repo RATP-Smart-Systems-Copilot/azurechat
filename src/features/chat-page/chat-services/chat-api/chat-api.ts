@@ -2,7 +2,7 @@
 import "server-only";
 
 import { getCurrentUser } from "@/features/auth-page/helpers";
-import { CHAT_DEFAULT_SYSTEM_PROMPT, modelOptions } from "@/features/theme/theme-config";
+import { CHAT_DEFAULT_SYSTEM_PROMPT } from "@/features/theme/theme-config";
 import { ChatCompletionStreamingRunner } from "openai/resources/beta/chat/completions";
 import { ChatApiRAG } from "../chat-api/chat-api-rag";
 import { FindAllChatDocuments, FindAllChatDocumentsByPersona } from "../chat-document-service";

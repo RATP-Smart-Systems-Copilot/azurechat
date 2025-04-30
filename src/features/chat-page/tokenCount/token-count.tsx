@@ -10,7 +10,7 @@ interface TokenCountProps {
 
 const TokenCount: React.FC<TokenCountProps> = ({ messages, gptModel }) => {
 
-    const selectedModel = Object.values(modelOptions).find(model => model.model === gptModel) || modelOptions['gpt-4o-mini']; // Set default value if gptModel is not found in modelOptions
+    const selectedModel = modelOptions[gptModel || 'gpt-4o-mini']; // Set default value if gptModel is not found in modelOptions
     // Utilise le hook useEffect pour mettre à jour l'état tokenCount et cost
     useEffect(() => {
         const model = selectedModel;

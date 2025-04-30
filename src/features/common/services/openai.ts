@@ -14,10 +14,7 @@ export const OpenAIInstance = (gptModel: string = process.env.AZURE_OPENAI_API_D
 
   const endpointSuffix = process.env.AZURE_OPENAI_API_ENDPOINT_SUFFIX || "openai.azure.com";
   let token = process.env.AZURE_OPENAI_API_KEY;
-  let selectedModel = Object.values(modelOptions).find(model => model.model === gptModel);
-  if (!selectedModel) {
-    selectedModel = modelOptions['gpt-4o-mini']; // Set default value if gptModel is not found in modelOptions
-  }
+  let selectedModel = modelOptions[gptModel || defaultGPTModel];
   if (USE_MANAGED_IDENTITIES) {
     const credential = new DefaultAzureCredential();
     const scope = "https://cognitiveservices.azure.com/.default";

@@ -2,10 +2,10 @@
 import "server-only";
 
 import { ChatThreadModel, UserPrompt } from "../models";
-import { MistralInstance } from "@/features/common/services/mistral";
+import { defaultMistralModel, MistralInstance } from "@/features/common/services/mistral";
 import { CreateChatMessage, FindTopChatMessagesForCurrentUser } from "../chat-message-service";
 import { mapAIInferenceChatMessages } from "../utils";
-import { CHAT_DEFAULT_SYSTEM_PROMPT } from "@/features/theme/theme-config";
+import { CHAT_DEFAULT_SYSTEM_PROMPT, modelOptions } from "@/features/theme/theme-config";
 import { EnsureChatThreadOperation } from "../chat-thread-service";
 import { getCurrentUser } from "@/features/auth-page/helpers";
 import { LLMAIStream } from "./LLMAIStream";
@@ -33,6 +33,8 @@ export const ChatApiAIInference = async (props: UserPrompt, signal: AbortSignal)
     }
 
     const currentChatThread = currentChatThreadResponse.response;
+    let selectedModel = modelOptions[currentChatThread.gptModel || defaultMistralModel];
+
 
        // promise all to get user, history and docs
     const [user, history] = await Promise.all([
@@ -68,7 +70,7 @@ export const ChatApiAIInference = async (props: UserPrompt, signal: AbortSignal)
           content: props.message,
           }],
         stream: true,
-        model: currentChatThread.gptModel,
+        model: selectedModel.model,
         temperature: currentChatThread.personaTemperature,
       },
     })
@@ -79,8 +81,16 @@ export const ChatApiAIInference = async (props: UserPrompt, signal: AbortSignal)
       throw new Error("The response stream is undefined");
     }
     if (response.status !== "200") {
-      throw new Error("Failed to get chat completions");
+      let errorBody = '';
+      if(response.body){
+        for await (const chunk of response.body) {
+          errorBody += chunk.toString();
+        }
+      }
+
+      throw new Error(`Failed to get chat completions: ${errorBody}`);
     }
+
     const readableStream = LLMAIStream({
       runner: stream,
       chatThread: currentChatThread,

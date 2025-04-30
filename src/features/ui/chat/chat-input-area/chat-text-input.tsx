@@ -12,8 +12,9 @@ export const ChatTextInput = React.forwardRef<
     if (textarea) {
       textarea.style.height = "auto"; // reset height to auto to shrink if needed
       // Ajuste la hauteur uniquement si la hauteur actuelle est inférieure au scrollHeight
-      if (textarea.clientHeight < textarea.scrollHeight) {
-        textarea.style.height = textarea.scrollHeight + "px";
+      const newHeight = Math.min(textarea.scrollHeight, 300); // limite à 400px
+      if (textarea.clientHeight < newHeight) {
+        textarea.style.height = newHeight + "px";
       }
     }
   }, [value, textareaRef]);
@@ -26,6 +27,7 @@ export const ChatTextInput = React.forwardRef<
       value={value}
       onChange={onChange}
       {...props}
+      style={{ maxHeight: 500 }} // limite max CSS en complément
     />
   );
 });

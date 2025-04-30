@@ -18,7 +18,6 @@ import { PERSONA_ATTRIBUTE, PersonaModel, PersonaModelSchema } from "./models";
 import { defaultGPTModel } from "@/features/common/services/openai";
 import { FindAllChatDocumentsByPersona } from "@/features/chat-page/chat-services/chat-document-service";
 import { DeleteDocumentsForPersona } from "@/features/chat-page/chat-services/azure-ai-search/azure-ai-search";
-import { modelOptions } from "@/features/theme/theme-config";
 
 interface PersonaInput {
   name: string;
@@ -313,7 +312,7 @@ export const CreatePersonaChat = async (
   if (personaResponse.status === "OK") {
     const persona = personaResponse.response;
     const personaGptModel = personaResponse.response.gptModel;
-    const gptModel = personaGptModel ? modelOptions[personaGptModel].model : modelOptions[defaultGPTModel].model
+    const gptModel = personaGptModel ? personaGptModel : defaultGPTModel;
 
     const response = await UpsertChatThread({
       name: persona.name,
