@@ -183,7 +183,7 @@ export const AddNewPersona: FC<Props> = (props) => {
                   <SelectValue placeholder="Sélectionnez un modèle" defaultValue={persona.gptModel} />
                 </SelectTrigger>
                 <SelectContent>
-                  {Object.entries(modelOptions).map(([key, value]) => (
+                  {Object.entries(modelOptions).filter(([_, model]) => model.provider === 'OpenAI' && model.enable).map(([key, value]) => (
                     <SelectItem key={key} value={key}>{value.name}</SelectItem>
                   ))}
                 </SelectContent>

@@ -3,6 +3,8 @@ import { AzureKeyCredential } from "@azure/core-auth";
 
 const USE_MANAGED_IDENTITIES = process.env.USE_MANAGED_IDENTITIES === "true";
 
+export const defaultMistralModel = 'Codestral-2501';
+
 export const MistralInstance = (gptModel: string = process.env.AZURE_OPENAI_API_DEPLOYMENT_NAME) => {
 
     const endpointSuffix = process.env.AZURE_LLM_API_ENDPOINT_SUFFIX || "services.ai.azure.com";

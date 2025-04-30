@@ -87,7 +87,7 @@ export const ChatHome: FC<ChatPersonaProps> = (props) => {
                   alt="ai-icon"
                 />
                 <div className="grid grid-cols-2 gap-3">
-                  {Object.entries(llmModels).filter(([_, model]) => model.provider === 'OpenAI').map(([key, model], index) => (
+                  {Object.entries(llmModels).filter(([_, model]) => model.provider === 'OpenAI' && model.enable).map(([key, model], index) => (
                     <ChatCard
                       key={key}
                       model={key}
@@ -106,7 +106,7 @@ export const ChatHome: FC<ChatPersonaProps> = (props) => {
                   alt="ai-icon"
                 />
                 <div className="grid grid-cols-2 gap-3">
-                  {Object.entries(llmModels).filter(([_, model]) => model.provider === 'MistralAI').map(([key, model], index) => (
+                  {Object.entries(llmModels).filter(([_, model]) => model.provider === 'MistralAI' && model.enable).map(([key, model], index) => (
                     <ChatCard
                       key={key}
                       model={key}

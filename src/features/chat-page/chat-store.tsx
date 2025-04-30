@@ -1,7 +1,7 @@
 "use client";
 import { uniqueId } from "@/features/common/util";
 import { showError } from "@/features/globals/global-message-store";
-import { AI_NAME, NEW_CHAT_NAME } from "@/features/theme/theme-config";
+import { AI_NAME, modelOptions, NEW_CHAT_NAME } from "@/features/theme/theme-config";
 import {
   ParsedEvent,
   ReconnectInterval,
@@ -170,7 +170,9 @@ class ChatState {
       }
 
       let apiRoute = "/api/chat";
-      if(this.chatThread?.gptModel === 'Codestral-2501' || this.chatThread?.gptModel === 'Mistral-Nemo' ){
+      let selectedModel = this.chatThread?.gptModel ? modelOptions[this.chatThread?.gptModel] : null;
+
+      if(selectedModel && selectedModel.provider !== "OpenAI" ){
         apiRoute = "/api/chat-inference";
       }
 
