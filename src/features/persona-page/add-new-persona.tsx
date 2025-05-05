@@ -30,6 +30,7 @@ import { fileStore, useFileStore } from "./file/file-store";
 import { ChatDocumentModel } from "../chat-page/chat-services/models";
 import { CheckIcon, File, Trash2 } from "lucide-react";
 import { modelOptions } from "../theme/theme-config";
+import { PersonaDocuments } from "./persona-documents/persona-documents";
 
 interface Props {}
 
@@ -214,6 +215,8 @@ export const AddNewPersona: FC<Props> = (props) => {
                 })
               )}
               </div>
+              <PersonaDocuments initialPersonaDocumentIds={[]}/>
+
             </div>
           </ScrollArea>
           <Input
