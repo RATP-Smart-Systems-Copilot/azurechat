@@ -5,8 +5,8 @@ import {
 } from "openai/resources/chat/completions";
 import { ChatMessageModel } from "./models";
 
-export type Role = 'user' | 'assistant' | 'system';
-export const roles: Role[] = ['user', 'assistant', 'system'];
+export type Role = 'user' | 'assistant' | 'developer';
+export const roles: Role[] = ['user', 'assistant', 'developer'];
 
 export interface MessageInterface {
   role: Role;
@@ -15,7 +15,7 @@ export interface MessageInterface {
 
 export const mapOpenAIChatMessages = (
   messages: ChatMessageModel[]
-): ChatCompletionMessageParam[] => {
+) => {
   return messages
   .filter((message) => message.content.trim() !== "") // Filtrer les messages avec un content non vide
   .map((message) => {
@@ -25,17 +25,17 @@ export const mapOpenAIChatMessages = (
           role: message.role,
           name: message.name,
           content: message.content,
-        } as ChatCompletionFunctionMessageParam;
+        } ;
       case "assistant":
         return {
           role: message.role,
           content: message.content,
-        } as ChatCompletionAssistantMessageParam;
+        } ;
       default:
         return {
           role: message.role,
           content: message.content,
-        } as ChatCompletionMessageParam;
+        } ;
     }
   });
 };

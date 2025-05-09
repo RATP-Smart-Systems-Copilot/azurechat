@@ -15,7 +15,7 @@ import { ChatCitationModel, ChatThreadModel } from "../models";
 export const ChatApiRAG = async (props: {
   chatThread: ChatThreadModel;
   userMessage: string;
-  history: ChatCompletionMessageParam[];
+  history: any[];
   signal: AbortSignal;
 }): Promise<ChatCompletionStreamingRunner> => {
   const { chatThread, userMessage, history, signal } = props;

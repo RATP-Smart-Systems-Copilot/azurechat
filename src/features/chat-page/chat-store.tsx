@@ -23,6 +23,7 @@ import {
   ChatMessageModel,
   ChatThreadModel,
 } from "./chat-services/models";
+import { ResponseTextDeltaEvent } from "openai/resources/responses/responses.mjs";
 let abortController: AbortController = new AbortController();
 
 type chatStatus = "idle" | "loading" | "file upload";
@@ -190,8 +191,8 @@ class ChatState {
             case "functionCall":
               const mappedFunction: ChatMessageModel = {
                 id: uniqueId(),
-                content: responseType.response.arguments,
-                name: responseType.response.name,
+                content: "arguments" in responseType.response ? responseType.response.arguments : (responseType.value || ""),
+                name: "name" in responseType.response ? responseType.response.name : responseType.response.item_id,
                 role: "function",
                 createdAt: new Date(),
                 isDeleted: false,
@@ -218,9 +219,10 @@ class ChatState {
               this.addToMessages(mappedFunctionResult);
               break;
             case "content":
+              const response =  responseType.response;
               const mappedContent: ChatMessageModel = {
-                id: responseType.response.id,
-                content: responseType.response.choices[0].message.content || "",
+                id:  "item_id" in response ? response.item_id : response.id,
+                content:  ("delta" in response ? responseType.value : response.choices[0].message.content) || "",
                 name: AI_NAME,
                 role: "assistant",
                 createdAt: new Date(),

@@ -1,5 +1,7 @@
 import { ChatCompletionSnapshot } from "openai/lib/ChatCompletionStream";
+import { ResponseFunctionCallArgumentsDeltaEvent } from "openai/lib/responses/EventTypes.mjs";
 import { ChatCompletionMessage } from "openai/resources/chat/completions";
+import { ResponseCompletedEvent, ResponseFunctionCallArgumentsDoneEvent, ResponseTextDeltaEvent, ResponseTextDoneEvent } from "openai/resources/responses/responses.mjs";
 
 export const CHAT_DOCUMENT_ATTRIBUTE = "CHAT_DOCUMENT";
 export const CHAT_THREAD_ATTRIBUTE = "CHAT_THREAD";
@@ -77,7 +79,8 @@ export type ChatCitationModel = {
 
 export type AzureChatCompletionFunctionCall = {
   type: "functionCall";
-  response: ChatCompletionMessage.FunctionCall;
+  response: ChatCompletionMessage.FunctionCall|ResponseFunctionCallArgumentsDeltaEvent;
+  value?: string;
 };
 
 export type AzureChatCompletionFunctionCallResult = {
@@ -87,7 +90,8 @@ export type AzureChatCompletionFunctionCallResult = {
 
 export type AzureChatCompletionContent = {
   type: "content";
-  response: ChatCompletionSnapshot;
+  response: ChatCompletionSnapshot|ResponseTextDeltaEvent;
+  value: string;
 };
 
 export type AzureChatLLMCompletionContent = {
@@ -98,7 +102,7 @@ export type AzureChatLLMCompletionContent = {
 
 export type AzureChatCompletionFinalContent = {
   type: "finalContent";
-  response: string;
+  response: string|ResponseTextDoneEvent|ResponseCompletedEvent;
 };
 
 export type AzureChatCompletionError = {

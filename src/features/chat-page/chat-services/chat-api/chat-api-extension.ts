@@ -10,7 +10,7 @@ import { ChatThreadModel } from "../models";
 export const ChatApiExtensions = async (props: {
   chatThread: ChatThreadModel;
   userMessage: string;
-  history: ChatCompletionMessageParam[];
+  history: any[];
   extensions: RunnableToolFunction<any>[];
   signal: AbortSignal;
 }): Promise<ChatCompletionStreamingRunner> => {

@@ -1,22 +1,15 @@
 "use server";
 import "server-only";
 
-import { ServerActionResponse } from "@/features/common/server-action-response";
-
+import { ServerActionResponse } from "@/features/common/server-action-response"; // adapt selon ton path
+import { FindAllExtensionForCurrentUser, FindSecureHeaderValue } from "@/features/extensions-page/extension-services/extension-service";
 import { userHashedId } from "@/features/auth-page/helpers";
-import {
-  FindAllExtensionForCurrentUser,
-  FindSecureHeaderValue,
-} from "@/features/extensions-page/extension-services/extension-service";
-import {
-  ExtensionFunctionModel,
-  ExtensionModel,
-} from "@/features/extensions-page/extension-services/models";
-import { RunnableToolFunction } from "openai/lib/RunnableFunction";
-import { ToolsInterface } from "../models";
+import { ToolsInterface } from "../models"; // ton interface
+import { ExtensionFunctionModel, ExtensionModel } from "@/features/extensions-page/extension-services/models";
+
 export const GetDynamicExtensions = async (props: {
   extensionIds: string[];
-}): Promise<ServerActionResponse<Array<any>>> => {
+}): Promise<ServerActionResponse<any[]>> => {
   const extensionResponse = await FindAllExtensionForCurrentUser();
 
   if (extensionResponse.status === "OK") {
@@ -24,24 +17,24 @@ export const GetDynamicExtensions = async (props: {
       props.extensionIds.includes(e.id)
     );
 
-    const dynamicExtensions: Array<RunnableToolFunction<any>> = [];
+    const dynamicExtensions: any[] = [];
 
     extensionToReturn.forEach((e) => {
       e.functions.forEach((f) => {
         const extension = JSON.parse(f.code) as ToolsInterface;
         dynamicExtensions.push({
           type: "function",
+          name: extension.name,
+          description: extension.description,
+          parameters: extension.parameters,
           function: {
-            function: (args: any) =>
-              executeFunction({
+            execute: async (args: any) => {
+              return executeFunction({
                 functionModel: f,
                 extensionModel: e,
                 args,
-              }),
-            parse: JSON.parse,
-            parameters: extension.parameters,
-            description: extension.description,
-            name: extension.name,
+              });
+            },
           },
         });
       });
@@ -64,56 +57,38 @@ async function executeFunction(props: {
   try {
     const { functionModel, args, extensionModel } = props;
 
-    // get the secure headers
-    const headerPromise = extensionModel.headers.map(async (h) => {
-      const headerValue = await FindSecureHeaderValue(h.id);
-
-      if (headerValue.status === "OK") {
+    const headerItems = await Promise.all(
+      extensionModel.headers.map(async (h) => {
+        const headerValue = await FindSecureHeaderValue(h.id);
         return {
           id: h.id,
           key: h.key,
-          value: headerValue.response,
+          value: headerValue.status === "OK" ? headerValue.response : "***",
         };
-      }
+      })
+    );
 
-      return {
-        id: h.id,
-        key: h.key,
-        value: "***",
-      };
-    });
-
-    const headerItems = await Promise.all(headerPromise);
-
-    // we need to add the user id to the headers as this is expected by the function and does not have context of the user
     headerItems.push({
       id: "authorization",
       key: "authorization",
       value: await userHashedId(),
     });
-    // map the headers to a dictionary
-    const headers: { [key: string]: string } = headerItems.reduce(
-      (acc: { [key: string]: string }, header) => {
-        acc[header.key] = header.value;
-        return acc;
-      },
-      {}
-    );
 
-    // replace the query parameters
+    const headers = headerItems.reduce((acc, header) => {
+      acc[header.key] = header.value;
+      return acc;
+    }, {} as Record<string, string>);
+
     if (args.query) {
       for (const key in args.query) {
         const value = args.query[key];
-        functionModel.endpoint = functionModel.endpoint.replace(
-          `${key}`,
-          value
-        );
+        functionModel.endpoint = functionModel.endpoint.replace(`${key}`, value);
       }
     }
 
     const requestInit: RequestInit = {
       method: functionModel.endpointType,
-      headers: headers,
+      headers,
       cache: "no-store",
     };
 
@@ -124,16 +99,13 @@ async function executeFunction(props: {
     const response = await fetch(functionModel.endpoint, requestInit);
 
     if (!response.ok) {
-      return `There was an error calling the api: ${response.statusText}`;
+      return `Error calling API: ${response.statusText}`;
     }
-    const result = await response.json();
 
-    return {
-      id: functionModel.id,
-      result: result,
-    };
-  } catch (e) {
-    console.error("🔴", e);
-    return `There was an error calling the api: ${e}`;
+    const result = await response.json();
+    return { id: functionModel.id, result };
+  } catch (error) {
+    console.error("🔴 Error executing function:", error);
+    return `Error: ${error}`;
   }
 }
