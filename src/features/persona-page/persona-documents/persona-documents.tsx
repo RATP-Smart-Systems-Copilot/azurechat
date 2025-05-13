@@ -129,18 +129,10 @@ export const PersonaDocuments: FC<Props> = ({ initialPersonaDocumentIds }) => {
     <div className="grid gap-2">
       <div className="flex items-center justify-between space-x-2">
         <div className="flex items-center space-x-4">
-          <Label>Persona Documents</Label>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Info size={15} />
-            </TooltipTrigger>
-            <TooltipContent>
-              <p>Documents that are used when chatting with the persona</p>
-            </TooltipContent>
-          </Tooltip>
+          <Label>Documents Sharepoint</Label>
         </div>
         <SharePointFilePicker
-          token={session?.user?.accessToken ?? ""}
+          token={session?.user && 'accessToken' in session?.user ? session?.user?.accessToken as string : ""}
           tenantUrl={process.env.NEXT_PUBLIC_SHAREPOINT_URL ?? ""}
           onFilesSelected={fetchMetadataForDocuments}
         />
@@ -159,7 +151,7 @@ export const PersonaDocuments: FC<Props> = ({ initialPersonaDocumentIds }) => {
 
         {pickedFiles.length === 0 ? (
           <div className="p-2 flex items-center justify-center w-full text-muted-foreground">
-            No files selected
+            Aucun fichier sélectionné
           </div>
         ) : (
           <div className="w-full">

@@ -14,10 +14,11 @@ import {
 import { HistoryContainer } from "@/features/common/services/cosmos";
 import { uniqueId } from "@/features/common/util";
 import { SqlQuerySpec } from "@azure/cosmos";
-import { PERSONA_ATTRIBUTE, PersonaModel, PersonaModelSchema } from "./models";
+import { DocumentMetadata, PERSONA_ATTRIBUTE, PersonaModel, PersonaModelSchema } from "./models";
 import { defaultGPTModel } from "@/features/common/services/openai";
 import { FindAllChatDocumentsByPersona } from "@/features/chat-page/chat-services/chat-document-service";
 import { DeleteDocumentsForPersona } from "@/features/chat-page/chat-services/azure-ai-search/azure-ai-search";
+import { DeletePersonaDocumentsByPersonaId, UpdateOrAddPersonaDocuments } from "./persona-documents-service";
 
 interface PersonaInput {
   name: string;
@@ -78,10 +79,22 @@ export const FindPersonaByID = async (
 };
 
 export const CreatePersona = async (
-  props: PersonaInput
+  props: PersonaInput,
+  sharePointFiles: DocumentMetadata[]
 ): Promise<ServerActionResponse<PersonaModel>> => {
   try {
     const user = await getCurrentUser();
+
+    const personaDocumentIds = await UpdateOrAddPersonaDocuments (
+      sharePointFiles,
+      []
+    );
+    if (personaDocumentIds.status !== "OK") {
+      return {
+        status: "ERROR",
+        errors: personaDocumentIds.errors,
+      };
+    }
 
     const modelToSave: PersonaModel = {
       id: uniqueId(),
@@ -95,6 +108,7 @@ export const CreatePersona = async (
       createdAt: new Date(),
       type: "PERSONA",
       sharedWith: [],
+      personaDocumentIds: personaDocumentIds.response,
     };
 
     const valid = ValidateSchema(modelToSave);
@@ -164,6 +178,7 @@ export const DeletePersona = async (
     const personaResponse = await EnsurePersonaOperation(personaId);
 
     if (personaResponse.status === "OK") {
+      await DeletePersonaDocumentsByPersonaId(personaId);
       const chatDocumentsResponse = await FindAllChatDocumentsByPersona(personaId);
 
       if (chatDocumentsResponse.status !== "OK") {
@@ -199,7 +214,8 @@ export const DeletePersona = async (
 };
 
 export const UpsertPersona = async (
-  personaInput: PersonaModel
+  personaInput: PersonaModel,
+  sharePointFiles: DocumentMetadata[]
 ): Promise<ServerActionResponse<PersonaModel>> => {
   try {
     const personaResponse = await EnsurePersonaOperation(personaInput.id);
@@ -207,6 +223,18 @@ export const UpsertPersona = async (
     if (personaResponse.status === "OK") {
       const { response: persona } = personaResponse;
       const user = await getCurrentUser();
+
+      const personaDocumentIds = await UpdateOrAddPersonaDocuments(
+        sharePointFiles,
+        personaInput.personaDocumentIds || []
+      );
+
+      if (personaDocumentIds.status !== "OK") {
+        return {
+          status: "ERROR",
+          errors: personaDocumentIds.errors,
+        };
+      }
 
       const modelToUpdate: PersonaModel = {
         ...persona,
@@ -219,6 +247,7 @@ export const UpsertPersona = async (
         isPublished: personaInput.isPublished,
         createdAt: new Date(),
         sharedWith: personaInput.sharedWith || [],
+        personaDocumentIds: personaDocumentIds.response,
       };
 
       const validationResponse = ValidateSchema(modelToUpdate);
@@ -330,6 +359,7 @@ export const CreatePersonaChat = async (
       extension: [],
       gptModel: gptModel,
       personaId: personaId,
+      documentIds: persona.personaDocumentIds || [],
     });
 
     return response;

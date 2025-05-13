@@ -37,6 +37,7 @@ export interface ChatThreadModel {
   type: typeof CHAT_THREAD_ATTRIBUTE;
   gptModel?: string;
   personaId?: string;
+  documentIds: string[];
 }
 
 export interface UserPrompt {

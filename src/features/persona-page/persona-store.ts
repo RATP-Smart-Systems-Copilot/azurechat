@@ -1,6 +1,6 @@
 import { proxy, useSnapshot } from "valtio";
 import { RevalidateCache } from "../common/navigation-helpers";
-import { PERSONA_ATTRIBUTE, PERSONA_TEMPERATURE, PersonaModel } from "./persona-services/models";
+import { DocumentMetadata, PERSONA_ATTRIBUTE, PERSONA_TEMPERATURE, PersonaModel } from "./persona-services/models";
 import {
   CreatePersona,
   UpsertPersona,
@@ -85,13 +85,14 @@ export const getDocumentsPersona = async (personaId : string):  Promise<Array<Ch
 }
 
 export const addOrUpdatePersona = async (previous: any, formData: FormData)=> {
+  const sharePointFiles = HandleSharePointFiles(formData);
   personaStore.updateErrors([]);
 
   const model = FormDataToPersonaModel(formData);
   const response =
     model.id && model.id !== ""
-      ? await UpsertPersona(model)
-      : await CreatePersona(model);
+      ? await UpsertPersona(model, sharePointFiles)
+      : await CreatePersona(model, sharePointFiles);
 
   if (response.status === "OK") {
     personaStore.updateOpened(false);
@@ -104,9 +105,23 @@ export const addOrUpdatePersona = async (previous: any, formData: FormData)=> {
   return response;
 };
 
+const HandleSharePointFiles = (formData: FormData): DocumentMetadata[] => {
+  const filesObjStrings = formData.getAll(
+    "selectedSharePointDocumentIds"
+  ) as string[];
+
+  if (!filesObjStrings || filesObjStrings[0].length === 0) return [];
+
+  const fileObj = JSON.parse(filesObjStrings[0]) as DocumentMetadata[];
+  return Array.isArray(fileObj) ? fileObj : [];
+};
+
 export const FormDataToPersonaModel = (formData: FormData): PersonaModel => {
   const sharedWith = formData.get("sharedWith") as string;
   const sharedWithArray = sharedWith ? sharedWith.split(",") : [];
+  const ids = formData.getAll("personaDocumentIds") as string[];
+  const fileObj = JSON.parse(ids[0]) as string[];
+  const personaDocumentIds =  Array.isArray(fileObj) ? fileObj : [];
 
   return {
     id: formData.get("id") as string,
@@ -120,5 +135,6 @@ export const FormDataToPersonaModel = (formData: FormData): PersonaModel => {
     type: PERSONA_ATTRIBUTE,
     gptModel: formData.get("gptModel") as string,
     sharedWith: sharedWithArray, // Ajout du champ shareWith
+    personaDocumentIds: personaDocumentIds,
   };
 };

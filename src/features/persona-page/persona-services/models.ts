@@ -66,6 +66,7 @@ export const PersonaModelSchema = z.object({
   type: z.literal(PERSONA_ATTRIBUTE),
   createdAt: z.date(),
   sharedWith: z.array(z.string()).optional(),
+  personaDocumentIds: z.array(z.string()).optional(),
 });
 
 

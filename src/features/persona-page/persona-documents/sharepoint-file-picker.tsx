@@ -191,7 +191,6 @@ export function SharePointFilePicker({
 
     try {
       setShowPicker(true);
-
       // Schema for the file picker options
       // https://learn.microsoft.com/en-us/onedrive/developer/controls/file-pickers/v8-schema?view=odsp-graph-online
       const options = {
@@ -283,19 +282,7 @@ export function SharePointFilePicker({
               Select Files
             </DialogTitle>
             <DialogDescription className="inline-flex items-center gap-2">
-              Do not upload documents with a classification higher than B2.
-              <a
-                href={process.env.NEXT_PUBLIC_BUHLER_AI_RULES ?? ""}
-                target="_blank"
-              >
-                <Button
-                  variant={"link"}
-                  className="gap-1 p-0 h-auto"
-                  type="button"
-                >
-                  Bühler AI Policy <ExternalLink size={14} />
-                </Button>
-              </a>
+              Sélectionner les fichiers à intégrer
               {isLoading && (
                 <div className="absolute inset-0 flex items-center justify-center bg-background opacity-80 text-red-950">
                   <div className="loader">Loading...</div>

@@ -6,7 +6,7 @@ import {
   zodErrorsToServerActionErrors,
 } from "@/features/common/server-action-response";
 import { getGraphClient } from "../../common/services/microsoft-graph-client";
-import { getCurrentUser, userHashedId } from "@/features/auth-page/helpers";
+import { getCurrentUser } from "@/features/auth-page/helpers";
 import {
   DocumentMetadata,
   EXTERNAL_SOURCE,
@@ -21,7 +21,7 @@ import { HistoryContainer } from "@/features/common/services/cosmos";
 import { SqlQuerySpec } from "@azure/cosmos";
 import { FindPersonaByID } from "./persona-service";
 import {
-  DeleteSearchDocumentByPersonaDocumentId,
+  DeleteDocumentByPersonaDocumentId,
   IndexDocuments,
   PersonaDocumentExistsInIndex,
 } from "@/features/chat-page/chat-services/azure-ai-search/azure-ai-search";
@@ -29,12 +29,12 @@ import { DocumentIntelligenceInstance } from "@/features/common/services/documen
 import { ResponseType } from "@microsoft/microsoft-graph-client";
 import { ChunkDocumentWithOverlap } from "@/features/chat-page/chat-services/chat-document-service";
 import { SupportedFileExtensionsTextFiles } from "@/features/chat-page/chat-services/models";
+import { userAgent } from "next/server";
 
 export async function DocumentDetails(documents: SharePointFile[]): Promise<
   ServerActionResponse<{
     successful: DocumentMetadata[];
-    sizeToBig: DocumentMetadata[];
-    unsuccessful: { documentId: string }[];
+    unsuccessful: { documentId: string; error: boolean }[];
   }>
 > {
   try {
@@ -44,7 +44,6 @@ export async function DocumentDetails(documents: SharePointFile[]): Promise<
         response: {
           successful: [],
           unsuccessful: [],
-          sizeToBig: [],
         },
       };
     }
@@ -60,42 +59,23 @@ export async function DocumentDetails(documents: SharePointFile[]): Promise<
       };
     }
 
-    const { token } = await getCurrentUser();
-    const client = getGraphClient(token);
+    const user = await getCurrentUser();
+    const client = getGraphClient(user.token);
     const body = CreateDocumentDetailBody(documents, [
       "id",
       "name",
       "createdBy",
       "createdDateTime",
       "parentReference",
-      "size",
     ]);
     const response = await client.api("/$batch").post(body);
 
     let successful: DocumentMetadata[] = [];
-    let unsuccessful: { documentId: string }[] = [];
-    let sizeToBig: DocumentMetadata[] = [];
+    let unsuccessful: { documentId: string; error: boolean }[] = [];
 
     for (const responseItem of response.responses) {
       if (responseItem.status === 200) {
         const document = responseItem.body;
-
-        if (
-          document.size >
-          (Number(process.env.MAX_PERSONA_DOCUMENT_SIZE) || 10485760)
-        ) {
-          sizeToBig.push({
-            documentId: document.id,
-            name: document.name,
-            createdBy: document.createdBy.user.displayName,
-            createdDateTime: document.createdDateTime,
-            parentReference: {
-              driveId: document.parentReference?.driveId,
-            },
-          } as DocumentMetadata);
-          continue;
-        }
-
         successful.push({
           documentId: document.id,
           name: document.name,
@@ -108,6 +88,7 @@ export async function DocumentDetails(documents: SharePointFile[]): Promise<
       } else {
         unsuccessful.push({
           documentId: responseItem.id,
+          error: true,
         });
       }
     }
@@ -117,7 +98,6 @@ export async function DocumentDetails(documents: SharePointFile[]): Promise<
       response: {
         successful,
         unsuccessful,
-        sizeToBig,
       },
     };
   } catch (error) {
@@ -132,67 +112,20 @@ export async function DocumentDetails(documents: SharePointFile[]): Promise<
   }
 }
 
-function IsDocumentLimitExceeded(sharePointFiles: DocumentMetadata[]): boolean {
-  return (
-    sharePointFiles.length > Number(process.env.MAX_PERSONA_DOCUMENT_LIMIT)
-  );
-}
-
-async function RemoveUnselectedPersonaDocuments(removeDocuments: string[]) {
-  try {
-    await Promise.all(
-      removeDocuments.map(async (id) => {
-        await HistoryContainer()
-          .item(id, await userHashedId())
-          .delete();
-      })
-    );
-    await Promise.all(
-      removeDocuments.map(async (oldDocumentId) => {
-        await DeleteSearchDocumentByPersonaDocumentId(oldDocumentId);
-      })
-    );
-  } catch (error) {
-    // Fail silently because we don't want to block the process if we can't delete the document
-  }
-}
-
-async function GetNewNotIndexedDocuments(sharePointFiles: DocumentMetadata[]) {
-  const newDocuments = [];
-  for (const file of sharePointFiles) {
-    if (!file.id) {
-      return { error: { message: `Document ID is missing.` } };
-    }
-    const documentResponse = await PersonaDocumentExistsInIndex(file.id);
-    if (documentResponse.status === "NOT_FOUND") {
-      newDocuments.push(file);
-    } else if (documentResponse.status === "ERROR") {
-      return { error: documentResponse.errors };
-    }
-  }
-  return { newDocuments };
-}
-
 export const UpdateOrAddPersonaDocuments = async (
   sharePointFiles: DocumentMetadata[],
   currentPersonaDocuments: string[]
 ): Promise<ServerActionResponse<string[]>> => {
-  if (IsDocumentLimitExceeded(sharePointFiles)) {
+  if (sharePointFiles.length > Number(process.env.MAX_PERSONA_DOCUMENT_LIMIT)) {
     return {
       status: "ERROR",
       errors: [
         {
-          message: `Document limit exceeded. Maximum is ${process.env.MAX_PERSONA_DOCUMENT_LIMIT}.`,
+          message: `Document IDs limit exceeded. Maximum is ${process.env.MAX_PERSONA_DOCUMENT_LIMIT}.`,
         },
       ],
     };
   }
-
-  const removeDocuments = currentPersonaDocuments.filter((id) => {
-    return !sharePointFiles.map((e) => e.id).includes(id);
-  });
-
-  await RemoveUnselectedPersonaDocuments(removeDocuments);
 
   // create or update documents in the database
   const addOrUpdateResponse = await AddOrUpdatePersonaDocuments(
@@ -210,36 +143,59 @@ export const UpdateOrAddPersonaDocuments = async (
     file.id = addOrUpdateResponse.response[index];
   });
 
-  const { newDocuments, error } = await GetNewNotIndexedDocuments(
-    sharePointFiles
+  // remove documents that are not selected anymore
+  const removeDocuments = currentPersonaDocuments.filter((id) => {
+    return !sharePointFiles.map((e) => e.id).includes(id);
+  });
+
+  Promise.all(
+    removeDocuments.map(async (id) => {
+      await HistoryContainer().item(id).delete();
+    })
   );
 
-  if (error) {
-    return {
-      status: "ERROR",
-      errors: Array.isArray(error) ? error : [error],
-    };
+  // check if documents are already indexed in vector database
+  const newDocuments = [];
+
+  for (const file of sharePointFiles) {
+    if (!file.id) {
+      return {
+        status: "ERROR",
+        errors: [
+          {
+            message: `Document ID is missing.`,
+          },
+        ],
+      };
+    }
+
+    const documentResponse = await PersonaDocumentExistsInIndex(file.id);
+    if (documentResponse.status === "NOT_FOUND") {
+      newDocuments.push(file);
+    } else if (documentResponse.status === "ERROR") {
+      return {
+        status: "ERROR",
+        errors: documentResponse.errors,
+      };
+    }
   }
 
   const handleNewDocumentsResponse = await IndexNewPersonaDocuments(
     newDocuments
   );
-
   if (handleNewDocumentsResponse.status !== "OK") {
-    // Remove documents from Cosmos DB because something went wrong with indexing
-    await Promise.all(
-      newDocuments.map(async (oldDocumentId) => {
-        if (oldDocumentId.id) {
-          return await DeletePersonaDocumentById(oldDocumentId.id);
-        }
-      })
-    );
-
     return {
       status: "ERROR",
       errors: handleNewDocumentsResponse.errors,
     };
   }
+
+  // remove old documents from the vector database
+  Promise.all(
+    removeDocuments.map(async (oldDocumentId) => {
+      await DeleteDocumentByPersonaDocumentId(oldDocumentId);
+    })
+  );
 
   return {
     status: "OK",
@@ -303,23 +259,44 @@ export const DeletePersonaDocumentsByPersonaId = async (personaId: string) => {
     return;
   }
 
-  // Delete Documents from Azure Search
-  await Promise.all(
-    personaDocuments.map(async (oldDocumentId) => {
-      return await DeleteSearchDocumentByPersonaDocumentId(oldDocumentId);
-    })
-  );
+  const querySpec: SqlQuerySpec = {
+    query: `SELECT * FROM root r WHERE ARRAY_CONTAINS(@ids, r.id)`,
+    parameters: [
+      {
+        name: "@ids",
+        value: personaDocuments,
+      },
+    ],
+  };
 
-  // Delete Documents from Cosmos DB
-  for (const id of persona.response.personaDocumentIds || []) {
-    DeletePersonaDocumentById(id);
+  try {
+    // remove old documents from the vector database
+    const deleteResponses = await Promise.all(
+      personaDocuments.map(async (oldDocumentId: string) => {
+        return await DeleteDocumentByPersonaDocumentId(oldDocumentId);
+      })
+    );
+
+    const failedDeletions = deleteResponses.filter(
+      (response: { status: string; }) => response.status !== "OK"
+    );
+
+    if (failedDeletions.length > 0) {
+      throw new Error(
+        'Failed to delete some persona documents'
+      );
+    }
+
+    const { resources } = await HistoryContainer()
+      .items.query<PersonaDocument>(querySpec)
+      .fetchAll();
+
+    for (const document of resources) {
+      await HistoryContainer().item(document.id).delete();
+    }
+  } catch (error) {
+    throw new Error("Failed to delete persona documents. Error: " + error);
   }
-};
-
-const DeletePersonaDocumentById = async (personaDocumentId: string) => {
-  await HistoryContainer()
-    .item(personaDocumentId, await userHashedId())
-    .delete();
 };
 
 export const AuthorizedDocuments = async (
@@ -364,20 +341,17 @@ const CreateDocumentDetailBody = (
 const AddOrUpdatePersonaDocuments = async (
   sharePointFiles: SharePointFile[]
 ): Promise<ServerActionResponse<string[]>> => {
-  const personaDocuments: PersonaDocument[] = await Promise.all(
-    sharePointFiles.map(async (file) => ({
-      id: file.id || uniqueId(),
-      userId: await userHashedId(),
-      externalFile: {
-        documentId: file.documentId,
-        parentReference: {
-          driveId: file.parentReference.driveId,
-        },
+  const personaDocuments: PersonaDocument[] = sharePointFiles.map((file) => ({
+    id: file.id || uniqueId(),
+    externalFile: {
+      documentId: file.documentId,
+      parentReference: {
+        driveId: file.parentReference.driveId,
       },
-      source: EXTERNAL_SOURCE,
-      type: PERSONA_DOCUMENT_ATTRIBUTE,
-    }))
-  );
+    },
+    source: EXTERNAL_SOURCE,
+    type: PERSONA_DOCUMENT_ATTRIBUTE,
+  }));
 
   const documentIds: string[] = [];
 
@@ -434,8 +408,6 @@ const IndexNewPersonaDocuments = async (
     })
   );
 
-  const successfullyIndexedPersonaDocuments: string[] = [];
-
   const documentIndexResponses = await Promise.all(
     splitDocuments.map(async (doc) => {
       if (!doc.chunks) {
@@ -449,42 +421,27 @@ const IndexNewPersonaDocuments = async (
         };
       }
 
-      const results = await IndexDocuments(
-        doc.chunks,
+      const indexResponses = await IndexDocuments(
         doc.name,
+        doc.chunks,
         undefined,
         doc.id
       );
 
-      for (const result of results) {
-        // if one of the documents was OK add it to the successfully indexed documents so we can delete it later
-        if (result.status === "OK" && doc.id) {
-          successfullyIndexedPersonaDocuments.push(doc.id);
-          return results;
-        }
-      }
-
-      return results;
+      return indexResponses;
     })
   );
 
-  const flatResponses = documentIndexResponses.flat();
-  const allDocumentsIndexed = flatResponses.every((r) => r.status === "OK");
+  const allDocumentsIndexed = documentIndexResponses
+    .flat()
+    .every((r) => r.status === "OK");
 
   if (!allDocumentsIndexed) {
-    // If any document failed to index, delete all successfully indexed documents
-    await Promise.all(
-      successfullyIndexedPersonaDocuments.map(async (id) => {
-        await DeleteSearchDocumentByPersonaDocumentId(id);
-      })
-    );
-
     return {
       status: "ERROR",
       errors: [
         {
-          message:
-            "Problem with indexing persona documents due to high traffic. Try again later.",
+          message: "Problem with indexing persona documents",
         },
       ],
     };
@@ -504,12 +461,55 @@ const SharePointFileToText = async (
 
   try {
     const documentPromises = documents.map(async (document) => {
-      const response = await DownloadSharePointFile(client, document);
-      ValidateSharePointFileSize(response, document);
-      if (IsTextFile(document.name)) {
-        return ExtractTextFromArrayBuffer(response, document);
+      const response = (await client
+        .api(
+          `/drives/${document.parentReference.driveId}/items/${document.documentId}/content`
+        )
+        .responseType(ResponseType.ARRAYBUFFER)
+        .get()) as ArrayBuffer;
+
+      if (response.byteLength === 0) {
+        throw new Error(`Document is empty.`);
       }
-      return ExtractTextFromNonTextFile(response, document);
+
+      if (response.byteLength > Number(process.env.MAX_PERSONA_DOCUMENT_SIZE)) {
+        throw new Error(
+          `Document size exceeded. Maximum is ${process.env.MAX_PERSONA_DOCUMENT_SIZE}.`
+        );
+      }
+
+      const fileExtension = document.name.split(".").pop();
+      if (fileExtension && IsAlreadyText(fileExtension)) {
+        const decoder = new TextDecoder();
+        const textContent = decoder.decode(response);
+
+        return {
+          ...document,
+          paragraphs: [textContent],
+        };
+      }
+
+      const diClient = DocumentIntelligenceInstance();
+
+      const poller = await diClient.beginAnalyzeDocument(
+        "prebuilt-read",
+        response
+      );
+
+      const { paragraphs } = await poller.pollUntilDone();
+
+      const docs: Array<string> = [];
+
+      if (paragraphs) {
+        for (const paragraph of paragraphs) {
+          docs.push(paragraph.content);
+        }
+      }
+
+      return {
+        ...document,
+        paragraphs: docs,
+      };
     });
 
     try {
@@ -544,78 +544,10 @@ const SharePointFileToText = async (
   }
 };
 
-const DownloadSharePointFile = async (
-  client: any,
-  document: DocumentMetadata
-): Promise<ArrayBuffer> => {
-  const response = (await client
-    .api(
-      `/drives/${document.parentReference.driveId}/items/${document.documentId}/content`
-    )
-    .responseType(ResponseType.ARRAYBUFFER)
-    .get()) as ArrayBuffer;
-  if (response.byteLength === 0) {
-    throw new Error(`Document is empty.`);
-  }
-  return response;
-};
-
-const ValidateSharePointFileSize = (
-  response: ArrayBuffer,
-  document: DocumentMetadata
-) => {
-  if (
-    response.byteLength >
-    (Number(process.env.MAX_PERSONA_DOCUMENT_SIZE) || 10485760)
-  ) {
-    throw new Error(
-      `Document ${document.name} is too big. Maximum is ${(
-        Number(process.env.MAX_PERSONA_DOCUMENT_SIZE) /
-        (1024 * 1024)
-      ).toFixed(
-        2
-      )} MB. Choose a smaller document or split the document into two documents.`
-    );
-  }
-};
-
-const ExtractTextFromArrayBuffer = (
-  response: ArrayBuffer,
-  document: DocumentMetadata
-): SharePointFileContent => {
-  const decoder = new TextDecoder();
-  const textContent = decoder.decode(response);
-  return {
-    ...document,
-    paragraphs: [textContent],
-  };
-};
-
-const ExtractTextFromNonTextFile = async (
-  response: ArrayBuffer,
-  document: DocumentMetadata
-): Promise<SharePointFileContent> => {
-  const diClient = DocumentIntelligenceInstance();
-  const poller = await diClient.beginAnalyzeDocument("prebuilt-read", response);
-  const { paragraphs } = await poller.pollUntilDone();
-  const docs: Array<string> = [];
-  if (paragraphs) {
-    for (const paragraph of paragraphs) {
-      docs.push(paragraph.content);
-    }
-  }
-  return {
-    ...document,
-    paragraphs: docs,
-  };
-};
-
-const IsTextFile = (fileName: string) => {
-  const fileExtension = fileName.split(".").pop();
-
-  if (!fileExtension) return false;
+const IsAlreadyText = (extension: string) => {
+  if (!extension) return false;
   return Object.values(SupportedFileExtensionsTextFiles).includes(
-    fileExtension.toUpperCase() as SupportedFileExtensionsTextFiles
+    extension.toUpperCase() as SupportedFileExtensionsTextFiles
   );
 };
 

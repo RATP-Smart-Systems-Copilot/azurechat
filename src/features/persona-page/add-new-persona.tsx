@@ -84,16 +84,22 @@ export const AddNewPersona: FC<Props> = (props) => {
     if(persona.id){
       const personaId = persona.id;
       return (
-        <div className="flex items-center space-x-2">
-          <AttachFile
-            onClick={(formData) =>
-              fileStore.onFileChange({ formData, personaId })
-            }
-          />  Ajouter un document
+        <div className="grid gap-2">
+          <div className="flex items-center justify-between space-x-2">
+            <div className="flex items-center space-x-4">
+              <Label>Documents depuis votre ordinateur</Label>
+            </div>
+            <AttachFile
+              onClick={(formData) =>
+                fileStore.onFileChange({ formData, personaId })
+              }
+            />
+          </div>
         </div>
       );
     }
   };
+
 
   const handleButtonDeleteClick = (doc: ChatDocumentModel) => {
     fileStore.onDelete(doc, persona.id);
@@ -109,16 +115,16 @@ export const AddNewPersona: FC<Props> = (props) => {
         personaStore.updateOpened(value);
       }}
     >
-      <SheetContent className="min-w-[480px] sm:w-[540px] flex flex-col">
+      <SheetContent className="min-w-[900px] sm:w-[700px] flex flex-col">
         <SheetHeader>
-          <SheetTitle>Persona</SheetTitle>
+          <SheetTitle>Agent IA</SheetTitle>
         </SheetHeader>
         <form action={formAction} className="flex-1 flex flex-col">
           <ScrollArea
             className="flex-1 -mx-6 flex max-h-[calc(100vh-140px)]"
             type="always"
           >
-            <div className="pb-6 px-6 flex gap-8 flex-col  flex-1">
+          <div className="pb-6 px-6 flex gap-8 flex-col flex-1">
               <input type="hidden" name="id" defaultValue={persona.id} />
               {formState && formState.status === "OK" ? null : (
                 <>
@@ -130,38 +136,59 @@ export const AddNewPersona: FC<Props> = (props) => {
                     ))}
                 </>
               )}
-              <div className="grid gap-2">
-                <Label>Name</Label>
-                <Input
-                  type="text"
-                  required
-                  name="name"
-                  defaultValue={persona.name}
-                  placeholder="Name of your persona"
-                />
-              </div>
-              <div className="grid gap-2">
-                <Label htmlFor="description">Short description</Label>
-                <Input
-                  type="text"
-                  required
-                  defaultValue={persona.description}
-                  name="description"
-                  placeholder="Short description"
-                />
-              </div>
-              <div className="grid gap-2">
-                <Label htmlFor="temperature">Niveau de créativité</Label>
-                <Input
-                  type="number"
-                  required
-                  defaultValue={persona.temperature}
-                  name="temperature"
-                  min={0}
-                  max={2.0}
-                  step={0.1}
-                  placeholder="Température compris entre 0 et 2.0"
-                />
+              <div className="flex gap-4">
+                <div className="flex flex-col">
+                  <Label>Nom de l&apos;assistant</Label>
+                  <Input
+                    type="text"
+                    required
+                    name="name"
+                    className="min-w-[300px]"
+                    defaultValue={persona.name}
+                    placeholder="Name of your persona"
+                  />
+                </div>
+                <div className="flex flex-col">
+                  <Label htmlFor="description">Description</Label>
+                  <Input
+                    type="text"
+                    required
+                    defaultValue={persona.description}
+                    name="description"
+                    className="min-w-[250px]"
+                    placeholder="Short description"
+                  />
+                </div>
+                <div className="flex flex-col">
+                  <Label htmlFor="temperature">Température</Label>
+                  <Input
+                    type="number"
+                    required
+                    defaultValue={persona.temperature}
+                    name="temperature"
+                    min={0}
+                    max={2.0}
+                    step={0.1}
+                    placeholder="Température compris entre 0 et 2.0"
+                  />
+                </div>
+                <div className="grid gap-2 flex-1 ">
+                  <Label htmlFor="gptModel">Modèle GPT</Label>
+                  <Select
+                    defaultValue={persona.gptModel}
+                    name="gptModel"
+                    required
+                  >
+                    <SelectTrigger className="w-[100px]" aria-label="Select GPT Model">
+                      <SelectValue placeholder="Sélectionnez un modèle" defaultValue={persona.gptModel} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {Object.entries(modelOptions).filter(([_, model]) => model.provider === 'OpenAI' && model.enable).map(([key, value]) => (
+                        <SelectItem key={key} value={key}>{value.name}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
               </div>
               <div className="grid gap-2 flex-1 ">
                 <Label htmlFor="personaMessage">Contexte</Label>
@@ -173,51 +200,35 @@ export const AddNewPersona: FC<Props> = (props) => {
                   placeholder="Personality of your persona"
                 />
               </div>
-              <div className="grid gap-2 flex-1 ">
-              <Label htmlFor="gptModel">Modèle GPT</Label>
-              <Select
-                defaultValue={persona.gptModel}
-                name="gptModel"
-                required
-              >
-                <SelectTrigger className="w-[100px]" aria-label="Select GPT Model">
-                  <SelectValue placeholder="Sélectionnez un modèle" defaultValue={persona.gptModel} />
-                </SelectTrigger>
-                <SelectContent>
-                  {Object.entries(modelOptions).filter(([_, model]) => model.provider === 'OpenAI' && model.enable).map(([key, value]) => (
-                    <SelectItem key={key} value={key}>{value.name}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              </div>
-              <AttachFileToPersona />
               <p>Base de connaissance : </p>
-              <div className="pb-6 px-6 flex gap-2 flex-col  flex-1">
-              {documentsPersona.length === 0 ? (
-                <div>Aucune donnée</div>
-              ) : (
-                documentsPersona.map((doc) => {
-                  return (
-                    <div className="flex gap-2 items-center" key={doc.id}>
-                      <File size={16} /> <div>{doc.name}</div>
-                      <Button
-                        type="button"
-                        variant={"ghost"}
-                        size={"sm"}
-                        title="Supprimer le document"
-                        className="flex items-center hover:bg-gray-100 transition-colors duration-150 rounded"
-                        onClick={() => handleButtonDeleteClick(doc)}
-                      >
-                      {deletedDocIds.has(doc.id) ? <CheckIcon size={16} /> : <Trash2 size={16} />}
-                      </Button>
-                    </div>
-                  );
-                })
-              )}
+              <div className="pb-6 px-6 flex gap-2 flex-col  flex-1 border bg-background ">
+                <AttachFileToPersona />
+                {documentsPersona.length === 0 ? (
+                  <div className="p-2 flex items-center justify-center w-full text-muted-foreground">
+                  Aucun fichier
+                </div>
+                ) : (
+                  documentsPersona.map((doc) => {
+                    return (
+                      <div className="flex gap-2 items-center" key={doc.id}>
+                        <File size={16} /> <div>{doc.name}</div>
+                        <Button
+                          type="button"
+                          variant={"ghost"}
+                          size={"sm"}
+                          title="Supprimer le document"
+                          className="flex items-center hover:bg-gray-100 transition-colors duration-150 rounded"
+                          onClick={() => handleButtonDeleteClick(doc)}
+                        >
+                        {deletedDocIds.has(doc.id) ? <CheckIcon size={16} /> : <Trash2 size={16} />}
+                        </Button>
+                      </div>
+                    );
+                  })
+                )}
+                <PersonaDocuments initialPersonaDocumentIds={[]}/>
               </div>
-              <PersonaDocuments initialPersonaDocumentIds={[]}/>
-
-            </div>
+          </div>
           </ScrollArea>
           <Input
                   type="hidden"
