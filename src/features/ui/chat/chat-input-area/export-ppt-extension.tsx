@@ -2,17 +2,17 @@ import { FC, useEffect, useState } from "react";
 import { ToggleRight, ToggleLeft, Presentation } from "lucide-react";
 import { chatStore } from "@/features/chat-page/chat-store";
 
-export const PPT_EXTENSION = "PPT_EXTENSION";
+const PPT_EXTENSION = "PPT_EXTENSION";
 
-export const ExportPPTExtension = () => {
+export const ExportPPTExtension: FC = () => {
     const [active, setActive] = useState<boolean>(false);
     useEffect(() => {
-    const isActive: boolean = chatStore.isExportPPTExtensionState(); // Ensure type is boolean
-    setActive(isActive); // This should work without issues
+        const isActive: boolean = chatStore.isExportPPTExtensionState(); // Ensure type is boolean
+        setActive(isActive); // This should work without issues
     }, []);
 
     const handleToggle = async () => {
-        if (chatStore.updateSearchExtensionState(!active)) {
+        if (chatStore.updateExportPPTExtensionState(!active)) {
             await chatStore.AddExtensionToChatThread(PPT_EXTENSION);
             setActive(true);
         } else {

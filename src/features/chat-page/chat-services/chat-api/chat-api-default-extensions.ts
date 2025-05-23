@@ -69,7 +69,7 @@ export const GetExportPPTExtensions = async (props: {
       parameters: {
         type: "object",
         properties: {
-          prompt: { type: "string" },
+          prompt: { type: "string"},
         },
       },
       description:
@@ -78,7 +78,76 @@ export const GetExportPPTExtensions = async (props: {
           Choose the slide that seems most relevant to you. And use the most interesting options to create impactful slides (list, bold text, chart).
           Type of slide possible in pageContents :  textOn1ColumnSlide | textWithChartSlide | dividerSlide.
           Type of chart possible in textWithChartSlide : "area" | "bar"| "bar3d"| "bubble"| "doughnut"| "line"| "pie"| "radar"| "scatter".
-          Output strictly as valid JSON following this schema, an example of an expected response:
+          Complete Rules used for formatted your json response : export interface SlideTitle{
+  title: string;
+  subtitle: string;
+}
+
+export interface BulletPoint{
+  value: string,
+  indentLevel: number
+}
+
+export interface SlideText{
+  text: string;
+  bullet: boolean;
+  indentlevel: number;
+  bold: boolean;
+
+}
+
+export type SlideType = "texton1column" | "textwithChart";
+export type ChartType = "area" | "bar"| "bar3d"| "bubble"| "doughnut"| "line"| "pie"| "radar"| "scatter";
+
+export interface Chart{
+  chartType: ChartType;
+  name: string;
+  labels: Array<string>;
+  values: Array<number>;
+}
+
+export interface BaseSlideContent {
+  title: string;
+  subtitle?: string;
+}
+
+export interface BaseSlideContentText extends BaseSlideContent {
+    text_body: SlideText[];
+}
+
+// Slide de type "texton1column"
+export interface TextOn1ColumnSlide extends BaseSlideContentText {
+  type: "texton1column";
+  subtitle?: string;
+  little_title_section: string;
+  text_body: SlideText[];
+}
+
+// Slide de type "textwithChart"
+export interface TextWithChartSlide extends BaseSlideContentText {
+  type: "textwithChart";
+  chart: Chart;
+  text_body: SlideText[];
+}
+
+export interface DividerSlide extends BaseSlideContent {
+  type: "dividerSlide";
+  numberSection: string
+}
+
+export type SlideContent = TextOn1ColumnSlide | TextWithChartSlide | DividerSlide;
+
+export interface SlideSummary{
+  sectionTitle: string;
+  sectionSubtitle: string;
+}
+
+export interface Slides{
+  pageTitle: SlideTitle;
+  pageSummary: SlideSummary[];
+  pageContents: SlideContent[];
+}
+          Output strictly as valid JSON following this schema
         {"pageTitle":{"title":"Présentation Exemple pour Test de Génération de PPT","subtitle":"Développement et Test"},
   "pageSummary":[{"sectionTitle": "Titre court", "sectionSubtitle": "Sous titre"},{"sectionTitle": "Titre court", "sectionSubtitle": "Sous titre"}],
   "pageContents":[{"type":"dividerSlide", "numberSection": "01", "title": "Un loong titre Introduction", "subtitle": "Sous titre"},{"title":"Introduction","type":"texton1column","little_title_section":"Contexte",

@@ -7,7 +7,9 @@ import { RunnableToolFunction } from "openai/lib/RunnableFunction";
 import { ChatCompletionStreamingRunner } from "openai/resources/beta/chat/completions";
 import { ChatCompletionMessageParam } from "openai/resources/chat/completions";
 import { ChatThreadModel } from "../models";
-import { PPT_EXTENSION } from "@/features/ui/chat/chat-input-area/export-ppt-extension";
+
+const PPT_EXTENSION = "PPT_EXTENSION";
+
 export const ChatApiExtensions = async (props: {
   chatThread: ChatThreadModel;
   userMessage: string;
@@ -35,7 +37,7 @@ export const ChatApiExtensions = async (props: {
         },
       ],
       tools: extensions,
-      ...(chatThread.gptModel !== "o3-mini" && { temperature: chatThread.personaTemperature }),
+      ...((chatThread.gptModel !== "o3-mini" && chatThread.gptModel !== "o4-mini") && { temperature: chatThread.personaTemperature }),
     },
     { signal: signal }
   );

@@ -18,8 +18,9 @@ import { GetDynamicExtensions } from "./chat-api-dynamic-extensions";
 import { ChatApiExtensions } from "./chat-api-extension";
 import { ChatApiMultimodal } from "./chat-api-multimodal";
 import { OpenAIStream } from "./open-ai-stream";
-import { PPT_EXTENSION } from "@/features/ui/chat/chat-input-area/export-ppt-extension";
+
 type ChatTypes = "extensions" | "chat-with-file" | "multimodal" | "simple" | "ai-inference";
+const PPT_EXTENSION = "PPT_EXTENSION";
 
 export const ChatAPIEntry = async (props: UserPrompt, signal: AbortSignal) => {
   const currentChatThreadResponse = await EnsureChatThreadOperation(props.id);
@@ -118,7 +119,7 @@ const _getHistory = async (chatThread: ChatThreadModel) => {
 
   if (historyResponse.status === "OK") {
     let historyResults = historyResponse.response;
-    if(chatThread.gptModel === process.env.AZURE_OPENAI_API_DEPLOYMENT_NAME_o3mini){
+    if(chatThread.gptModel === process.env.AZURE_OPENAI_API_DEPLOYMENT_NAME_o3mini || chatThread.gptModel === "o4-mini"){
       historyResults = historyResults.filter((message) => message.role !== "function");
     }
     return mapOpenAIChatMessages(historyResults).reverse();

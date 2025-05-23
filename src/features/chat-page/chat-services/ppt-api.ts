@@ -115,8 +115,6 @@ export const Ppt = async (content: any) : Promise<ArrayBuffer> => {
   });
 
   pptx.addSlide({ masterName: "Slide_final" });
-  const file = await pptx.writeFile({ fileName: 'Presentation_RATP.pptx' });
-  console.log("Présentation générée : presentation-ai.pptx");
 
   return pptx.write({ outputType: "arraybuffer" }) as unknown as ArrayBuffer;;
 };
