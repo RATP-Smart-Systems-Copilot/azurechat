@@ -36,6 +36,7 @@ class ChatState {
   public userName: string = "";
   public chatThreadId: string = "";
   public webSearchState: boolean = false;
+  public exportPPTExtensionState: boolean = false;
 
   private chatThread: ChatThreadModel | undefined;
 
@@ -112,7 +113,15 @@ class ChatState {
     this.loading = "idle";
   }
 
-  public isSearchExtensionState(): boolean{
+  public isExportPPTExtensionState(): boolean{
+    return this.exportPPTExtensionState;
+  }
+
+  public updateExportPPTExtensionState(active : boolean): boolean {
+    return this.exportPPTExtensionState = active;
+  }
+
+   public isSearchExtensionState(): boolean{
     return this.webSearchState;
   }
 

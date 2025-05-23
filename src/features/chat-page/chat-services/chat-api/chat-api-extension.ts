@@ -7,6 +7,9 @@ import { RunnableToolFunction } from "openai/lib/RunnableFunction";
 import { ChatCompletionStreamingRunner } from "openai/resources/beta/chat/completions";
 import { ChatCompletionMessageParam } from "openai/resources/chat/completions";
 import { ChatThreadModel } from "../models";
+
+const PPT_EXTENSION = "PPT_EXTENSION";
+
 export const ChatApiExtensions = async (props: {
   chatThread: ChatThreadModel;
   userMessage: string;
@@ -34,7 +37,7 @@ export const ChatApiExtensions = async (props: {
         },
       ],
       tools: extensions,
-      ...(chatThread.gptModel !== "o3-mini" && { temperature: chatThread.personaTemperature }),
+      ...((chatThread.gptModel !== "o3-mini" && chatThread.gptModel !== "o4-mini") && { temperature: chatThread.personaTemperature }),
     },
     { signal: signal }
   );
@@ -44,6 +47,10 @@ const extensionsSystemMessage = async (chatThread: ChatThreadModel) => {
   let message = "";
 
   for (const e of chatThread.extension) {
+     // Ignorer PPT_EXTENSION
+    if (e === PPT_EXTENSION) {
+      continue;
+    }
     const extension = await FindExtensionByID(e);
     if (extension.status === "OK") {
       message += ` ${extension.response.executionSteps} \n`;

@@ -50,6 +50,7 @@
     "next-auth": "^4.24.5",
     "next-themes": "^0.2.1",
     "openai": "^4.86.2",
+    "pptxgenjs": "^4.0.0",
     "react": "^18",
     "react-dom": "^18",
     "react-syntax-highlighter": "^15.6.1",
