@@ -13,11 +13,12 @@ import {
 import { EnsureChatThreadOperation } from "../chat-thread-service";
 import { ChatThreadModel, UserPrompt } from "../models";
 import { mapOpenAIChatMessages } from "../utils";
-import { GetDefaultExtensions } from "./chat-api-default-extensions";
+import { GetDefaultExtensions, GetExportPPTExtensions } from "./chat-api-default-extensions";
 import { GetDynamicExtensions } from "./chat-api-dynamic-extensions";
 import { ChatApiExtensions } from "./chat-api-extension";
 import { ChatApiMultimodal } from "./chat-api-multimodal";
 import { OpenAIStream } from "./open-ai-stream";
+import { PPT_EXTENSION } from "@/features/ui/chat/chat-input-area/export-ppt-extension";
 type ChatTypes = "extensions" | "chat-with-file" | "multimodal" | "simple" | "ai-inference";
 
 export const ChatAPIEntry = async (props: UserPrompt, signal: AbortSignal) => {
@@ -159,6 +160,10 @@ const _getExtensions = async (props: {
 }) => {
   const extension: Array<any> = [];
 
+  // Vérifier si PPT_EXTENSION est présent dans les extensions
+  const hasPPT = props.chatThread.extension.includes(PPT_EXTENSION);
+
+  // Appeler GetDefaultExtensions
   const response = await GetDefaultExtensions({
     chatThread: props.chatThread,
     userMessage: props.userMessage,
@@ -168,6 +173,22 @@ const _getExtensions = async (props: {
     extension.push(...response.response);
   }
 
+  // Si PPT_EXTENSION est présent, appeler GetExportPPTExtensions
+  if (hasPPT) {
+    const pptResponse = await GetExportPPTExtensions({
+      chatThread: props.chatThread,
+      userMessage: props.userMessage,
+      signal: props.signal,
+    });
+    if (pptResponse.status === "OK" && pptResponse.response.length > 0) {
+      extension.push(...pptResponse.response);
+    }
+
+    // Retirer PPT_EXTENSION de la liste des extensions
+    props.chatThread.extension = props.chatThread.extension.filter(ext => ext !== PPT_EXTENSION);
+  }
+
+  // Appeler GetDynamicExtensions avec les extensions restantes
   const dynamicExtensionsResponse = await GetDynamicExtensions({
     extensionIds: props.chatThread.extension,
   });

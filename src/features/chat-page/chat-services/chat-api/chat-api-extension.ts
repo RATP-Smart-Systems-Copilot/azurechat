@@ -7,6 +7,7 @@ import { RunnableToolFunction } from "openai/lib/RunnableFunction";
 import { ChatCompletionStreamingRunner } from "openai/resources/beta/chat/completions";
 import { ChatCompletionMessageParam } from "openai/resources/chat/completions";
 import { ChatThreadModel } from "../models";
+import { PPT_EXTENSION } from "@/features/ui/chat/chat-input-area/export-ppt-extension";
 export const ChatApiExtensions = async (props: {
   chatThread: ChatThreadModel;
   userMessage: string;
@@ -44,6 +45,10 @@ const extensionsSystemMessage = async (chatThread: ChatThreadModel) => {
   let message = "";
 
   for (const e of chatThread.extension) {
+     // Ignorer PPT_EXTENSION
+    if (e === PPT_EXTENSION) {
+      continue;
+    }
     const extension = await FindExtensionByID(e);
     if (extension.status === "OK") {
       message += ` ${extension.response.executionSteps} \n`;

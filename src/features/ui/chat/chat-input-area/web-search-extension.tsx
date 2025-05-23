@@ -1,5 +1,5 @@
 import { FC, useEffect, useState } from "react";
-import { ToggleRight, ToggleLeft } from "lucide-react";
+import { ToggleRight, ToggleLeft, Globe } from "lucide-react";
 import { chatStore } from "@/features/chat-page/chat-store";
 import { ExtensionModel } from "@/features/extensions-page/extension-services/models";
 
@@ -37,7 +37,7 @@ export const WebSearchExtension: FC<Props> = (props) => {
                 active ? "bg-green-500 text-white" : "bg-gray-200 text-gray-800"
             }`}
             >
-            {active ? <ToggleRight size={20} /> : <ToggleLeft size={20} />}
+            {active ? <ToggleRight size={20} /> : <ToggleLeft size={20} />}<Globe size={20}/>
             <span className="text-sm font-medium">Rechercher sur le web</span>
             </button>
         );

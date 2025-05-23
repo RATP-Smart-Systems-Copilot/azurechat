@@ -33,6 +33,7 @@ import {
 } from "./speech/use-text-to-speech";
 import { WebSearchExtension } from "@/features/ui/chat/chat-input-area/web-search-extension";
 import { ExtensionModel } from "@/features/extensions-page/extension-services/models";
+import { ExportPPTExtension } from "@/features/ui/chat/chat-input-area/export-ppt-extension";
 
 interface Props {
   extensions: Array<ExtensionModel>;
@@ -87,6 +88,7 @@ export const ChatInput : FC<Props> = (props) => {
       <ChatInputActionArea>
         <ChatInputSecondaryActionArea>
           {!isSimpleChat && !props.disabled && <WebSearchExtension extensions={props.extensions}/>}
+          {<ExportPPTExtension/>}
         </ChatInputSecondaryActionArea>
         <ChatInputPrimaryActionArea>
           {!isSimpleChat && (
