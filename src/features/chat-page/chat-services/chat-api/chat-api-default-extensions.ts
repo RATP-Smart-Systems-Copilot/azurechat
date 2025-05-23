@@ -245,7 +245,7 @@ async function executeCreateImage(
     await UploadImageToStore(
       threadId,
       imageName,
-      Buffer.from(response.data[0].b64_json, "base64")
+      Buffer.from(response.data[0].b64_json ?? "", "base64")
     );
 
     const imageUrl = await GetImageUrl(threadId, imageName) as string;
