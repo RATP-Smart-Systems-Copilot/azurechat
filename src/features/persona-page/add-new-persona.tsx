@@ -1,7 +1,7 @@
 "use client";
 
 import { useSession } from "next-auth/react";
-import { FC, useEffect, useState } from "react";
+import { FC, startTransition, useEffect, useState } from "react";
 import { useFormState, useFormStatus } from "react-dom";
 import { ServerActionResponse } from "../common/server-action-response";
 import { Button } from "../ui/button";
@@ -31,6 +31,9 @@ import { ChatDocumentModel } from "../chat-page/chat-services/models";
 import { CheckIcon, File, Trash2 } from "lucide-react";
 import { modelOptions } from "../theme/theme-config";
 import { PersonaDocuments } from "./persona-documents/persona-documents";
+import { AdvancedLoadingIndicator } from "../ui/advanced-loading-indicator";
+import { useResetableActionState } from "../common/hooks/useResetableActionState";
+import { TooltipProvider } from "@radix-ui/react-tooltip";
 
 interface Props {}
 
@@ -57,7 +60,7 @@ export const AddNewPersona: FC<Props> = (props) => {
     fetchDocuments();
   }, [persona.id, , refreshKey]);
 
-  const [formState, formAction] = useFormState(
+  const [state, submit, reset, isLoading] = useResetableActionState(
     addOrUpdatePersona,
     initialState
   );
@@ -112,30 +115,36 @@ export const AddNewPersona: FC<Props> = (props) => {
     <Sheet
       open={isOpened}
       onOpenChange={(value) => {
-        personaStore.updateOpened(value);
+         if (!isLoading) {
+          personaStore.updateOpened(value);
+          startTransition(() => {
+            reset();
+          });
+        }
       }}
     >
       <SheetContent className="min-w-[900px] sm:w-[700px] flex flex-col">
         <SheetHeader>
-          <SheetTitle>Agent IA</SheetTitle>
+          <SheetTitle>Assistant IA</SheetTitle>
+          {state && state.status === "OK" ? null : (
+            <>
+              {state &&
+                state.errors.map((error, index) => (
+                  <div key={index} className="text-red-500">
+                    {error.message}
+                  </div>
+                ))}
+            </>
+          )}
         </SheetHeader>
-        <form action={formAction} className="flex-1 flex flex-col">
+        <TooltipProvider>
+          <form action={submit} className="flex-1 flex flex-col">
           <ScrollArea
             className="flex-1 -mx-6 flex max-h-[calc(100vh-140px)]"
             type="always"
           >
           <div className="pb-6 px-6 flex gap-8 flex-col flex-1">
               <input type="hidden" name="id" defaultValue={persona.id} />
-              {formState && formState.status === "OK" ? null : (
-                <>
-                  {formState &&
-                    formState.errors.map((error, index) => (
-                      <div key={index} className="text-red-500">
-                        {error.message}
-                      </div>
-                    ))}
-                </>
-              )}
               <div className="flex gap-4">
                 <div className="flex flex-col">
                   <Label>Nom de l&apos;assistant</Label>
@@ -236,26 +245,60 @@ export const AddNewPersona: FC<Props> = (props) => {
                   name="sharedWith"
                   placeholder="sharedWith"
                 />
-          <SheetFooter className="py-2 flex sm:justify-between flex-row">
-            <PublicSwitch /> <Submit />
-          </SheetFooter>
+           <SheetFooter className="py-2 flex sm:justify-between flex-row">
+              <PublicSwitch /> <Submit isLoading={isLoading} />
+            </SheetFooter>
           <div className=" flex justify-center">
             <div className="border bg-background p-2 px-5  rounded-full flex gap-2 items-center text-sm">
               {uploadButtonLabel}
             </div>
           </div>
         </form>
+        </TooltipProvider>
       </SheetContent>
     </Sheet>
   );
 };
 
-function Submit() {
+function Submit({ isLoading }: { isLoading: boolean }) {
   const status = useFormStatus();
   return (
-    <Button disabled={status.pending} className="gap-2">
-      <LoadingIndicator isLoading={status.pending} />
-      Save
-    </Button>
+    <div className="flex items-center space-x-4">
+      <Button disabled={isLoading} className="gap-2">
+        <LoadingIndicator isLoading={isLoading} />
+        Save
+      </Button>
+      <AdvancedLoadingIndicator
+        isLoading={isLoading}
+        interval={2500}
+        loadingMessages={[
+          "Checking Documents...",
+          "Searching for Documents...",
+          "Translating Documents...",
+          "Indexing Documents...",
+          "Almost there...",
+          "Big documents take time...",
+          "Just a moment...",
+          "Hang tight...",
+          "Processing your request...",
+          "Analyzing content...",
+          "Finalizing setup...",
+          "Loading resources...",
+          "Wrapping things up...",
+          "Preparing your results...",
+          "Tidying up the details...",
+          "Double-checking info...",
+          "Synchronizing...",
+          "Fetching additional data...",
+          "Reviewing documents...",
+          "Securing data...",
+          "Hold on, almost finished...",
+          "Making progress...",
+          "One last check...",
+          "Taking longer than expected...",
+        ]
+        }
+        />
+    </div>
   );
 }

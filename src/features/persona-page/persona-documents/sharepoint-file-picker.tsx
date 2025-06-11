@@ -40,7 +40,6 @@ export function SharePointFilePicker({
     const messageListener = (event: MessageEvent) => {
       // For iframe, we check if the origin matches our tenant URL
       // This is a security measure to ensure we only process messages from our iframe
-      console.log("URL"+new URL(tenantUrl).hostname);
       if (event.origin.includes(new URL(tenantUrl).hostname)) {
         const message = event.data;
 
@@ -225,7 +224,6 @@ export function SharePointFilePicker({
       });
 
       const url = `${tenantUrl}/_layouts/15/FilePicker.aspx?${queryString}`;
-      console.log(url);
 
       // We need to wait for the iframe to be in the DOM
       setTimeout(() => {

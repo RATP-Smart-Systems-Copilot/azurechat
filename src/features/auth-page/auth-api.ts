@@ -46,7 +46,7 @@ const configureIdentityProvider = () => {
         tenantId: process.env.AZURE_AD_TENANT_ID!,
         authorization: {
           params: {
-            scope: "openid profile User.Read", 
+            scope: "offline_access openid profile User.Read email Files.Read.All",
           },
         },
         async profile(profile, tokens) {
@@ -177,7 +177,7 @@ async function refreshAccessToken(token: JWT) {
         grant_type: "refresh_token",
         refresh_token: token.refreshToken as string,
         scope:
-          "offline_access openid profile User.Read email Files.Read.All Sites.Read.All AllSites.Read MyFiles.Read",
+          "offline_access openid profile User.Read email Files.Read.All Sites.Read.All",
       }),
     });
 
