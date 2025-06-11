@@ -334,10 +334,8 @@ class ChatState {
   }
 
   public isSimpleChat(){
-    return this.chatThread?.gptModel !==  "gpt-4o-mini"
-    && this.chatThread?.gptModel !==  "gpt4o"
-    && this.chatThread?.gptModel !==  "o3-mini"
-    && this.chatThread?.gptModel !==  "gpt-4.1-mini";
+    return this.chatThread?.gptModel ===  'o4-mini'
+    || this.chatThread?.gptModel ===  'Codestral-2501';
   }
 }
 

@@ -88,7 +88,7 @@ export const ChatInput : FC<Props> = (props) => {
       <ChatInputActionArea>
         <ChatInputSecondaryActionArea>
           {!isSimpleChat && !props.disabled && <WebSearchExtension extensions={props.extensions}/>}
-          {<ExportPPTExtension/>}
+          {!isSimpleChat && !props.disabled && <ExportPPTExtension/>}
         </ChatInputSecondaryActionArea>
         <ChatInputPrimaryActionArea>
           {!isSimpleChat && (
