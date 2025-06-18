@@ -84,9 +84,9 @@ export const getDocumentsPersona = async (personaId : string):  Promise<Array<Ch
   return chatDocumentsResponse.response;
 }
 
-export const addOrUpdatePersona = async (previous: any, formData: FormData)=> {
+export const AddOrUpdatePersona = async (previous: any, formData: FormData)=> {
   const sharePointFiles = HandleSharePointFiles(formData);
-  personaStore.updateErrors([]);
+  //personaStore.updateErrors([]);
 
   const model = FormDataToPersonaModel(formData);
   const response =
@@ -99,9 +99,9 @@ export const addOrUpdatePersona = async (previous: any, formData: FormData)=> {
     RevalidateCache({
       page: "persona",
     });
-  } else {
+  } /*else {
     personaStore.updateErrors(response.errors.map((e) => e.message));
-  }
+  }*/
   return response;
 };
 

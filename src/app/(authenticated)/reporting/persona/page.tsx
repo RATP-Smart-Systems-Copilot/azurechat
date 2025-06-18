@@ -8,5 +8,5 @@ interface Props {
 }
 
 export default async function Home(props: Props) {
-  return <PersonaReportingPage page={Number(props.searchParams.pageNumber ?? 0)} />;
+  return <PersonaReportingPage page={Number((await props.searchParams).pageNumber ?? 0)} />;
 }

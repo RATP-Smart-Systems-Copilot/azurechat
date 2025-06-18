@@ -2,7 +2,7 @@
 
 import { useSession } from "next-auth/react";
 import { FC, startTransition, useEffect, useState } from "react";
-import { useFormState, useFormStatus } from "react-dom";
+import { useFormStatus } from "react-dom";
 import { ServerActionResponse } from "../common/server-action-response";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
@@ -19,7 +19,7 @@ import {
 import { Switch } from "../ui/switch";
 import { Textarea } from "../ui/textarea";
 import {
-  addOrUpdatePersona,
+  AddOrUpdatePersona,
   getDocumentsPersona,
   personaStore,
   usePersonaState,
@@ -41,12 +41,14 @@ export const AddNewPersona: FC<Props> = (props) => {
   const initialState: ServerActionResponse | undefined = undefined;
 
   const { isOpened, persona } = usePersonaState();
+  const [state, submit, reset, isLoading] = useResetableActionState(
+      AddOrUpdatePersona,
+      initialState
+  );
   const { uploadButtonLabel } = useFileStore();
   const [documentsPersona, setDocumentsPersona] = useState<Array<ChatDocumentModel>>([]);
   const [deletedDocIds, setDeletedDocIds] = useState<Set<string>>(new Set());
   const [refreshKey, setRefreshKey] = useState(0);
-
-
 
   useEffect(() => {
     const fetchDocuments = async () => {
@@ -59,11 +61,6 @@ export const AddNewPersona: FC<Props> = (props) => {
 
     fetchDocuments();
   }, [persona.id, , refreshKey]);
-
-  const [state, submit, reset, isLoading] = useResetableActionState(
-    addOrUpdatePersona,
-    initialState
-  );
 
   const { data } = useSession();
 
@@ -235,7 +232,7 @@ export const AddNewPersona: FC<Props> = (props) => {
                     );
                   })
                 )}
-                <PersonaDocuments initialPersonaDocumentIds={[]}/>
+                <PersonaDocuments initialPersonaDocumentIds={persona.personaDocumentIds || []}/>
               </div>
           </div>
           </ScrollArea>
@@ -272,31 +269,32 @@ function Submit({ isLoading }: { isLoading: boolean }) {
         isLoading={isLoading}
         interval={2500}
         loadingMessages={[
-          "Checking Documents...",
-          "Searching for Documents...",
-          "Translating Documents...",
-          "Indexing Documents...",
-          "Almost there...",
-          "Big documents take time...",
-          "Just a moment...",
-          "Hang tight...",
-          "Processing your request...",
-          "Analyzing content...",
-          "Finalizing setup...",
-          "Loading resources...",
-          "Wrapping things up...",
-          "Preparing your results...",
-          "Tidying up the details...",
-          "Double-checking info...",
-          "Synchronizing...",
-          "Fetching additional data...",
-          "Reviewing documents...",
-          "Securing data...",
-          "Hold on, almost finished...",
-          "Making progress...",
-          "One last check...",
-          "Taking longer than expected...",
+          "Vérification des documents...",
+          "Recherche des documents...",
+          "Traduction des documents...",
+          "Indexation des documents...",
+          "Presque terminé...",
+          "Les gros documents prennent du temps...",
+          "Un instant...",
+          "Patientez...",
+          "Traitement de votre demande...",
+          "Analyse du contenu...",
+          "Finalisation de la configuration...",
+          "Chargement des ressources...",
+          "Finition en cours...",
+          "Préparation de vos résultats...",
+          "Mise au point des détails...",
+          "Double vérification des informations...",
+          "Synchronisation...",
+          "Récupération des données supplémentaires...",
+          "Revue des documents...",
+          "Sécurisation des données...",
+          "Patientez, presque fini...",
+          "Progrès en cours...",
+          "Une dernière vérification...",
+          "Cela prend plus de temps que prévu..."
         ]
+
         }
         />
     </div>

@@ -18,7 +18,8 @@ import { DocumentMetadata, PERSONA_ATTRIBUTE, PersonaModel, PersonaModelSchema }
 import { defaultGPTModel } from "@/features/common/services/openai";
 import { FindAllChatDocumentsByPersona } from "@/features/chat-page/chat-services/chat-document-service";
 import { DeleteDocumentsForPersona } from "@/features/chat-page/chat-services/azure-ai-search/azure-ai-search";
-import { DeletePersonaDocumentsByPersonaId, UpdateOrAddPersonaDocuments } from "./persona-documents-service";
+import { DeletePersonaDocumentsByPersonaId, UpdateOrAddPersonaDocuments  as AddOrUpdatePersonaDocuments } from "./persona-documents-service";
+import { RevalidateCache } from "@/features/common/navigation-helpers";
 
 interface PersonaInput {
   name: string;
@@ -85,7 +86,7 @@ export const CreatePersona = async (
   try {
     const user = await getCurrentUser();
 
-    const personaDocumentIds = await UpdateOrAddPersonaDocuments (
+    const personaDocumentIds = await AddOrUpdatePersonaDocuments(
       sharePointFiles,
       []
     );
@@ -215,7 +216,7 @@ export const DeletePersona = async (
 
 export const UpsertPersona = async (
   personaInput: PersonaModel,
-  sharePointFiles: DocumentMetadata[]
+  sharePointFiles?: DocumentMetadata[]
 ): Promise<ServerActionResponse<PersonaModel>> => {
   try {
     const personaResponse = await EnsurePersonaOperation(personaInput.id);
@@ -223,17 +224,18 @@ export const UpsertPersona = async (
     if (personaResponse.status === "OK") {
       const { response: persona } = personaResponse;
       const user = await getCurrentUser();
+      let personaDocumentIds: string[] = sharePointFiles === undefined ? (personaInput.personaDocumentIds || []) : [];
+      let personaDocumentIdsResponse = null;
 
-      const personaDocumentIds = await UpdateOrAddPersonaDocuments(
-        sharePointFiles,
-        personaInput.personaDocumentIds || []
-      );
+      if(sharePointFiles !== undefined){
+        personaDocumentIdsResponse  = await AddOrUpdatePersonaDocuments(
+          sharePointFiles,
+          personaInput.personaDocumentIds || []
+        );
 
-      if (personaDocumentIds.status !== "OK") {
-        return {
-          status: "ERROR",
-          errors: personaDocumentIds.errors,
-        };
+        if (personaDocumentIdsResponse.status === "OK") {
+          personaDocumentIds = personaDocumentIdsResponse.response;
+        }
       }
 
       const modelToUpdate: PersonaModel = {
@@ -247,7 +249,7 @@ export const UpsertPersona = async (
         isPublished: personaInput.isPublished,
         createdAt: new Date(),
         sharedWith: personaInput.sharedWith || [],
-        personaDocumentIds: personaDocumentIds.response,
+        personaDocumentIds: personaDocumentIds,
       };
 
       const validationResponse = ValidateSchema(modelToUpdate);
@@ -258,6 +260,17 @@ export const UpsertPersona = async (
       const { resource } = await HistoryContainer().items.upsert<PersonaModel>(
         modelToUpdate
       );
+
+      if (personaDocumentIdsResponse && personaDocumentIdsResponse.status !== "OK") {
+        RevalidateCache({
+          page: "persona",
+        });
+
+        return {
+          status: "ERROR",
+          errors: personaDocumentIdsResponse.errors,
+        };
+      }
 
       if (resource) {
         return {

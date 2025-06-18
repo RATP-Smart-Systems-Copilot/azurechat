@@ -352,6 +352,6 @@ export const CreatNewChatGPT= async ( gptModel : string = process.env.AZURE_OPEN
   }
 };
 
-export const RedirectToChatThread = (chatThreadId: string) => {
+export const RedirectToChatThread = async (chatThreadId: string) => {
   redirect(`/chat/${chatThreadId}`);
 };

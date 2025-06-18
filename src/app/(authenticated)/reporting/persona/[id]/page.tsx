@@ -9,15 +9,16 @@ interface HomeParams {
 }
 
 export default async function Home(props: HomeParams) {
+  const idPersona = (await props.params).id
   const [personaResponse] = await Promise.all([
-    FindPersonaForAdmin(props.params.id),
+    FindPersonaForAdmin(idPersona),
   ]);
 
   if (personaResponse.status !== "OK") {
     return <DisplayError errors={personaResponse.errors} />;
   }
 
-  const usersResponse = await FindAllUsersForAdmin(400,0);
+  const usersResponse = await FindAllUsersForAdmin(700,0);
 
   if (usersResponse.status !== "OK") {
     return <DisplayError errors={usersResponse.errors} />;
