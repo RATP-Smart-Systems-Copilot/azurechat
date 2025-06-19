@@ -12,9 +12,9 @@ export const metadata = {
 };
 
 interface HomeParams {
-  params: {
+  params: Promise<{
     id: string;
-  };
+  }>;
 }
 
 export default async function Home(props: HomeParams) {

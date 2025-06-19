@@ -3,9 +3,9 @@ import { FindAllUsersForAdmin, FindPersonaForAdmin } from "@/features/reporting-
 import { DisplayError } from "@/features/ui/error/display-error";
 
 interface HomeParams {
-  params: {
+  params: Promise<{
     id: string;
-  };
+  }>;
 }
 
 export default async function Home(props: HomeParams) {

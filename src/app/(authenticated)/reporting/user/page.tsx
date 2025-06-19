@@ -1,12 +1,12 @@
 import { UserReportingPage } from "@/features/reporting-page/reporting-user-page";
 
 interface Props {
-  params: {};
-  searchParams: {
+  params: Promise<{}>;
+  searchParams: Promise<{
     pageNumber?: string;
-  };
+  }>;
 }
 
 export default async function Home(props: Props) {
-  return <UserReportingPage page={Number(props.searchParams.pageNumber ?? 0)} />;
+  return <UserReportingPage page={Number((await props.searchParams).pageNumber ?? 0)} />;
 }

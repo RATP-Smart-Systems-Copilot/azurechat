@@ -177,7 +177,7 @@ async function refreshAccessToken(token: JWT) {
         grant_type: "refresh_token",
         refresh_token: token.refreshToken as string,
         scope:
-          "offline_access openid profile User.Read email Files.Read.All Sites.Read.All",
+          "offline_access openid profile User.Read email Files.Read.All",
       }),
     });
 

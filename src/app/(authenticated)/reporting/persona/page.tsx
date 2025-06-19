@@ -1,10 +1,10 @@
 import { PersonaReportingPage } from "@/features/reporting-page/reporting-personas-page";
 
 interface Props {
-  params: {};
-  searchParams: {
+  params: Promise<{}>;
+  searchParams: Promise<{
     pageNumber?: string;
-  };
+  }>;
 }
 
 export default async function Home(props: Props) {
