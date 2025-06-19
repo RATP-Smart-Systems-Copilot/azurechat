@@ -26,13 +26,13 @@ export async function middleware(request: NextRequest) {
       return NextResponse.redirect(url);
     }
 
-    /*if (requireAdmin.some((path) => pathname.startsWith(path))) {
+    if (requireAdmin.some((path) => pathname.startsWith(path))) {
       //check if not authorized
       if (!token.isAdmin) {
         const url = new URL(`/unauthorized`, request.url);
         return NextResponse.rewrite(url);
       }
-    }*/
+    }
   }
 
   return res;
