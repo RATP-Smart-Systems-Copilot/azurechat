@@ -31,7 +31,6 @@ export const ChatAPIEntry = async (props: UserPrompt, signal: AbortSignal) => {
 
   const currentChatThread = currentChatThreadResponse.response;
 
-
    // promise all to get user, history and docs
    const [user, history, docs, docsPersona, extension] = await Promise.all([
     getCurrentUser(),
@@ -52,7 +51,7 @@ export const ChatAPIEntry = async (props: UserPrompt, signal: AbortSignal) => {
 
   if (props.multimodalImage && props.multimodalImage.length > 0) {
     chatType = "multimodal";
-  } else if (docs.length > 0 || docsPersona.length > 0) {
+  } else if (docs.length > 0 || docsPersona.length > 0 || currentChatThread.documentIds.length > 0) {
     chatType = "chat-with-file";
   } else if (extension.length > 0) {
     chatType = "extensions";

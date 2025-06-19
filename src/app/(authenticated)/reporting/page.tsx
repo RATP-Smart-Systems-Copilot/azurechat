@@ -1,7 +1,7 @@
 import { ReportingHomePage } from "@/features/reporting-page/reporting-home";
 
 interface Props {
-  params: {};
+  params: Promise<{}>;
 }
 
 export default async function Home(props: Props) {

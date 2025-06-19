@@ -292,6 +292,7 @@ export const CreateChatThread = async (gptModel: string = process.env.AZURE_OPEN
       personaTemperature: PERSONA_TEMPERATURE,
       extension: [],
       gptModel: gptModel,
+      documentIds: [],
     };
 
     const { resource } = await HistoryContainer().items.create<ChatThreadModel>(
@@ -351,6 +352,6 @@ export const CreatNewChatGPT= async ( gptModel : string = process.env.AZURE_OPEN
   }
 };
 
-export const RedirectToChatThread = (chatThreadId: string) => {
+export const RedirectToChatThread = async (chatThreadId: string) => {
   redirect(`/chat/${chatThreadId}`);
 };

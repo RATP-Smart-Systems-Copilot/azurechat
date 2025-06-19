@@ -1,8 +1,13 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   output: "standalone",
+  serverExternalPackages: [
+    "@azure/storage-blob",
+  ],
   experimental: {
-    serverComponentsExternalPackages: ["@azure/storage-blob"],
+    serverActions: {
+      bodySizeLimit: "4mb", // default is "1mb" 
+    },
   },
 };
 

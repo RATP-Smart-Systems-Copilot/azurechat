@@ -401,6 +401,7 @@ export const CreateChatWithExtension = async (
       personaMessageTitle: CHAT_DEFAULT_PERSONA,
       personaTemperature: PERSONA_TEMPERATURE,
       extension: [extension.id],
+      documentIds: []
     });
 
     return response;

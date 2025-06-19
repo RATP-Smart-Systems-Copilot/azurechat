@@ -45,8 +45,8 @@ export default function ReportingPersonaPage(props: PersonaProps) {
   );
 
   return (
-      <main className="flex flex-1 flex-col">
-          <div className="container max-w-4xl py-3">
+      <main className="flex flex-col min-h-screen overflow-auto">
+          <div className="container max-w-6xl py-3">
               <h1>Assistant</h1>
               <Table>
                   <TableHeader>
@@ -74,11 +74,24 @@ export default function ReportingPersonaPage(props: PersonaProps) {
                       </TableRow>
                       <TableRow>
                           <TableCell className="font-medium">Partagé avec</TableCell>
-                          <TableCell>{persona.sharedWith}</TableCell>
+                          <TableCell>  {
+                            persona.sharedWith && persona.sharedWith.length > 0
+                            ? persona.sharedWith
+                                .map(id => props.users.find(user => user.userId === id)?.useName || 'Utilisateur non trouvé')
+                                .join(', ')
+                            : 'Aucun utilisateur'
+                        }</TableCell>
                       </TableRow>
                       <TableRow>
-                          <TableCell className="font-medium">Propriétaire</TableCell>
-                          <TableCell>{persona.userId}</TableCell>
+                        <TableCell className="font-medium">Propriétaire</TableCell>
+                        <TableCell> {
+                            // Recherche de l'utilisateur dans filteredUsers par userId
+                            props.users.find(user => user.userId === persona.userId)?.useName || 'Utilisateur non trouvé'}
+                        </TableCell>
+                      </TableRow>
+                      <TableRow>
+                          <TableCell className="font-medium">Sharepoint Document</TableCell>
+                          <TableCell>{persona.personaDocumentIds}</TableCell>
                       </TableRow>
                   </TableBody>
               </Table>

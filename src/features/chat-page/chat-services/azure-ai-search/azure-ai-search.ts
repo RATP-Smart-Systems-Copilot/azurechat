@@ -22,9 +22,10 @@ export interface AzureSearchDocumentIndex {
   pageContent: string;
   embedding?: number[];
   user: string;
-  chatThreadId?: string;
-  metadata: string;
-  personaId?: string;
+  chatThreadId?: string | null;
+  metadata: string | null;
+  personaId?: string | null;
+  documentId?: string | null;
 }
 
 export type DocumentSearchResponse = {
@@ -213,6 +214,7 @@ export const IndexDocuments = async (
   docs: string[],
   chatThreadId?: string,
   personaId?: string,
+  documentId?: string,
 ): Promise<Array<ServerActionResponse<boolean>>> => {
   try {
     if (debug) console.log("Indexing documents with fileName:", fileName, "chatThreadId:", chatThreadId);
@@ -221,12 +223,13 @@ export const IndexDocuments = async (
     for (const doc of docs) {
       const docToAdd: AzureSearchDocumentIndex = {
         id: uniqueId(),
-        chatThreadId,
+        chatThreadId: chatThreadId || null,
         user: await userHashedId(),
         pageContent: doc,
-        metadata: fileName,
+        metadata: fileName || null,
         embedding: [],
         personaId: personaId,
+        documentId: documentId || null,
       };
 
       documentsToIndex.push(docToAdd);
@@ -473,6 +476,12 @@ const CreateSearchIndex = async (): Promise<
           filterable: true,
         },
         {
+          name: "documentId",
+          type: "Edm.String",
+          searchable: true,
+          filterable: true,
+        },
+        {
           name: "pageContent",
           searchable: true,
           type: "Edm.String",
@@ -501,6 +510,99 @@ const CreateSearchIndex = async (): Promise<
     };
   } catch (e) {
     console.error("CreateSearchIndex error:", e);
+    return {
+      status: "ERROR",
+      errors: [
+        {
+          message: `${e}`,
+        },
+      ],
+    };
+  }
+};
+
+export const PersonaDocumentExistsInIndex = async (
+  documentId: string
+): Promise<ServerActionResponse<AzureSearchDocumentIndex>> => {
+  const result = await SimpleSearch(
+    documentId,
+    `documentId eq '${documentId}'`
+  );
+
+  if (result.status === "OK") {
+    const documents = result.response;
+    if (documents.length > 0) {
+      return {
+        status: "OK",
+        response: documents[0].document,
+      };
+    } else {
+      return {
+        status: "NOT_FOUND",
+        errors: [
+          {
+            message: `No document found with id ${documentId}`,
+          },
+        ],
+      };
+    }
+  }
+
+  return {
+    status: "ERROR",
+    errors: [
+      {
+        message: `Unexpected error occurred while checking persona document index.`,
+      },
+    ],
+  };
+};
+
+export const DeleteDocumentByPersonaDocumentId = async (
+  documentId: string
+): Promise<ServerActionResponse<boolean>> => {
+  try {
+    // Find the document using personaDocumentId
+    const documentResponse = await SimpleSearch(
+      undefined,
+      `documentId eq '${documentId}' and user eq '${await userHashedId()}'`
+    );
+
+    if (
+      documentResponse.status === "OK" &&
+      documentResponse.response.length > 0
+    ) {
+      const documents = documentResponse.response.map((r) => r.document);
+      const instance = AzureAISearchInstance();
+
+      const deletedResponse = await instance.deleteDocuments(documents);
+
+      if (deletedResponse.results.every((r) => r.succeeded)) {
+        return {
+          status: "OK",
+          response: true,
+        };
+      } else {
+        return {
+          status: "ERROR",
+          errors: deletedResponse.results
+            .filter((r) => !r.succeeded)
+            .map((r) => ({
+              message: r.errorMessage || "Unknown error",
+            })),
+        };
+      }
+    } else {
+      return {
+        status: "ERROR",
+        errors: [
+          {
+            message: `No document found with personaDocumentId: ${documentId}`,
+          },
+        ],
+      };
+    }
+  } catch (e) {
     return {
       status: "ERROR",
       errors: [

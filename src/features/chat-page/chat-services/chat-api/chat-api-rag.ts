@@ -11,6 +11,8 @@ import { ChatCompletionMessageParam } from "openai/resources/chat/completions";
 import { SimilaritySearch } from "../azure-ai-search/azure-ai-search";
 import { CreateCitations, FormatCitations } from "../citation-service";
 import { ChatCitationModel, ChatThreadModel } from "../models";
+import { AuthorizedDocuments, PersonaDocumentById } from "@/features/persona-page/persona-services/persona-documents-service";
+import { convertPersonaDocumentToSharePointDocument } from "@/features/persona-page/persona-services/models";
 
 export const ChatApiRAG = async (props: {
   chatThread: ChatThreadModel;
@@ -21,8 +23,13 @@ export const ChatApiRAG = async (props: {
   const { chatThread, userMessage, history, signal } = props;
 
   const openAI = OpenAIInstance(chatThread.gptModel);
+  const allowedPersonaDocumentIdsResponse =
+    await AllowedPersonaDocumentIdsResponse(chatThread.documentIds);
 
-  let filter = `user eq '${await userHashedId()}' and chatThreadId eq '${chatThread.id}' or personaId eq '${chatThread.personaId}'`;
+  let filter = `user eq '${await userHashedId()}' and chatThreadId eq '${chatThread.id}' or personaId eq '${chatThread.personaId}'
+   or ( (${allowedPersonaDocumentIdsResponse
+      .map((id) => `documentId eq '${id}'`)
+      .join(" or ")}))`;
 
   const documentResponse = await SimilaritySearch(
     userMessage,
@@ -83,4 +90,29 @@ ${userMessage}
   };
 
   return openAI.beta.chat.completions.stream(stream, { signal });
+};
+
+const AllowedPersonaDocumentIdsResponse = async (
+  personaDocumentIds: string[]
+) => {
+  const personaDocumentsResponses = await Promise.all(
+    personaDocumentIds.map(async (id) => {
+      try {
+        return await PersonaDocumentById(id);
+      } catch (error) {
+        return null;
+      }
+    })
+  );
+
+  const personaDocuments = personaDocumentsResponses.filter(
+    (response) => response !== null && response.status === "OK"
+  );
+
+
+  const allowedPersonaDocuments = await AuthorizedDocuments(
+    personaDocuments.map((e) => convertPersonaDocumentToSharePointDocument(e.response))
+  );
+
+  return allowedPersonaDocuments;
 };

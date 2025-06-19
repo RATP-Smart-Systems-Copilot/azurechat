@@ -6,6 +6,7 @@ import { Provider } from "next-auth/providers/index";
 import { hashValue } from "./helpers";
 import { image } from "@markdoc/markdoc/dist/src/schema";
 import { access } from "fs";
+import { JWT } from "next-auth/jwt";
 
 const configureIdentityProvider = () => {
   const providers: Array<Provider> = [];
@@ -45,7 +46,7 @@ const configureIdentityProvider = () => {
         tenantId: process.env.AZURE_AD_TENANT_ID!,
         authorization: {
           params: {
-            scope: "openid profile User.Read", 
+            scope: "offline_access openid profile User.Read email Files.Read.All",
           },
         },
         async profile(profile, tokens) {
@@ -55,6 +56,7 @@ const configureIdentityProvider = () => {
             ...profile,
             email,
             id: profile.sub,
+            accessToken: tokens.access_token,
             isAdmin:
               adminEmails?.includes(profile.email?.toLowerCase()) ||
               adminEmails?.includes(profile.preferred_username?.toLowerCase()),
@@ -91,6 +93,7 @@ const configureIdentityProvider = () => {
             email: email,
             isAdmin: adminEmails?.includes(email),
             image: "",
+            accessToken: "fake_token",
           };
           console.log(
             "=== DEV USER LOGGED IN:\n",
@@ -129,19 +132,29 @@ export const fetchProfilePicture = async (profilePictureUrl: string, accessToken
   return image;
 };
 
-
 export const options: NextAuthOptions = {
   secret: process.env.NEXTAUTH_SECRET,
   providers: [...configureIdentityProvider()],
   callbacks: {
-    async jwt({ token, user }) {
-      if (user?.isAdmin) {
+    async jwt({ token, user, account }) {
+      if (account && user) {
+        token.accessToken = account.access_token;
+        token.accessTokenExpires = account.expires_at;
+        token.refreshToken = account.refresh_token;
         token.isAdmin = user.isAdmin;
+
+        return token;
       }
-      return token;
+
+      if (Date.now() < (token.accessTokenExpires as number) * 1000) {
+        return token;
+      }
+
+      return refreshAccessToken(token);
     },
-    async session({ session, token, user }) {
+    async session({ session, token }) {
       session.user.isAdmin = token.isAdmin as boolean;
+      session.user.accessToken = token.accessToken as string;
       return session;
     },
   },
@@ -150,4 +163,43 @@ export const options: NextAuthOptions = {
   },
 };
 
+async function refreshAccessToken(token: JWT) {
+  try {
+    const url = `https://login.microsoftonline.com/${process.env.AZURE_AD_TENANT_ID}/oauth2/v2.0/token`;
+    const response = await fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+      body: new URLSearchParams({
+        client_id: process.env.AZURE_AD_CLIENT_ID!,
+        client_secret: process.env.AZURE_AD_CLIENT_SECRET!,
+        grant_type: "refresh_token",
+        refresh_token: token.refreshToken as string,
+        scope:
+          "offline_access openid profile User.Read email Files.Read.All",
+      }),
+    });
+
+    const refreshedTokens = await response.json();
+
+    if (!response.ok) {
+      throw new Error(
+        `Failed to refresh access token: ${refreshedTokens.error}`
+      );
+    }
+
+    return {
+      ...token,
+      accessToken: refreshedTokens.access_token,
+      accessTokenExpires: refreshedTokens.expiresAt,
+      refreshToken: refreshedTokens.refresh_token || token.refreshToken,
+    };
+  } catch (error) {
+    return {
+      ...token,
+      error: "RefreshAccessTokenError",
+    };
+  }
+}
 export const handlers = NextAuth(options);
