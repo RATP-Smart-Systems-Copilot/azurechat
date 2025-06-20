@@ -46,5 +46,6 @@ export const config = {
     "/api/chat:path*",
     "/api/images:path*",
     "/chat/:path*",
+    "/persona/:path*",
   ],
 };
