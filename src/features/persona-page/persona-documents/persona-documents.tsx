@@ -28,7 +28,7 @@ export const PersonaDocuments: FC<Props> = ({ initialPersonaDocumentIds, sharepo
   useEffect(() => {
     const fetchAllDocuments = async () => {
       const personaDocuments = await fetchPersonaDocuments();
-      await fetchMetadataForDocuments(personaDocuments);
+      await fetchMetadataForDocuments(personaDocuments, true);
     };
     fetchAllDocuments();
   }, [initialPersonaDocumentIds]);
@@ -66,7 +66,8 @@ export const PersonaDocuments: FC<Props> = ({ initialPersonaDocumentIds, sharepo
   };
 
   const fetchMetadataForDocuments = async (
-    documents: SharePointFile[]
+    documents: SharePointFile[],
+    init: boolean,
   ): Promise<void> => {
     if (!initialPersonaDocumentIds) return;
 
@@ -82,7 +83,7 @@ export const PersonaDocuments: FC<Props> = ({ initialPersonaDocumentIds, sharepo
         return matchingDocument ? { ...matchingDocument, id: file.id } : null;
       });
 
-      setPickedFiles(updatedFiles.filter(Boolean) as DocumentMetadata[]);
+      setPickedFiles(init ? (updatedFiles.filter(Boolean) as DocumentMetadata[]) : (prev => [...prev, ...updatedFiles.filter(Boolean)] as DocumentMetadata[]));
     }
 
     if (response.status === "OK" && response.response.unsuccessful.length > 0) {
