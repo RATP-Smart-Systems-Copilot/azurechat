@@ -8,6 +8,7 @@ import { PersonaModel } from "./persona-services/models";
 interface ChatPersonaProps {
   personas: PersonaModel[];
   sharedPersonas: PersonaModel[];
+  sharepointUrl: string;
 }
 
 export const ChatPersonaPage: FC<ChatPersonaProps> = (props) => {
@@ -44,7 +45,7 @@ export const ChatPersonaPage: FC<ChatPersonaProps> = (props) => {
             })}
           </div>
         </div>
-        <AddNewPersona />
+        <AddNewPersona  sharepointUrl={props.sharepointUrl}/>
       </main>
     </ScrollArea>
   );
