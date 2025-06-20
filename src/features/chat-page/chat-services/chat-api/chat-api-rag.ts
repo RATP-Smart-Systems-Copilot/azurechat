@@ -24,7 +24,7 @@ export const ChatApiRAG = async (props: {
 
   const openAI = OpenAIInstance(chatThread.gptModel);
   const allowedPersonaDocumentIdsResponse =
-    await AllowedPersonaDocumentIdsResponse(chatThread.documentIds);
+    await AllowedPersonaDocumentIdsResponse((chatThread.documentIds || []));
 
   let filter = `user eq '${await userHashedId()}' and chatThreadId eq '${chatThread.id}' or personaId eq '${chatThread.personaId}'
    or ( (${allowedPersonaDocumentIdsResponse
