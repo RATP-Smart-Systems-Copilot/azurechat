@@ -21,7 +21,7 @@ import {
 interface SharePointFilePickerSelectorProps {
   sharepointUrl: string;
   token: string;
-  onFilesSelected: (files: SharePointFile[]) => void;
+  onFilesSelected: (files: SharePointFile[], init: boolean) => void;
 }
 
 export function SharePointFilePicker({
@@ -140,7 +140,7 @@ export function SharePointFilePicker({
                 return file;
               });
 
-              onFilesSelected(files);
+              onFilesSelected(files, false);
 
               portRef.current?.postMessage({
                 type: "result",
@@ -201,7 +201,7 @@ export function SharePointFilePicker({
         },
         search: { enabled: true },
         typesAndSources: {
-          mode: "files",
+          mode: "all",
           filters: [
             ...Object.values(SupportedFileExtensionsDocumentIntellicence).map(
               (ext) => `.${ext}`

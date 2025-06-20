@@ -134,6 +134,7 @@ export enum SupportedFileExtensionsDocumentIntellicence {
   PPTX = "PPTX",
   HTML = "HTML",
   PDF = "PDF",
+  ASPX = "ASPX",
 }
 
 // https://platform.openai.com/docs/guides/images?api-mode=responses#image-input-requirements
@@ -182,4 +183,5 @@ export enum SupportedFileExtensionsTextFiles {
   PLIST = "PLIST",
   TOML = "TOML",
   RC = "RC",
+  ASPX = "ASPX",
 }
