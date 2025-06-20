@@ -19,13 +19,13 @@ import {
 } from "@/features/chat-page/chat-services/models";
 
 interface SharePointFilePickerSelectorProps {
-  tenantUrl: string;
+  sharepointUrl: string;
   token: string;
   onFilesSelected: (files: SharePointFile[]) => void;
 }
 
 export function SharePointFilePicker({
-  tenantUrl,
+  sharepointUrl,
   token,
   onFilesSelected,
 }: SharePointFilePickerSelectorProps) {
@@ -40,7 +40,7 @@ export function SharePointFilePicker({
     const messageListener = (event: MessageEvent) => {
       // For iframe, we check if the origin matches our tenant URL
       // This is a security measure to ensure we only process messages from our iframe
-      if (event.origin.includes(new URL(tenantUrl).hostname)) {
+      if (event.origin.includes(new URL(sharepointUrl).hostname)) {
         const message = event.data;
 
         if (
@@ -223,7 +223,7 @@ export function SharePointFilePicker({
         locale: "en-us",
       });
 
-      const url = `${tenantUrl}/_layouts/15/FilePicker.aspx?${queryString}`;
+      const url = `${sharepointUrl}/_layouts/15/FilePicker.aspx?${queryString}`;
 
       // We need to wait for the iframe to be in the DOM
       setTimeout(() => {

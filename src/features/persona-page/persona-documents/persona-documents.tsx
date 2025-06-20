@@ -18,9 +18,10 @@ import {
 
 interface Props {
   initialPersonaDocumentIds: readonly string[];
+  sharepointUrl: string;
 }
 
-export const PersonaDocuments: FC<Props> = ({ initialPersonaDocumentIds }) => {
+export const PersonaDocuments: FC<Props> = ({ initialPersonaDocumentIds, sharepointUrl }) => {
   const { data: session } = useSession();
   const [pickedFiles, setPickedFiles] = useState<DocumentMetadata[]>([]);
 
@@ -133,7 +134,7 @@ export const PersonaDocuments: FC<Props> = ({ initialPersonaDocumentIds }) => {
         </div>
         <SharePointFilePicker
           token={session?.user && 'accessToken' in session?.user ? session?.user?.accessToken as string : ""}
-          tenantUrl={process.env.NEXT_PUBLIC_SHAREPOINT_URL ?? ""}
+          sharepointUrl={sharepointUrl}
           onFilesSelected={fetchMetadataForDocuments}
         />
       </div>

@@ -23,9 +23,6 @@ jobs:
           node-version: "20.x"
 
       - name: ⚙️ npm install and build
-        env:
-            NEXT_PUBLIC_MAX_PERSONA_DOCUMENT_LIMIT: ${{ secrets.NEXT_PUBLIC_MAX_PERSONA_DOCUMENT_LIMIT }}
-            NEXT_PUBLIC_SHAREPOINT_URL: ${{ secrets.NEXT_PUBLIC_SHAREPOINT_URL }}
         run: |
           cd ./src
           npm install

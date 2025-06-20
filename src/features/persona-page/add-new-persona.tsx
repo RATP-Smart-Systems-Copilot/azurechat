@@ -35,7 +35,9 @@ import { AdvancedLoadingIndicator } from "../ui/advanced-loading-indicator";
 import { useResetableActionState } from "../common/hooks/useResetableActionState";
 import { TooltipProvider } from "@radix-ui/react-tooltip";
 
-interface Props {}
+interface Props {
+  sharepointUrl: string
+}
 
 export const AddNewPersona: FC<Props> = (props) => {
   const initialState: ServerActionResponse | undefined = undefined;
@@ -232,7 +234,7 @@ export const AddNewPersona: FC<Props> = (props) => {
                     );
                   })
                 )}
-                <PersonaDocuments initialPersonaDocumentIds={persona.personaDocumentIds || []}/>
+                <PersonaDocuments initialPersonaDocumentIds={persona.personaDocumentIds || []} sharepointUrl={props.sharepointUrl}/>
               </div>
           </div>
           </ScrollArea>

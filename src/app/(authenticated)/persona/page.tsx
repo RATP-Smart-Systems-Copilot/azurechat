@@ -12,6 +12,7 @@ export default async function Home() {
   const userId = await userHashedId();
   const userPersonas = personasResponse.response.filter(persona => persona.userId === userId);
   const sharedPersonas = personasResponse.response.filter(persona => persona.isPublished || (persona.sharedWith && persona.sharedWith.includes(userId)));
+  const sharepointUrl = process.env.NEXT_PUBLIC_SHAREPOINT_URL || "";
 
-  return <ChatPersonaPage personas={userPersonas} sharedPersonas={sharedPersonas} />;
+  return <ChatPersonaPage personas={userPersonas} sharedPersonas={sharedPersonas} sharepointUrl={sharepointUrl} />;
 }
