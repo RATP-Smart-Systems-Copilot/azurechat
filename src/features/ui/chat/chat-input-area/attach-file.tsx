@@ -1,4 +1,4 @@
-import { Edit } from "lucide-react";
+import { Paperclip } from "lucide-react";
 import { useRef } from "react";
 import { Button } from "../../button";
 
@@ -26,7 +26,7 @@ export const AttachFile = (props: {
   return (
     <>
       <Button size="icon" variant={"ghost"} onClick={handleClick} type="button" aria-label="Attach file to chat" className="p-1 cursor-pointer">
-        <Edit size={15} />
+        <Paperclip  size={16} />
       </Button>
       {/* This file input is hidden, and opens when the Button is clicked */}
       <input
