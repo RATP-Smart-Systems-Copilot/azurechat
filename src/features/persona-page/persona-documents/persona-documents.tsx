@@ -46,7 +46,6 @@ export const PersonaDocuments: FC<Props> = ({ initialPersonaDocumentIds, sharepo
     }
   };
 
-  // Ajoute des documents en évitant les doublons
   const addDocumentsWithMetadata = useCallback(
     async (documents: SharePointFile[]) => {
       if (!documents.length) return;
@@ -76,11 +75,27 @@ export const PersonaDocuments: FC<Props> = ({ initialPersonaDocumentIds, sharepo
         });
       }
 
-      // Filtrage des doublons par documentId
+      const newFiles = documents
+        .map((file) => {
+          const matchingDocument = response.response.successful.find(
+            (doc) => doc.documentId === file.documentId
+          );
+          return matchingDocument ? { ...matchingDocument, id: file.id } : null;
+        })
+        .filter(Boolean);
+
+      // Fusionne les anciens fichiers et les nouveaux, sans doublons
       setPickedFiles((prev) => {
-        const existingIds = new Set(prev.map((f) => f.documentId));
-        const newFiles = response.response.successful.filter((file) => !existingIds.has(file.documentId));
-        return [...prev, ...newFiles];
+        const filesMap = new Map();
+        // Ajoute les anciens fichiers
+        prev.forEach((file) => filesMap.set(file.documentId, file));
+        // Ajoute/écrase avec les nouveaux fichiers
+        newFiles.forEach((file) => {
+          if (file) {
+            filesMap.set(file.documentId, file);
+          }
+        });
+        return Array.from(filesMap.values());
       });
     },
     []
@@ -112,6 +127,7 @@ export const PersonaDocuments: FC<Props> = ({ initialPersonaDocumentIds, sharepo
       hasInitialized.current = true;
       fetchInitialDocuments();
     }
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [initialPersonaDocumentIds]);
 
@@ -146,7 +162,9 @@ export const PersonaDocuments: FC<Props> = ({ initialPersonaDocumentIds, sharepo
             {pickedFiles.map((file) => (
               <div
                 key={file.documentId}
-                className="flex items-center justify-between space-x-2 border rounded-md p-2 mb-2 border-input bg-background"
+                className={`flex items-center justify-between space-x-2 border rounded-md p-2 mb-2 border-input ${
+                  file.id ? 'bg-primary/50' : 'bg-background'
+                }`}
               >
                 <div>
                   <p>{file.name}</p>

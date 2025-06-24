@@ -30,14 +30,15 @@ type MessageAction = "deleteMessage";
 
 export const ChatPage: FC<ChatPageProps> = (props) => {
   const { data: session } = useSession();
+  const [localMessages, setLocalMessages] = useState(props.messages);
 
   useEffect(() => {
     chatStore.initChatSession({
       chatThread: props.chatThread,
-      messages: props.messages,
+      messages: localMessages,
       userName: session?.user?.name!,
     });
-  }, [props.messages, session?.user?.name, props.chatThread]);
+  }, [localMessages, session?.user?.name, props.chatThread]);
 
   const { messages, loading } = useChat();
   const [isLoading, setIsLoading] = useState(false);
@@ -46,8 +47,8 @@ export const ChatPage: FC<ChatPageProps> = (props) => {
     if (window.confirm("Êtes-vous sûr(e) de vouloir supprimer ce message ?")) {
       setIsLoading(true);
       await DeleteMessageByID(messageID, props.chatThread.id);
-      props.messages =  props.messages.filter(
-        (message) => message.id !== messageID
+       setLocalMessages((prevMessages) =>
+        prevMessages.filter((message) => message.id !== messageID)
       );
     }
     setIsLoading(false);

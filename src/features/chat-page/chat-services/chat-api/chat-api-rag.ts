@@ -26,10 +26,15 @@ export const ChatApiRAG = async (props: {
   const allowedPersonaDocumentIdsResponse =
     await AllowedPersonaDocumentIdsResponse((chatThread.documentIds || []));
 
-  let filter = `user eq '${await userHashedId()}' and chatThreadId eq '${chatThread.id}' or personaId eq '${chatThread.personaId}'
-   or ( (${allowedPersonaDocumentIdsResponse
+  let filter = `user eq '${await userHashedId()}' and chatThreadId eq '${chatThread.id}'`;
+  if(chatThread.personaId){
+    filter += ` or personaId eq '${chatThread.personaId}'`;
+  }
+  if(allowedPersonaDocumentIdsResponse.length > 0){
+    filter += ` or ( (${allowedPersonaDocumentIdsResponse
       .map((id) => `documentId eq '${id}'`)
       .join(" or ")}))`;
+  }
 
   const documentResponse = await SimilaritySearch(
     userMessage,

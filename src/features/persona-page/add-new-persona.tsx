@@ -125,16 +125,6 @@ export const AddNewPersona: FC<Props> = (props) => {
       <SheetContent className="min-w-[900px] sm:w-[700px] flex flex-col">
         <SheetHeader>
           <SheetTitle>Assistant IA</SheetTitle>
-          {state && state.status === "OK" ? null : (
-            <>
-              {state &&
-                state.errors.map((error, index) => (
-                  <div key={index} className="text-red-500">
-                    {error.message}
-                  </div>
-                ))}
-            </>
-          )}
         </SheetHeader>
         <TooltipProvider>
           <form action={submit} className="flex-1 flex flex-col">
@@ -254,6 +244,16 @@ export const AddNewPersona: FC<Props> = (props) => {
           </div>
         </form>
         </TooltipProvider>
+        {state && state.status === "OK" ? null : (
+            <>
+              {state &&
+                state.errors.map((error, index) => (
+                  <div key={index} className="text-red-500">
+                    {error.message}
+                  </div>
+                ))}
+            </>
+          )}
       </SheetContent>
     </Sheet>
   );
