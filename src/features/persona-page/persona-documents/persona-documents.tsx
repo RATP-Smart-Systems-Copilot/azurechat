@@ -46,6 +46,7 @@ export const PersonaDocuments: FC<Props> = ({ initialPersonaDocumentIds, sharepo
     }
   };
 
+
   const addDocumentsWithMetadata = useCallback(
     async (documents: SharePointFile[]) => {
       if (!documents.length) return;
