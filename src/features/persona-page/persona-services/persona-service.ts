@@ -224,7 +224,7 @@ export const UpsertPersona = async (
     if (personaResponse.status === "OK") {
       const { response: persona } = personaResponse;
       const user = await getCurrentUser();
-      let personaDocumentIds: string[] = sharePointFiles === undefined ? (personaInput.personaDocumentIds || []) : [];
+      let personaDocumentIds: string[] = (personaInput.personaDocumentIds || []);
       let personaDocumentIdsResponse = null;
 
       if(sharePointFiles !== undefined){

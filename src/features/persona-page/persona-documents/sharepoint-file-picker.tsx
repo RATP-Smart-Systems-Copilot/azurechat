@@ -214,7 +214,7 @@ export function SharePointFilePicker({
         selection: {
           mode: "multiple",
           enablePersistence: true,
-          maximumCount: process.env.NEXT_PUBLIC_MAX_PERSONA_DOCUMENT_LIMIT || 20,
+          maximumCount: 5,
         },
       };
 
